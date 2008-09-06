@@ -1,0 +1,24 @@
+Source: dwdiff
+Section: utils
+Priority: extra
+Maintainer: Olexandr Kravchuk <sashko.debian@gmail.com>
+Build-Depends: debhelper (>= 7), autotools-dev, libicu-dev
+Standards-Version: 3.8.0
+Homepage: http://os.ghalkes.nl/dwdiff.html
+
+Package: dwdiff
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: font-end fof the diff program that operates word by word
+ dwdiff is a front-end for the diff program that operates at the word level
+ instead of the line level. It is different from wdiff in that it allows the
+ user to specify what should be considered whitespace, and in that it takes an
+ optional list of characters that should be considered delimiters. Delimiters
+ are single characters that are treated as if they are words, even when there
+ is no whitespace separating them from preceding words or delimiters. dwdiff
+ is mostly commandline compatible with wdiff. Only the --autopager, --terminal
+ and --avoid-wraps options are not supported.
+ .
+ The default output from dwdiff is the new text, with the deleted and inserted
+ parts annotated with markers. Command line options are available to change
+ both what is printed, and the markers.

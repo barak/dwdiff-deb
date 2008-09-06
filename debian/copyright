@@ -1,0 +1,16 @@
+This package was debianized by Olexandr Kravchuk <sashko.debian@gmail.com> on
+Sat, 06 Sep 2008 20:34:47 +0300.
+
+It was downloaded from http://os.ghalkers.nl/
+
+Upstream Author: Gertjan Halkes <dwdiff@ghalkers.nl>
+
+This software is copyright (c) 2008 by Gertjan Halkes.
+
+You are free to distribute this software under the terms of
+the GNU General Public License  either version 3 of the License.
+On Debian systems, the complete text of the GNU General Public
+License can be found in the file `/usr/share/common-licenses/GPL-3'.
+
+The Debian packaging is (c) 2008, Olexandr Kravchuk <sashko.debian@gmail.com>
+and is licensed under the GPL, see above.

@@ -1,0 +1,6 @@
+dwdiff (1.4-1) unstable; urgency=low
+
+  * Initial release (Closes: #498270)
+
+ -- Olexandr Kravchuk <sashko.debian@gmail.com>  Sat, 06 Sep 2008 20:34:47 +0300
+

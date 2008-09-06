@@ -57,7 +57,7 @@ INSTALL=install
 
 # Miscelaneous install paths
 bindir=$(prefix)/bin
-docdir=$(prefix)/share/doc/dwdiff-1.4
+docdir=$(prefix)/share/doc/dwdiff
 mandir=$(prefix)/share/man
 
 all: dwdiff linguas
@@ -69,9 +69,11 @@ OBJECTS=$(CSOURCES:.c=.o)
 
 clean:
 	rm -rf src/*.o po/*.mo
+	rm -f config.log
+	rm -f Makefile
 
 dist-clean: clean
-	rm -rf dwdiff
+	rm dwdiff
 
 .c.o:
 	$(CC) $(CFLAGS) $(GETTEXTFLAGS) -DLOCALEDIR=\"$(LOCALEDIR)\" $(ICUFLAGS) -c -o $@ $<
@@ -90,7 +92,7 @@ dwdiff-install: dwdiff
 	$(INSTALL) -d "$(mandir)/man1"
 	$(INSTALL) -m 644 "man/dwdiff.1" "$(mandir)/man1"
 	$(INSTALL) -d "$(docdir)"
-	$(INSTALL) -m 644 README COPYING Changelog "$(docdir)"
+	$(INSTALL) -m 644 README "$(docdir)"
 
 # Work around empty LINGUAS list. Some shells don't like empty lists in for-loops
 lingua-install:
