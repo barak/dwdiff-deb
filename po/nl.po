@@ -1,11 +1,11 @@
 # Dutch translations for dwdiff package.
-# Copyright (C) 2006-2007 G.P. Halkes
+# Copyright (C) 2006-2010 G.P. Halkes
 # This file is distributed under the same license as the dwdiff package.
 # G.P. Halkes <dwdiff@ghalkes.nl>, 2007.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: dwdiff 1.4\n"
+"Project-Id-Version: dwdiff 1.8.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-06-16 14:58+0200\n"
 "PO-Revision-Date: 2006-07-23 11:53+0200\n"
@@ -14,6 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language-Team: nl"
 
 #: util.h:27
 #, c-format
@@ -54,11 +55,21 @@ msgstr "Fout bij het lezen van bestand %s: %s\n"
 msgid "Error writing to temporary file %s: %s\n"
 msgstr "Fout bij het schrijven naar tijdelijk bestand %s: %s\n"
 
+#: dwdiff.c:466
+#, c-format
+msgid "old: 0 words\n"
+msgstr "oud: 0 woorden\n"
+
 #: dwdiff.c:380
 #, c-format
 msgid "old: %d words  %d %d%% common  %d %d%% deleted  %d %d%% changed\n"
 msgstr ""
 "oud: %d woorden  %d %d%% gelijk  %d %d%% verwijderd  %d %d%% veranderd\n"
+
+#: dwdiff.c:475
+#, c-format
+msgid "new: 0 words\n"
+msgstr "nieuw: 0 woorden\n"
 
 #: dwdiff.c:385
 #, c-format
@@ -290,6 +301,19 @@ msgstr ""
 "toegevoegde\n"
 "                                       tekst te markeren\n"
 
+#: option.c:484
+msgid ""
+"-S[<marker>], --paragraph-separator[=<marker>]  Show inserted or deleted blocks\n"
+"                               of empty lines, optionally overriding the "
+"marker\n"
+msgstr ""
+"-S[<marker>], --paragraph-separator[=<marker>]  Toon toegevoegde of verwijderde\n"
+"                blokken van lege regels, optioneel met niet standaard markering\n"
+
+#: option.c:433
+msgid "--wdiff-output                         Produce wdiff compatible output\n"
+msgstr "--wdiff-output                         Maak wdiff gelijkende uitvoer\n"
+
 #: option.c:417
 #, c-format
 msgid "Usage: dwdiff [OPTIONS] <OLD FILE> <NEW FILE>\n"
@@ -301,10 +325,10 @@ msgstr "Gebruik: dwdiff [OPTIES] <OUD BESTAND> <NIEUW BESTAND>\n"
 #. - G.P. Halkes is name and should be left as is.
 #: option.c:429
 msgid ""
-"Copyright (C) 2006-2008 G.P. Halkes\n"
+"Copyright (C) 2006-2010 G.P. Halkes\n"
 "Licensed under the GNU General Public License version 3\n"
 msgstr ""
-"Copyright © 2006-2008 G.P. Halkes\n"
+"Copyright © 2006-2010 G.P. Halkes\n"
 "Gelicenseerd onder de GNU General Public License version 3\n"
 
 #: option.c:458
@@ -358,11 +382,6 @@ msgstr "Optie %.*s bestaat niet\n"
 msgid "Need two files to compare\n"
 msgstr "Er zijn twee bestanden nodig om te vergelijken\n"
 
-#: optionMacros.h:50
-#, c-format
-msgid "Option %.*s has zero length argument\n"
-msgstr "Optie %.*s heeft een argument met lengte nul\n"
-
 #: optionMacros.h:89
 #, c-format
 msgid "Option %.*s does not take an argument\n"
@@ -381,3 +400,80 @@ msgstr "Kon geen geheugen verkrijgen: %s\n"
 #: util.c:38
 msgid "Out of memory"
 msgstr "Onvoldoende geheugen beschikbaar"
+
+#. TRANSLATORS:
+#. The context meant here are words preceeding and succeeding each word in
+#. the text. By using these extra context words, frequently occuring words
+#. will be more likely to be matched to the corresponding word in the other
+#. text, thus giving a better result.
+#: option.c:430
+msgid ""
+"-m <num>, --match-context=<num>        Use <num> words of context for "
+"matching\n"
+msgstr ""
+"-m <num>, --match-context=<num>        Gebruik <num> woorden context voor "
+"vergelijking\n"
+
+#: option.c:431
+msgid ""
+"--aggregate-changes                    Allow close changes to aggregate\n"
+msgstr ""
+"--aggregate-changes                    Laat nabije veranderingen versmelten\n"
+
+#: optionMacros.h:177
+#, c-format
+msgid "Garbage after value for %.*s option\n"
+msgstr "Rommel na waarde voor %.*s optie\n"
+
+#: optionMacros.h:180
+#, c-format
+msgid "Value for %.*s option (%ld) is out of range\n"
+msgstr "Waarde voor %.*s option (%ld) is buiten toegestaan bereik\n"
+
+#: option.c:678
+msgid "The colors black through gray are also usable as background color\n"
+msgstr "De kleuren zwart tot en met grijs zijn ook bruikbaar als achtergrondkleur\n"
+
+#: dwfilter.c:44
+#, c-format
+msgid ""
+"Usage: dwfilter [OPTIONS] <OLD FILE> <NEW FILE> <POST PROCESSOR> [POST "
+"PROCESSOR OPTIONS]\n"
+msgstr "Gebruik: dwfilter [OPTIES] <OUD BESTAND> <NIEUW BESTAND> <NABEWERKER> [NABEWERKER OPTIES]\n"
+
+#: dwfilter.c:113
+msgid "No post processor specified\n"
+msgstr "Geen nabewerker gespecificeerd\n"
+
+#: dwfilter.c:145
+#, c-format
+msgid "Could not execute %s: %s\n"
+msgstr "Kon %s niet uitvoeren: %s\n"
+
+#: dwfilter.c:196
+msgid "dwdiff returned an error\n"
+msgstr "dwdiff gaf een fout terug\n"
+
+
+#: dwfilter.c:149
+#, c-format
+msgid "Error waiting for child process to terminate: %s\n"
+msgstr "Fout tijdens het wachten op afsluiten van kind proces: %s\n"
+
+#: optionMacros.h:295
+#, c-format
+msgid "Value for %.*s option (%s) is not a valid boolean value\n"
+msgstr "Waarde voor %.*s optie (%s) is geen geldige booleaanse waarde\n"
+
+#: optionDescriptions.h:56
+msgid  "-r, --reverse                          Format new as old\n"
+msgstr "-r, --reverse                          Formateer nieuw als oud\n"
+
+#: option.c:679
+#, c-format
+msgid "Error opening temporary output file: %s\n"
+msgstr "Fout bij het openen van het tijdelijke uitvoerbestand: %s\n"
+
+#: optionDescriptions.h:53
+msgid "-R, --repeat-markers                   Repeat markers at newlines\n"
+msgstr "-R, --repeat-markers                   Herhaal markeringen bij regeleindes\n"

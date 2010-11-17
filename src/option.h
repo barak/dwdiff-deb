@@ -1,4 +1,4 @@
-/* Copyright (C) 2008 G.P. Halkes
+/* Copyright (C) 2008-2010 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -58,6 +58,16 @@ struct {
 	int lineNumbers;
 	bool context;
 	int contextLines;
+	int matchContext;
+	bool aggregateChanges;
+	bool paraDelim;
+	const char *paraDelimMarker;
+	size_t paraDelimMarkerLength;
+	bool wdiffOutput;
+
+	FILE *output;
+	bool dwfilterMode;
+	bool repeatMarkers;
 } option;
 
 void parseCmdLine(int argc, char *argv[]);

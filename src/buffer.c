@@ -1,4 +1,4 @@
-/* Copyright (C) 2007 G.P. Halkes
+/* Copyright (C) 2007-2010 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -21,12 +21,6 @@
 #include "util.h"
 #include "option.h"
 
-typedef struct {
-	char *line;
-	size_t allocated;
-	size_t filled;
-} Context;
-
 typedef enum {
 	PRINTING_CHANGED,
 	PRINTING_AFTER_CONTEXT,
@@ -38,18 +32,28 @@ typedef enum {
 	BUFFERING_INITIAL
 } PrintState;
 
-#define INITIAL_BUFFER_SIZE 80
-
 static Context *contextBuffers;
 static PrintState state = PRE_BUFFERING_INITIAL;
 static int bufferIndex;
 static int afterContextLines;
 
+/** Initialize a single buffer.
+	@param buffer The buffer to initialize.
+*/
+void initBuffer(Context *buffer, size_t size) {
+	buffer->filled = 0;
+	buffer->flags = 0;
+	buffer->allocated = size;
+	errno = 0;
+	if ((buffer->line = malloc(size)) == NULL)
+		outOfMemory();
+}
+
 /** Ensure that a buffer has sufficient unused storage remaining.
 	@param buffer The context buffer to check.
 	@param required The number of bytes required in the buffer.
 */
-static void ensureBufferSpace(Context *buffer, size_t required) {
+void ensureBufferSpace(Context *buffer, size_t required) {
 	if (buffer->allocated - buffer->filled >= required)
 		return;
 
@@ -73,12 +77,8 @@ void initContextBuffers(void) {
 		outOfMemory();
 
 	contextBuffers[0].filled = 0;
-	for (i = 0; i <= option.contextLines; i++) {
-		contextBuffers[i].allocated = INITIAL_BUFFER_SIZE;
-		errno = 0;
-		if ((contextBuffers[i].line = malloc(INITIAL_BUFFER_SIZE)) == NULL)
-			outOfMemory();
-	}
+	for (i = 0; i <= option.contextLines; i++)
+		initBuffer(contextBuffers + i, INITIAL_BUFFER_SIZE);
 }
 
 /** Write a character, buffering if necessary.
@@ -87,10 +87,11 @@ void initContextBuffers(void) {
 		the old and the new file.
 */
 void addchar(char c, bool common) {
-	int i;
+	/* Using ignore variable to shut up gcc about the warn_unused_result attribute set on fwrite. */
+	int i, ignore;
 
 	if (!option.context) {
-		putchar(c);
+		putc(c, option.output);
 		return;
 	}
 
@@ -105,17 +106,17 @@ void addchar(char c, bool common) {
 			   However, the set of buffers is used as a ring buffer so first print all
 			   buffers after the current one, then print all buffers before the current. */
 			case BUFFERING:
-				fwrite("--\n", 1, 3, stdout);
+				ignore = fwrite("--\n", 1, 3, option.output);
 			case BUFFERING_INITIAL:
 				for (i = bufferIndex + 1; i <= option.contextLines; i++)
-					fwrite(contextBuffers[i].line, 1, contextBuffers[i].filled, stdout);
+					ignore = fwrite(contextBuffers[i].line, 1, contextBuffers[i].filled, option.output);
 				/* FALLTHROUGH */
 			/* In pre-buffering state, only the first buffers are used. Once we start
 			   wrapping around, we change state to a regular buffering state. */
 			case PRE_BUFFERING:
 			case PRE_BUFFERING_INITIAL:
 				for (i = 0; i <= bufferIndex; i++)
-					fwrite(contextBuffers[i].line, 1, contextBuffers[i].filled, stdout);
+					ignore = fwrite(contextBuffers[i].line, 1, contextBuffers[i].filled, option.output);
 				break;
 			default:
 				PANIC();
@@ -134,7 +135,7 @@ void addchar(char c, bool common) {
 			break;
 		case PRINTING_AFTER_CONTEXT:
 		case PRINTING_CHANGED:
-			putchar(c);
+			putc(c, option.output);
 			break;
 		default:
 			PANIC();
@@ -238,8 +239,10 @@ void printLineNumbers(int oldLineNumber, int newLineNumber) {
 	The string should not contain newline characters.
 */
 void writeString(const char *string, size_t bytes) {
+	/* Using ignore variable to shut up gcc about the warn_unused_result attribute set on fwrite. */
+	int ignore;
 	if (!option.context) {
-		fwrite(string, 1, bytes, stdout);
+		ignore = fwrite(string, 1, bytes, option.output);
 		return;
 	}
 
@@ -254,7 +257,7 @@ void writeString(const char *string, size_t bytes) {
 			break;
 		case PRINTING_AFTER_CONTEXT:
 		case PRINTING_CHANGED:
-			fwrite(string, 1, bytes, stdout);
+			ignore = fwrite(string, 1, bytes, option.output);
 			break;
 		default:
 			PANIC();

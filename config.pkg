@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2007 G.P. Halkes
+# Copyright (C) 2006-2010 G.P. Halkes
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation.
@@ -12,7 +12,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-SWITCHES="+gettext +unicode"
+SWITCHES="+gettext +unicode +dwfilter"
 OPTIONS="localedir diff icu-config"
 
 COMPILERULE='$(CC) $(CFLAGS) $(GETTEXTFLAGS) $(ICUFLAGS) -c -o $@ $<'
@@ -23,16 +23,16 @@ USERRULES='.SUFFIXES: .mo .po
 	msgfmt -o $@ $<
 '
 
-TEST_INSTALL="install ./install.sh"
+TEST_INSTALL="install $PWD/install.sh"
 
-DEFAULT_LINGUAS="de nl"
+DEFAULT_LINGUAS="de fr nl ru "
 [ -f config.pkg.langpack ] && . config.pkg.langpack
 
 USER_HELP="  --without-gettext  Disable gettext translations
   --without-unicode  Disable Unicode support
   --icu-config=<path>  Path to icu-config script
   --localedir=<dir>  Installation directory for locales [prefix/share/locale]
-  --diff=<diff>      The diff program to use.
+  --diff=<diff>      The diff program to use
 
 Environment variables:
   LINGUAS            List of languages to install. Available languages are:
@@ -155,6 +155,30 @@ EOF
 		exit 1
 	}
 
+	if [ "yes" = "${with_dwfilter}" ] ; then
+		cat > .config.c <<EOF
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+	pid_t pid = fork();
+	execvp("test", NULL);
+}
+EOF
+		clean .config.o
+
+		test_link "required functions for dwfilter" || {
+			checkfunction "fork" 'pid_t pid = fork();' "<unistd.h>"
+			checkfunction "open" 'execvp("test", NULL);' "<unistd.h>"
+			check_message_result "!! A required function for dwfilter is not availabe. Try configuring with --without-dwfilter"
+			exit 1
+		}
+		DWFILTER="DWFILTER=yes"
+	else
+		DWFILTER="DWFILTER="
+	fi
+
+	checkfunction "strdup" "strdup(\"foo\");" "<string.h>" || CFLAGS="${CFLAGS} -DNO_STRDUP"
+
 	if [ "yes" = "${with_gettext}" ] || [ "yes" = "${with_unicode}" ] ; then
 		checkfunction "setlocale" "setlocale(LC_ALL, \"\");" "<locale.h>" || {
 			check_message_result "!! Gettext and Unicode support unavailable. Try configuring with --without-gettext --without-unicode"
@@ -224,6 +248,13 @@ EOF
 		{
 			{
 				check_message "Checking for icu-config... "
+				echo "Running which ${ICU_CONFIG} >/dev/null" >> config.log
+				if not which "${ICU_CONFIG}" >/dev/null ; then
+					check_message_result "no"
+					check_message_result "!! Could not find icu-config. Ensure that you have installed the development files for libicu, or try configuring with --without-unicode"
+					exit 1
+				fi
+
 				echo "Running ${ICU_CONFIG} --cppflags --ldflags" >> config.log
 				if "${ICU_CONFIG}" --cppflags --ldflags 2>&1 > /dev/null ; then
 					check_message_result "yes"
@@ -234,8 +265,8 @@ EOF
 				fi
 			} && {
 				check_message "Checking ICU version >= 3.4... "
-				echo "Running icu-config --version" >> config.log
-				ICUVERSION="`icu-config --version`"
+				echo "Running ${ICU_CONFIG} --version" >> config.log
+				ICUVERSION="`\"${ICU_CONFIG}\" --version`"
 				ICUMAJOR="`echo \"${ICUVERSION}\" | sed 's/\..*//'`"
 				ICUMINOR="`echo \"${ICUVERSION}\" | sed -e 's/^[^.]*\.//' -e 's/[^0-9]*$//'`"
 				if expr 3 \< "${ICUMAJOR}" \| \( 3 = "${ICUMAJOR}" \& 4 \<= "${ICUMINOR}" \) >/dev/null ; then
@@ -276,12 +307,10 @@ EOF
 		ICULIBS="\`\"${ICU_CONFIG}\" --ldflags\`"
 		if checkfunction "nl_langinfo" "nl_langinfo(CODESET);" "<langinfo.h>" ; then
 			ICUFLAGS="${ICUFLAGS} -DUSE_NL_LANGINFO"
-		elif not checkfunction "strdup" "strdup(\"foo\");" "<string.h>" ; then
-			ICUFLAGS="${ICUFLAGS} -DNO_STRDUP"
 		fi
 	fi
 
-	create_makefile "GETTEXTFLAGS=${GETTEXTFLAGS}" "GETTEXTLIBS=${GETTEXTLIBS}" "LINGUAS=${linguas}" "DIFF=${DIFF}" "DIFF_FLAGS=${DIFF_FLAGS}" ${option_localedir:+"LOCALEDIR=${option_localedir}"} "ICUFLAGS=${ICUFLAGS}" "ICULIBS=${ICULIBS}"
+	create_makefile "GETTEXTFLAGS=${GETTEXTFLAGS}" "GETTEXTLIBS=${GETTEXTLIBS}" "LINGUAS=${linguas}" "DIFF=${DIFF}" "DIFF_FLAGS=${DIFF_FLAGS}" ${option_localedir:+"LOCALEDIR=${option_localedir}"} "ICUFLAGS=${ICUFLAGS}" "ICULIBS=${ICULIBS}" $DWFILTER
 }
 
 sed_lines() {

@@ -1,3 +1,17 @@
+dwdiff (1.8.2-0.1) unstable; urgency=low
+
+  * NMU
+  * New upstream release.  closes: #602844.
+    - fixes mishandling of UTF-8 with dwdiff -p.  closes: #574931.
+    - fixes man page typos.  closes: #504540.
+    - no longer segfaults when second argument is stdin.
+      closes: #603745.
+  * Patch from Charlie Smotherman to fix typos in short description.
+    closes: #503666.
+  * Bump to Standards-Version 3.9.1.
+
+ -- Clint Adams <clint@gnu.org>  Tue, 16 Nov 2010 20:25:03 -0500
+
 dwdiff (1.4-1) unstable; urgency=low
 
   * Initial release (Closes: #498270)
