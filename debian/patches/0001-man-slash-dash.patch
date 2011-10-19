@@ -1,0 +1,37 @@
+From: "Barak A. Pearlmutter" <barak+git@cs.nuim.ie>
+Date: Wed, 19 Oct 2011 17:05:46 +0100
+Subject: man slash dash
+
+fix option slash dash in man page (thanks alot, lintian)
+---
+ man/dwdiff.1    |    2 +-
+ man/nl/dwdiff.1 |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/man/dwdiff.1 b/man/dwdiff.1
+index 1bd3891..ce655b8 100644
+--- a/man/dwdiff.1
++++ b/man/dwdiff.1
+@@ -54,7 +54,7 @@ characters depends on the current locale.
+ Specify a list of characters to be used as whitespace.
+ .IP "\fB\-\-diff\-input\fP"
+ Interpret the input as the output from \fBdiff\fP in the Unified Diff format
+-(usually produced by \fBdiff -u\fP). In this case only one input file is
++(usually produced by \fBdiff \-u\fP). In this case only one input file is
+ allowed. This option allows reformating diff output with \fBdwdiff\fP, and is
+ useful for example to post-process the output of \fBsvn diff\fP.
+ .IP "\fB\-1\fP, \fB\-\-no\-deleted\fP"
+diff --git a/man/nl/dwdiff.1 b/man/nl/dwdiff.1
+index d718fb0..063956a 100644
+--- a/man/nl/dwdiff.1
++++ b/man/nl/dwdiff.1
+@@ -54,7 +54,7 @@ locale-afhankelijk.
+ Specificeer de lijst van witruimte karakters.
+ .IP "\fB\-\-diff\-input\fP"
+ Interpreteer de invoer als de uitvoer van \fBdiff\fP in het Unified Diff
+-formaat (meestal geproduceerd door \fBdiff -u\fP). In dit geval is er maar één
++formaat (meestal geproduceerd door \fBdiff \-u\fP). In dit geval is er maar één
+ invoerbestand toegestaan. Deze optie maakt het mogelijk om de diff uitvoer
+ te herformateren met \fBdwdiff\fP, en is bijvoorbeeld nuttig om de uitvoer van
+ \fBsvn diff\fP na te bewerken.
+-- 
