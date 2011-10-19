@@ -1,4 +1,4 @@
-/* Copyright (C) 2008 G.P. Halkes
+/* Copyright (C) 2008-2010 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -38,11 +38,11 @@ static int ungetCharFile(Stream *stream, int c) {
 	return fileUngetc(stream->data.file, c);
 }
 
-VTable FileVtable = { getCharFile, ungetCharFile };
+static StreamVtable fileVtable = { getCharFile, ungetCharFile };
 
-/** Create a new @a FILE based stream.
-    @param file The @a FILE to wrap.
-    @return a new @a Stream wrapping the supplied @a FILE object.
+/** Create a new @a File based stream.
+    @param file The @a File to wrap.
+    @return a new @a Stream wrapping the supplied @a File object.
 */
 Stream *newFileStream(File *file) {
 	Stream *retval;
@@ -53,7 +53,7 @@ Stream *newFileStream(File *file) {
 	if ((retval = malloc(sizeof(Stream))) == NULL)
 		outOfMemory();
 
-	retval->vtable = &FileVtable;
+	retval->vtable = &fileVtable;
 	retval->data.file = file;
 
 	initStreamDefault(retval);
@@ -76,7 +76,7 @@ static int ungetCharString(Stream *stream, int c) {
 	}
 }
 
-VTable StringVtable = { getCharString, ungetCharString };
+static StreamVtable stringVtable = { getCharString, ungetCharString };
 
 /** Create a new string based stream.
     @param string The string to wrap.
@@ -88,7 +88,7 @@ Stream *newStringStream(const char *string, size_t length) {
 	if ((retval = malloc(sizeof(Stream))) == NULL)
 		outOfMemory();
 
-	retval->vtable = &StringVtable;
+	retval->vtable = &stringVtable;
 	retval->data.string.string = string;
 	retval->data.string.index = 0;
 	retval->data.string.length = length;
@@ -98,3 +98,6 @@ Stream *newStringStream(const char *string, size_t length) {
 	return retval;
 }
 
+bool isFileStream(const Stream *stream) {
+	return stream->vtable == &fileVtable;
+}

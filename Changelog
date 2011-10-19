@@ -1,3 +1,87 @@
+Version 1.8.2:
+    New features:
+    - when parsing options, \e is understood to mean the escape character
+
+    Bug fixes:
+    - the -p and -l options did not correctly handle UTF-8 characters.
+
+Version 1.8.1:
+    New features:
+    - the context matching now decreases the matched context size exponentially,
+      instead of immediately using the context-less mode if the changes found
+      with context need refining. This results in more intuitive output when
+      increasing the matching context size.
+
+Version 1.8:
+    New features:
+    - added an option to repeat the begin and end markers at the start and end
+      of line if a change crosses a newline
+
+    Bug fixes:
+    - newline characters in the delimiter set where handled incorrectly in
+      UTF-8 mode
+
+Version 1.7:
+    New features:
+    - added dwfilter program which reformats the old text such that it matches
+      the new text to allow other programs such as visual diff tools to show
+      the differences better. dwfilter can also be used to generate regular
+      diffs to patch the old text by reformating the new text as the old text
+      before executing diff [with caveats].
+
+    Bug fixes:
+    - \u and \U escapes were parsed incorrectly
+    - dwdiff crashed when generating statistics for empty files
+
+Version 1.6.1:
+    Bug fixes:
+    - the line clearing implemented for better background color handling caused
+      (parts of) lines to disappear in the output with cr/nl line endings
+    - the new paragraph separators were not handled correctly with the context
+      matching feature, causing crashes
+
+Version 1.6:
+    New features:
+    - the output for deleted text was changed such that the whitespace following
+      the deletion is now the whitespace that followed the deleted text, rather
+      than the whitespace that is now before the next word in the new file
+    - the output for changed text was changed in the case that the whitespace
+      before the old text contains a newline. In this case, depending on whether
+      the whitespace before the new text contains a newline, the new file's
+      whitespace is replaced by a single space or the new text is printed first
+    - the --wdiff-output option was added to revert to the old output mode
+    - the color specification now also allows specification of the background
+      color and custom escape sequences
+    - a new option to add markers for deleted or inserted blocks of lines
+      containing only whitespace (paragraph separators)
+
+    Bug fixes:
+    - octal escapes are now properly parsed
+    - icu-config was called directly rather than through $ICU_CONFIG in the
+      configure script, which prevented proper operation of the --icu-config
+      option
+    - compilation on systems without nl_langinfo was fixed
+
+Version 1.5.2
+    New features:
+    - better option parsing, which allows short options to be grouped. For
+      example -iPc instead of -i -P -c
+
+    Bug fixes:
+    - compatibility fixes to configure script
+
+Version 1.5.1:
+    Bug fixes:
+    - Statistics are now printed to stderr instead of stdout such that the only
+      thing printed on stdout is the text
+    - Repaired code for diff programs that do not support -a option
+    - Fixed Makefile to pass settings for diff program to C compiler
+
+Version 1.5:
+    New features:
+    - added match context which ensures better results for large edits with
+      frequently occuring words
+
 Version 1.4:
     New features:
     - an option to use all punctuation characters as delimiters

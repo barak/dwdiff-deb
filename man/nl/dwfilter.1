@@ -1,0 +1,93 @@
+.\" Copyright (C) 2010 G.P. Halkes
+.\" This program is free software: you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License version 3, as
+.\" published by the Free Software Foundation.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program.  If not, see <http://www.gnu.org/licenses/>.
+.TH "dwfilter" "1" "27-07-2010" "Version 1.8.2" "reformat text for processing"
+.hw /usr/share/doc/dwdiff-1.8.2 http://os.ghalkes.nl/dwdiff
+
+.SH NAAM
+
+\fBdwfilter\fP \- herformateer tekst met dwdiff voor verdere verwerking
+.SH OVERZICHT
+
+\fBdwfilter\fP [\fIOPTIES\fP] <\fIOUD BESTAND\fP> <\fINIEUW BESTAND\fP> <\fINABEWERKER\fP> [\fINABEWERKER OPTIES\fP]
+.SH BESCHRIJVING
+
+\fBdwfilter\fP herformateert de tekst in het oude bestand volgens de inhoud
+van het nieuwe bestand (of vice versa) en geeft vervolgens het geherformateerde
+oude bestand en het nieuwe bestand aan een volgend filter. De belangrijkste
+functie is het mogelijk maken om programma's als \fBmeld\fP and \fBkdiff3\fP
+te gebruiken, zelfs als een bestand geherformateerd is na bewerking. Een
+verdere functie is het maken van kleine verschil bestanden zelfs als het nieuwe
+bestand geherformateerd is.
+
+.SH OPTIES
+
+.IP "\fB\-r\fP, \fB\-\-reverse\fP"
+Herformateer het nieuwe bestand volgens de inhoud van het oude bestand in
+plaats van de standaard operatie waarbij het oude bestand wordt geherformateerd
+volgens de inhoud van het nieuwe bestand.
+.PP
+\fBdwfilter\fP accepteerd de volgende \fBdwdiff\fP opties:
+
+.PP
+\fB\-d\fP <\fIdelimiters\fP>, \fB\-\-delimiters\fP=<\fIdelimiters\fP>
+.br
+\fB\-P\fP, \fB\-\-punctuation\fP>
+.br
+\fB\-W\fP <\fIwhitespace\fP>, \fB\-\-whitespace\fP=<\fIwhitespace\fP>
+.br
+\fB\-i\fP, \fB\-\-ignore\-case\fP
+.br
+\fB\-I\fP, \fB\-\-ignore\-formatting\fP
+.br
+\fB-D\fP <\fIoption\fP>, \fB\-\-diff\-option\fP=<\fIoption\fP>
+.br
+\fB-C\fP<\fInum\fP>, \fB\-\-context\fP=<\fInum\fP>
+.br
+\fB\-m\fP<\fInum\fP>, \fB\-\-match\-context\fP=<\fInum\fP>
+.br
+\fB\-\-aggregate\-changes\fP
+.br
+\fB\-\-wdiff\-output
+.PP
+Zie de \fBdwdiff\fP handleiding voor de betekenis.
+
+
+Een enkel minteken (\-) als bestandsnaam kan worden gebruikt om aan te geven
+dat de tekst van de standaard invoer moet worden gelezen. Slechts één bestand
+kan van standaard invoer worden gelezen. Om te voorkomen dat \fBdwfilter\fP een
+bestandsnaam die begint met een minteken interpreteert als een optie kan een
+dubbel minteken (\-\-) opgegeven worden, waarna \fBdwfilter\fP alle volgende
+argumenten als bestandsnamen zal interpreteren.
+
+.SH BUGS
+
+Als u denkt een bug gevonden te hebben, controleer dan dat u de nieuwste versie
+van \fBdwdiff\fP [http://os.ghalkes.nl/dwdiff] gebruikt. Als u een bug wil
+rapporteren, voeg dan een minimaal voorbeeld dat het probleem demonstreert toe
+aan uw melding.
+
+.SH AUTEUR
+
+G.P. Halkes <dwdiff@ghalkes.nl>
+.SH COPYRIGHT
+
+Copyright \(co 2006-2010 G.P. Halkes
+.br
+dwdiff is gelicenseerd onder de GNU General Public License version 3.
+.br
+Voor meer informatie over de licentie, zie het bestand COPYING in de
+documentatie map. Op Un*x systemen is dit meestal
+/usr/share/doc/dwdiff-1.8.2.
+.SH ZIE OOK
+
+\fBdwdiff\fP(1), \fBdiff\fP(1), \fBmeld\fP(1), \fBkdiff3\fP(1)

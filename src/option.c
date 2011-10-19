@@ -1,4 +1,4 @@
-/* Copyright (C) 2006-2008 G.P. Halkes
+/* Copyright (C) 2006-2010 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -24,32 +24,34 @@
 #include "buffer.h"
 #include "dispatch.h"
 
-#define VERSION_STRING "1.4"
+#define DWDIFF_COMPILE
+#include "optionDescriptions.h"
 
 typedef struct {
 	const char *name;
 	const char *description;
 	const char *sequence;
+	const char *backgroundSequence;
 } Color;
 
 Color colors[] = {
-	{ "black", N_("Black"), "\033[0;30m" },
-	{ "red", N_("Red"), "\033[0;31m" },
-	{ "green", N_("Green"), "\033[0;32m" },
-	{ "brown", N_("Brown"), "\033[0;33m" },
-	{ "blue", N_("Blue"), "\033[0;34m" },
-	{ "magenta", N_("Magenta"), "\033[0;35m" },
-	{ "cyan", N_("Cyan"), "\033[0;36m" },
-	{ "gray", N_("Gray"), "\033[0;37m" },
-	{ "dgray", N_("Dark gray"), "\033[0;30;1m" },
-	{ "bred", N_("Bright red"), "\033[0;31;1m" },
-	{ "bgreen", N_("Bright green"), "\033[0;32;1m" },
-	{ "yellow", N_("Yellow"), "\033[0;33;1m" },
-	{ "bblue", N_("Bright blue"), "\033[0;34;1m" },
-	{ "bmagenta", N_("Bright magenta"), "\033[0;35;1m" },
-	{ "bcyan", N_("Bright cyan"), "\033[0;36;1m" },
-	{ "white", N_("White"), "\033[0;37;1m" },
-	{ NULL, NULL, NULL}
+	{ "black", N_("Black"), "30", "40" },
+	{ "red", N_("Red"), "31", "41" },
+	{ "green", N_("Green"), "32", "42" },
+	{ "brown", N_("Brown"), "33", "43" },
+	{ "blue", N_("Blue"), "34", "44" },
+	{ "magenta", N_("Magenta"), "35", "45" },
+	{ "cyan", N_("Cyan"), "36", "46" },
+	{ "gray", N_("Gray"), "37", "47" },
+	{ "dgray", N_("Dark gray"), "30;1", NULL },
+	{ "bred", N_("Bright red"), "31;1", NULL },
+	{ "bgreen", N_("Bright green"), "32;1", NULL },
+	{ "yellow", N_("Yellow"), "33;1", NULL },
+	{ "bblue", N_("Bright blue"), "34;1", NULL },
+	{ "bmagenta", N_("Bright magenta"), "35;1", NULL },
+	{ "bcyan", N_("Bright cyan"), "36;1", NULL },
+	{ "white", N_("White"), "37;1", NULL },
+	{ NULL, NULL, NULL, NULL }
 };
 
 /** Compare two strings, ignoring case.
@@ -119,6 +121,9 @@ static size_t parseEscapes(char *string, const char *descr) {
 				case '"':
 					string[writePosition++] = '"';
 					break;
+				case 'e':
+					string[writePosition++] = '\033';
+					break;
 				case 'x': {
 					/* Hexadecimal escapes */
 					unsigned int value = 0;
@@ -146,10 +151,16 @@ static size_t parseEscapes(char *string, const char *descr) {
 				}
 				case '0':
 				case '1':
-				case '2': {
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				case '6':
+				case '7': {
 					/* Octal escapes */
 					int value = (int)(string[readPosition - 1] - '0');
-					for (i = 0; i < 2 && readPosition + i < maxReadPosition && string[readPosition + i] >= '0' && string[readPosition + i] <= '7'; i++)
+					size_t maxIdx = string[readPosition - 1] < '4' ? 2 : 1;
+					for (i = 0; i < maxIdx && readPosition + i < maxReadPosition && string[readPosition + i] >= '0' && string[readPosition + i] <= '7'; i++)
 						value = value * 8 + (int)(string[readPosition + i] - '0');
 
 					readPosition += i;
@@ -194,6 +205,7 @@ static size_t parseEscapes(char *string, const char *descr) {
 					/* The conversion won't overwrite subsequent characters because
 					   \uxxxx is already the as long as the max utf-8 length */
 					writePosition += convertToUTF8(value, string + writePosition);
+					readPosition += chars;
 					break;
 				}
 #endif
@@ -350,6 +362,7 @@ void checkOverlapUTF8(void) {
 	if (!option.whitespaceSet)
 		return;
 
+	/* Check for overlap can be done in O(N) because the lists have already been sorted in postProcessOptionsUTF8. */
 	for (i = 0, j = 0; i < option.delimiterList.used; i++) {
 		for (; j < option.whitespaceList.used && compareUTF16Buffer(&option.delimiterList.list[i], &option.whitespaceList.list[j]) > 0; j++) /* NO-OP */;
 
@@ -382,6 +395,11 @@ void initOptionsUTF8(void) {
 }
 
 void postProcessOptionsUTF8(void) {
+	UTF16Buffer newline;
+	UChar newlineData[1] = { '\n' };
+	newline.data = newlineData;
+	newline.length = 1;
+
 	qsort(option.delimiterList.list, option.delimiterList.used,	sizeof(UTF16Buffer),
 		(int (*)(const void *, const void *)) compareUTF16Buffer);
 
@@ -392,12 +410,13 @@ void postProcessOptionsUTF8(void) {
 	   followed by something else). If that is not the case, the input needs to be
 	   transliterated. */
 	if (option.whitespaceSet) {
-		UTF16Buffer newline;
-		UChar newlineData[1] = { '\n' };
-		newline.data = newlineData;
-		newline.length = 1;
 		if (bsearch(&newline, option.whitespaceList.list, option.whitespaceList.used,
 				sizeof(UTF16Buffer), (int (*)(const void *, const void *)) compareUTF16Buffer) == NULL) {
+			option.transliterate = true;
+		}
+	} else {
+		if (bsearch(&newline, option.delimiterList.list, option.delimiterList.used,
+				sizeof(UTF16Buffer), (int (*)(const void *, const void *)) compareUTF16Buffer) != NULL) {
 			option.transliterate = true;
 		}
 	}
@@ -405,47 +424,75 @@ void postProcessOptionsUTF8(void) {
 /*===============================================================*/
 #endif
 
-const char *descriptions[] = {
-/* Options showing info about the program */
-N_("-h, --help                             Print this help message\n"),
-N_("-v, --version                          Print version and copyright information\n"),
+#define SEQUENCE_BUFFER_LEN 20
+static char *parseColor(const char *_color) {
+	char sequenceBuffer[SEQUENCE_BUFFER_LEN];
+	char *colon, *color;
+	int i, fg = -1, bg = -1;
 
-/* Options changing what is considered (non-)whitespace */
-N_("-d <delim>, --delimiters=<delim>       Specifiy delimiters\n"),
-N_("-P, --punctuation                      Use punctuation characters as delimiters\n"),
-N_("-W <ws>, --white-space=<ws>            Specify whitespace characters\n"),
+	color = strdupA(_color);
 
-/* Options changing what is output */
-N_("-1, --no-deleted                       Do not print deleted words\n"),
-N_("-2, --no-inserted                      Do not print inserted words\n"),
-N_("-3, --no-common                        Do not print common words\n"),
-N_("-L[<width>], --line-numbers[<width>]   Prepend line numbers\n"),
-N_("-C<num>, --context=<num>               Show <num> lines of context\n"),
-N_("-s, --statistics                       Print statistics when done\n"),
+	if (strncmp("e:", color, 2) == 0) {
+		/* Custom color string */
+		parseEscapes(color + 2, "color");
+		memmove(color, color + 2, strlen(color) + 1);
+		return color;
+	}
 
-/* Options changing the matching */
-N_("-i, --ignore-case                      Ignore differences in case\n"),
-N_("-I, --ignore-formatting                Ignore formatting differences\n"),
-N_("-D <option>, --diff-option=<option>    Add <option> to the diff command-line\n"),
+	colon = strchr(color, ':');
 
+	if (colon != NULL && strrchr(color, ':') != colon)
+		fatal(_("Invalid color specification %s\n"), color);
 
-/* Options changing the appearence of the output */
-N_("-c[<spec>], --color[=<spec>]           Color mode\n"),
-N_("-l, --less-mode                        As -p but also overstrike whitespace\n"),
-N_("-p, --printer                          Use overstriking and bold text\n"),
-N_("-w <string>, --start-delete=<string>   String to mark begin of deleted text\n"),
-N_("-x <string>, --stop-delete=<string>    String to mark end of deleted text\n"),
-N_("-y <string>, --start-insert=<string>   String to mark begin of inserted text\n"),
-N_("-z <string>, --stop-insert=<string>    String to mark end of inserted text\n"),
+	if (colon != NULL)
+		*colon++ = 0;
 
-NULL};
+	if (*color != 0) {
+		for (i = 0; colors[i].name != NULL; i++) {
+			if (strCaseCmp(color, colors[i].name) == 0) {
+				fg = i;
+				break;
+			}
+		}
+		if (colors[i].name == NULL)
+			fatal(_("Invalid color %s\n"), color);
+	}
+
+	if (colon != NULL) {
+		if (*colon != 0) {
+			for (i = 0; colors[i].backgroundSequence != NULL; i++) {
+				if (strCaseCmp(colon, colors[i].name) == 0) {
+					bg = i;
+					break;
+				}
+			}
+			if (colors[i].backgroundSequence == NULL)
+				fatal(_("Invalid color %s\n"), colon);
+		}
+	}
+
+	if (fg >= 0) {
+		if (bg >= 0)
+			snprintf(sequenceBuffer, SEQUENCE_BUFFER_LEN, "\033[0;%s;%sm", colors[fg].sequence, colors[bg].backgroundSequence);
+		else
+			snprintf(sequenceBuffer, SEQUENCE_BUFFER_LEN, "\033[0;%sm", colors[fg].sequence);
+	} else {
+		if (bg >= 0)
+			snprintf(sequenceBuffer, SEQUENCE_BUFFER_LEN, "\033[0%sm", colors[bg].backgroundSequence);
+	}
+	free(color);
+	return strdupA(sequenceBuffer);
+}
 
 PARSE_FUNCTION(parseCmdLine)
-
+	char *comma;
 	int noOptionCount = 0;
+
 	/* Initialise options to correct values */
 	memset(&option, 0, sizeof(option));
 	option.printDeleted = option.printAdded = option.printCommon = true;
+	option.matchContext = 2;
+	option.output = stdout;
 
 	initOptions();
 	ONLY_UNICODE(option.decomposition = UNORM_NFD;)
@@ -454,6 +501,9 @@ PARSE_FUNCTION(parseCmdLine)
 #ifdef NO_MINUS_A
 	option.transliterate = true;
 #endif
+
+	option.paraDelimMarker = "<-->";
+	option.paraDelimMarkerLength = strlen(option.paraDelimMarker);
 
 	OPTIONS
 		OPTION('d', "delimiters", REQUIRED_ARG)
@@ -482,7 +532,7 @@ PARSE_FUNCTION(parseCmdLine)
 				   - If the (C) symbol (that is the c in a circle) is not available,
 					 leave as it as is. (Unicode code point 0x00A9)
 				   - G.P. Halkes is name and should be left as is. */
-				_("Copyright (C) 2006-2008 G.P. Halkes\nLicensed under the GNU General Public License version 3\n"), stdout);
+				_("Copyright (C) 2006-2010 G.P. Halkes\nLicensed under the GNU General Public License version 3\n"), stdout);
 			exit(EXIT_SUCCESS);
 		END_OPTION
 		OPTION('1', "no-deleted", NO_ARG)
@@ -511,17 +561,17 @@ PARSE_FUNCTION(parseCmdLine)
 			if (UTF8Mode)
 				option.decomposition = UNORM_NFKD;
 			else
-				fatal(_("Option %.*s is only supported for UTF-8 mode\n"), (int) optlength, CURRENT_OPTION);
+				fatal(_("Option %.*s is only supported for UTF-8 mode\n"), OPTPRARG);
 #else
 		OPTION('I', "ignore-formatting", NO_ARG)
-			fatal(_("Support for option %.*s is not compiled into this version of dwdiff\n"), (int) optlength, CURRENT_OPTION);
+			fatal(_("Support for option %.*s is not compiled into this version of dwdiff\n"), OPTPRARG);
 #endif
 		END_OPTION
 		OPTION('s', "statistics", NO_ARG)
 			option.statistics = true;
 		END_OPTION
 		OPTION('a', "autopager", NO_ARG)
-			fatal(_("Option %.*s is not supported\n"), (int) optlength, CURRENT_OPTION);
+			fatal(_("Option %.*s is not supported\n"), OPTPRARG);
 		END_OPTION
 		OPTION('p', "printer", NO_ARG)
 			option.printer = true;
@@ -532,7 +582,7 @@ PARSE_FUNCTION(parseCmdLine)
 			noDefaultMarkers();
 		END_OPTION
 		OPTION('t', "terminal", NO_ARG)
-			fatal(_("Option %.*s is not supported\n"), (int) optlength, CURRENT_OPTION);
+			fatal(_("Option %.*s is not supported\n"), OPTPRARG);
 		END_OPTION
 		OPTION('w', "start-delete", REQUIRED_ARG)
 			option.delStartLen = parseEscapes(optArg, "start-delete");
@@ -551,7 +601,7 @@ PARSE_FUNCTION(parseCmdLine)
 			option.addStop = optArg;
 		END_OPTION
 		OPTION('n', "avoid-wraps", NO_ARG)
-			fatal(_("Option %.*s is not supported\n"), (int) optlength, CURRENT_OPTION);
+			fatal(_("Option %.*s is not supported\n"), OPTPRARG);
 		END_OPTION
 		SINGLE_DASH
 			switch (noOptionCount++) {
@@ -568,20 +618,7 @@ PARSE_FUNCTION(parseCmdLine)
 			}
 		END_OPTION
 		DOUBLE_DASH
-			/* Read all further options as file names, and stop processing*/
-			for (optInd++; optInd < argc; optInd++) {
-				switch (noOptionCount++) {
-					case 0:
-						option.oldFile.name = CURRENT_OPTION;
-						break;
-					case 1:
-						option.newFile.name = CURRENT_OPTION;
-						break;
-					default:
-						fatal(_("Too many files to compare\n"));
-				}
-			}
-			break;
+			NO_MORE_OPTIONS;
 		END_OPTION
 		OPTION('D', "diff-option", REQUIRED_ARG)
 			option.diffOption = optArg;
@@ -589,7 +626,6 @@ PARSE_FUNCTION(parseCmdLine)
 		OPTION('c', "color", OPTIONAL_ARG)
 			option.colorMode = true;
 			if (optArg != NULL) {
-				char *comma;
 				int i;
 
 				if (strCaseCmp(optArg, "list") == 0) {
@@ -601,7 +637,8 @@ PARSE_FUNCTION(parseCmdLine)
 					fputs("--              --\n", stdout);
 					for (i = 0; colors[i].name != NULL; i++)
 						printf("%-15s %s\n", colors[i].name, _(colors[i].description));
-
+					fputc('\n', stdout);
+					fputs(_("The colors black through gray are also usable as background color\n"), stdout);
 					exit(EXIT_SUCCESS);
 				}
 
@@ -612,34 +649,11 @@ PARSE_FUNCTION(parseCmdLine)
 				if (comma != NULL)
 					*comma++ = 0;
 
-				if (optArg[0] == 0) { /* , has already been converted to 0 */
-					option.delColor = colors[9].sequence;
-				} else {
-					for (i = 0; colors[i].name != NULL; i++) {
-						if (strCaseCmp(optArg, colors[i].name) == 0) {
-							option.delColor = colors[i].sequence;
-							break;
-						}
-					}
-					if (colors[i].name == NULL)
-						fatal(_("Invalid color %s\n"), optArg);
-				}
-
-				if (comma == NULL) {
-					option.addColor = colors[10].sequence;
-				} else {
-					for (i = 0; colors[i].name != NULL; i++) {
-						if (strCaseCmp(comma, colors[i].name) == 0) {
-							option.addColor = colors[i].sequence;
-							break;
-						}
-					}
-					if (colors[i].name == NULL)
-						fatal(_("Invalid color %s\n"), comma);
-				}
+				option.delColor = parseColor(optArg[0] == 0 ? "bred" : optArg);
+				option.addColor = parseColor(comma == NULL ? "bgreen" : comma);
 			} else {
-					option.delColor = colors[9].sequence;
-					option.addColor = colors[10].sequence;
+				option.delColor = parseColor("bred");
+				option.addColor = parseColor("bgreen");
 			}
 			option.delColorLen = strlen(option.delColor);
 			option.addColorLen = strlen(option.addColor);
@@ -656,14 +670,40 @@ PARSE_FUNCTION(parseCmdLine)
 			option.context = true;
 			initContextBuffers();
 		END_OPTION
-		fatal(_("Option %.*s does not exist\n"), (int) optlength, CURRENT_OPTION);
+		OPTION('m', "match-context", REQUIRED_ARG)
+			PARSE_INT(option.matchContext, 0, (INT_MAX - 1) / 2);
+			option.matchContext *= 2;
+		END_OPTION
+		BOOLEAN_LONG_OPTION("aggregate-changes", option.aggregateChanges)
+		OPTION('S', "paragraph-separator", OPTIONAL_ARG)
+			option.paraDelim = true;
+			if (optArg != NULL) {
+				option.paraDelimMarker = optArg;
+				option.paraDelimMarkerLength = parseEscapes(optArg, "paragraph-separator");
+			}
+		END_OPTION
+		BOOLEAN_LONG_OPTION("wdiff-output", option.wdiffOutput)
+		LONG_OPTION("dwfilter", REQUIRED_ARG)
+			option.dwfilterMode = true;
+			if ((option.output = fopen(optArg, "r+")) == NULL)
+				fatal(_("Error opening temporary output file: %s\n"), strerror(errno));
+		END_OPTION
+		OPTION('r', "reverse", NO_ARG)
+			if (!option.dwfilterMode)
+				fatal(_("Option %.*s does not exist\n"), OPTPRARG);
+		END_OPTION
+		OPTION('R', "repeat-markers", NO_ARG)
+			option.repeatMarkers = true;
+		END_OPTION
+
+		fatal(_("Option %.*s does not exist\n"), OPTPRARG);
 	NO_OPTION
 		switch (noOptionCount++) {
 			case 0:
-				option.oldFile.name = CURRENT_OPTION;
+				option.oldFile.name = optcurrent;
 				break;
 			case 1:
-				option.newFile.name = CURRENT_OPTION;
+				option.newFile.name = optcurrent;
 				break;
 			default:
 				fatal(_("Too many files to compare\n"));

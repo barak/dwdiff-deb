@@ -1,4 +1,4 @@
-.\" Copyright (C) 2006-2007 G.P. Halkes
+.\" Copyright (C) 2006-2010 G.P. Halkes
 .\" This program is free software: you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License version 3, as
 .\" published by the Free Software Foundation.
@@ -10,10 +10,10 @@
 .\"
 .\" You should have received a copy of the GNU General Public License
 .\" along with this program.  If not, see <http://www.gnu.org/licenses/>.
-.TH "dwdiff" "1" "05-07-2008" "Versie 1.4" "dwdiff afgebakend woord verschil programma"
-.SH NAAM
+.TH "dwdiff" "1" "27-07-2010" "Versie 1.8.2" "dwdiff afgebakend woord verschil programma"
+.hw /usr/share/doc/dwdiff-1.8.2 http://os.ghalkes.nl/dwdiff
 
-.hw /usr/share/doc/dwdiff-1.4 http://os.ghalkes.nl/dwdiff
+.SH NAAM
 
 \fBdwdiff\fP \- afgebakend woord verschil programma
 .SH OVERZICHT
@@ -21,9 +21,9 @@
 \fBdwdiff\fP [\fIOPTIES\fP] <\fIOUD BESTAND\fP> <\fINIEUW BESTAND\fP>
 .SH BESCHRIJVING
 
-\fBdwdiff\fP is een front-end voor het diff programma dat het verschil tussen
-twee bestanden bepaald in woorden, in plaats van in regels. Het verschilt van
-\fBwdiff\fP omdat het de gebruiker toestaat om te specificeren wat witruimte
+\fBdwdiff\fP is een front-end voor het \fBdiff\fP programma dat het verschil
+tussen twee bestanden bepaald in woorden, in plaats van in regels. Het verschilt
+van \fBwdiff\fP omdat het de gebruiker toestaat om te specificeren wat witruimte
 is, en omdat het een optionele lijst van afbakeningskarakters kan gebruiken.
 Afbakeningskarakters worden behandeld als of ze afzonderlijke woorden zijn,
 zelfs als er geen witruimte is gelaten tussen het karakter en het voorafgaande
@@ -56,12 +56,12 @@ Toon de woorden die verwijderd zijn uit het eerste bestand niet.
 Toon de woorden die ingevoegd zijn in het tweede bestand niet.
 .IP "\fB\-3\fP, \fB\-\-no\-common\fP"
 Toon de woorden die in beide bestanden voorkomen niet.
-.IP "\fB-L\fP[<\fIwidth\fP>], \fB\-\-line-numbers\fP[=<\fIwidth\fP>]"
+.IP "\fB\-L\fP[<\fIwidth\fP>], \fB\-\-line-numbers\fP[=<\fIwidth\fP>]"
 Toon regelnummers aan het begin van iedere regel. De getoonde regelnummers
 zijn respectievelijk het regelnummer in het oude bestand en het regelnummer
 in het nieuwe bestand. Het optionele <\fIwidth\fP> argument is het minimum
 aantal posities per regelnummer.
-.IP "\fB-C\fP<\fInum\fP>, \fB\-\-context\fP=<\fInum\fP>"
+.IP "\fB\-C\fP<\fInum\fP>, \fB\-\-context\fP=<\fInum\fP>"
 Toon <\fInum\fP> regels context voor en na veranderingen. Voegt een regel met
 alleen \-\- toe tussen ieder blok veranderingen.
 .IP "\fB\-s\fP, \fB\-\-statistics\fP"
@@ -83,7 +83,7 @@ van de canonieke decompositie. De compatibiliteitsdecompositie gooit opmaak
 informatie weg. Bijvoorbeeld, de ligatuur fi wordt vertaald naar twee losse
 letters voor de vergelijking. Echter, ook super- en subscript worden ook als
 gelijk gezien, evenals verschillende rotaties van hetzelfde karakter.
-.IP "\fB-D\fP <\fIoption\fP>, \fB\-\-diff\-option\fP=<\fIoption\fP>"
+.IP "\fB\-D\fP <\fIoption\fP>, \fB\-\-diff\-option\fP=<\fIoption\fP>"
 Voeg een optie toe aan de commando-regel voor het \fBdiff\fP(1) programma.
 Deze optie kan gebruikt worden om het \fBdiff\fP programma op te dragen dat
 het zijn algoritme moet aanpassen. WAARSCHUWING: zorg ervoor dat de opties die
@@ -92,14 +92,20 @@ veranderen, omdat anders \fBdwdiff\fP zal falen. De GNU en de meeste BSD
 versies van het \fBdiff\fP programma accepteren de \-d of \-\-minimal optie om
 een zo klein mogelijk verschil te vinden. Zie de \fBdiff\fP man pagina voor
 meer informatie.
-.IP "\fB-c\fP[<\fIspec\fP>], \fB\-\-color\fP[=<\fIspec\fP>]"
+.IP "\fB\-c\fP[<\fIspec\fP>], \fB\-\-color\fP[=<\fIspec\fP>]"
 Kleurenmodus. De optionele specificatie <\fIspec\fP> kan gebruikt worden om
 de gebruikte kleuren aan te passen. <\fIspec\fP> bestaat uit
 [<\fIverwijderd\fP>],[<\fItoegevoegd\fP>]. Als een van beide ontbreekt wordt
 zijn standaard kleur gebruikt (respectievelijk helder rood en helder groen).
-Een lijst met toelaatbare kleurnamen kan worden verkregen door het woord
-``list'' te gebruiken op de plaats van <\fIspec\fP>. De standaard markeringen
-zullen niet worden getoond in kleurenmodus.
+Beide delen van <\fIspec\fP> bestaan uit
+[<\fIvoorgrond\fP>][:<\fIachtergrond\fP>]. Een lijst met toelaatbare kleurnamen
+kan worden verkregen door het woord ``list'' te gebruiken op de plaats van
+<\fIspec\fP>. Alternatief kan een willekeurige escapecode om attributen te
+zetten worden gebruikt als kleur door er \fIe:\fP voor te zetten
+
+De standaard markeringen voor het begin en het einde van verwijderde en
+toegevoegde tekst worden onderdrukt, maar markeringen die op de commando-regel
+zijn gespecificeerd zullen worden afgedrukt.
 .IP "\fB\-l\fP, \fB\-\-less-mode\fP"
 Als \-p, maar voer het doorhalen ook uit op verwijderde witruimte karakters.
 .IP "\fB\-p\fP, \fB\-\-printer\fP"
@@ -113,6 +119,27 @@ dik gedrukte tekst laten zien.
 De standaard markeringen voor het begin en het einde van verwijderde en
 toegevoegde tekst worden onderdrukt, maar markeringen die op de commando-regel
 zijn gespecificeerd zullen worden afgedrukt.
+.IP "\fB\-m\fP[<\fInum\fP>], \fB\-\-match\-context\fP[=<\fInum\fP>]"
+Gebruik <\fInum\fP> woorden context voor en na ieder woord voor vergelijking.
+Woorden in de oude tekst komen dan alleen overeen met woorden in de nieuwe
+tekst als de woorden er omheen eveneens overeenkomen. Dit verbeterd de uitvoer
+van \fBdwdiff\fP voor grote aanpassingen met veel voorkomende woorden. Echter,
+het gebruik van context vergroot de benodigde schijfruimte en vergt meer
+rekentijd. De standaard waarde voor deze optie is 1. Zet deze optie op 0 om het
+gedrag van versies voor 1.5 te gebruiken.
+.IP "\fB\-\-aggregate\-changes\fP"
+Laat nabije veranderingen versmelten tot één verandering, als context woorden
+gebruikt worden (zie \fB\-\-match\-context\fP). Deze optie verminderd de
+benodigde rekentijd door de veranderingen die het \fBdiff\fP programma
+rapporteerd niet nader te verfijnen.
+.IP "\fB\-S\fP[<\fImarker\fP>], \fB\-\-paragraph\-separator\fP[=<\fImarker\fP>]"
+Toon toegevoegde of verwijderde blokken van regels met alleen maar witruimte
+karakters. Een speciale markering wordt aan de uitvoer toegevoegd om deze
+blokken aan te geven. De standaard markering is <\-\->.
+.IP "\fB\-\-wdiff\-output"
+Maak uitvoer die overeenkomt met die van het \fBwdiff\fP programma. \fBdwdiff\fP
+maakt gebruik van een ander uitvoer algoritme, welke een meer intuïtieve uitvoer
+produceert.
 .IP "\fB\-w <\fIstring\fP>, \fB\-\-start\-delete\fP=<\fIstring\fP>"
 Tekenreeks om het begin van verwijderde tekst te markeren.
 .IP "\fB\-x <\fIstring\fP>, \fB\-\-stop\-delete\fP=<\fIstring\fP>"
@@ -121,6 +148,9 @@ Tekenreeks om het einde van verwijderde tekst te markeren.
 Tekenreeks om het begin van toegevoegde tekst te markeren.
 .IP "\fB\-z <\fIstring\fP>, \fB\-\-stop\-insert\fP=<\fIstring\fP>"
 Tekenreeks om het einde van toegevoegde tekst te markeren.
+.IP "\fB\-R, \-\-repeat\-markers\fP"
+Herhaal de begin en eind markeringen aan het begin en het eind van een regel als
+de verandering over een regeleinde loopt.
 .PP
 Een enkel minteken (\-) als bestandsnaam kan worden gebruikt om aan te geven
 dat de tekst van de standaard invoer moet worden gelezen. Slechts één bestand
@@ -139,13 +169,13 @@ aan uw melding.
 G.P. Halkes <dwdiff@ghalkes.nl>
 .SH COPYRIGHT
 
-Copyright \(co 2006-2008 G.P. Halkes
+Copyright \(co 2006-2010 G.P. Halkes
 .br
 dwdiff is gelicenseerd onder de GNU General Public License version 3.
 .br
 Voor meer informatie over de licentie, zie het bestand COPYING in de
 documentatie map. Op Un*x systemen is dit meestal
-/usr/share/doc/dwdiff-1.4.
+/usr/share/doc/dwdiff-1.8.2.
 .SH ZIE OOK
 
-\fBwdiff\fP(1), \fBdiff\fP(1)
+\fBdwfilter\fP(1), \fBwdiff\fP(1), \fBdiff\fP(1)

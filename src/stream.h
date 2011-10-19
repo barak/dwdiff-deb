@@ -1,4 +1,4 @@
-/* Copyright (C) 2008 G.P. Halkes
+/* Copyright (C) 2008-2010 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -22,13 +22,13 @@ typedef struct Stream Stream;
 #include "util.h"
 #include "unicode.h"
 
-typedef struct VTable {
+typedef struct StreamVtable {
 	int (*getChar)(struct Stream *);
 	int (*ungetChar)(struct Stream *, int c);
-} VTable;
+} StreamVtable;
 
 struct Stream {
-	VTable *vtable;
+	StreamVtable *vtable;
 	union {
 		File *file;
 		struct {
@@ -52,6 +52,7 @@ struct Stream {
 
 Stream *newFileStream(File *file);
 Stream *newStringStream(const char *string, size_t length);
+bool isFileStream(const Stream *stream);
 
 #define sferror(s) (fileError((s)->data.file))
 #define sfclose(s) (fileClose((s)->data.file))
@@ -62,6 +63,7 @@ Stream *newStringStream(const char *string, size_t length);
 // Note: this gets a single byte character, rather than a UTF-8 character
 #define sgetc(s) (fileGetc((s)->data.file))
 #define sputc(s, c) (filePutc((s)->data.file, c))
+#define swrite(s, buf, bytes) (fileWrite((s)->data.file, buf, bytes))
 #define sgeterrno(s) (fileGetErrno((s)->data.file))
 
 #endif

@@ -1,4 +1,4 @@
-/* Copyright (C) 2008 G.P. Halkes
+/* Copyright (C) 2008-2010 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -24,7 +24,12 @@ void outOfMemory(void) __attribute__((noreturn));
 #endif
 int ASCIItolower(int c);
 
+#ifdef DEBUG
+#define PANIC() do { fprintf(stderr, _("Program logic error at %s:%d\n"), __FILE__, __LINE__); abort(); } while (0)
+#else
 #define PANIC() fatal(_("Program logic error at %s:%d\n"), __FILE__, __LINE__)
+#endif
 #define ASSERT(_condition) do { if (!(_condition)) PANIC(); } while(0)
 
+char *safe_strdup(const char *orig);
 #endif

@@ -1,4 +1,4 @@
-/* Copyright (C) 2008 G.P. Halkes
+/* Copyright (C) 2008-2010 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -51,3 +51,10 @@ char *strdupA(const char *orig) {
 	return strcpy(result, orig);
 }
 #endif
+
+char *safe_strdup(const char *orig) {
+	char *result = strdupA(orig);
+	if (result == NULL)
+		outOfMemory();
+	return result;
+}

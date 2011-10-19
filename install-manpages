@@ -1,9 +1,17 @@
 #!/bin/sh
 # Install manual page
 
+not() {
+	if "$@" ; then
+		false
+	else
+		true
+	fi
+}
+
 for lingua in ${LINGUAS} ; do
-	if [ ! -f "man/${lingua}/dwdiff.1" ] ; then
-		echo "No manual page for lingua ${lingua}"
+	if not [ -f "man/${lingua}/dwdiff.1" ] ; then
+		echo "No manual page for dwfiff for lingua ${lingua}"
 		continue
 	fi
 
@@ -12,6 +20,18 @@ for lingua in ${LINGUAS} ; do
 
 	${INSTALL} -d "${mandir}/${lingua}/man1"
 	${INSTALL} -m 644 "man/${lingua}/dwdiff.1" "${mandir}/${lingua}/man1"
+
+	if not [ "x$1" = "xyes" ] ; then
+		continue
+	fi
+
+	if not [ -f "man/${lingua}/dwfilter.1" ] ; then
+		echo "No manual page for dwfilter for lingua ${lingua}"
+		continue
+	fi
+
+	${INSTALL} -m 644 "man/${lingua}/dwfilter.1" "${mandir}/${lingua}.UTF-8/man1"
+	${INSTALL} -m 644 "man/${lingua}/dwfilter.1" "${mandir}/${lingua}/man1"
 done
 
 exit 0

@@ -14,7 +14,7 @@ The default output from dwdiff is the new text, with the deleted and inserted
 parts annotated with markers. Command line options are available to change
 both what is printed, and the markers.
 
-dwdiff is Licensed under the GNU General Public License version 3. See the file
+dwdiff is licensed under the GNU General Public License version 3. See the file
 COPYING for details.
 
 Motivation
@@ -43,6 +43,11 @@ not available (this option is not in the POSIX specifications) a work-around
 for the -a option is enabled. If a diff command is available that does provide
 this option but the command has a different name, one can set the diff command
 to be used by adding --diff=<command> to the configure command-line.
+
+dwdiff relies on the GNU gettext library for providing localised messages, and
+on libicu (http://icu-project.org) for Unicode support. dwdiff can be compiled
+without support for either of these libraries, which means all messages will be
+in English and Unicode will not be supported.
 
 There are two ways in which to compile dwdiff:
 

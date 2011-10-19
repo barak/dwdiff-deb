@@ -1,4 +1,4 @@
-/* Copyright (C) 2008 G.P. Halkes
+/* Copyright (C) 2008-2010 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -14,6 +14,8 @@
 
 #ifndef FILE_H
 #define FILE_H
+
+#include "buffer.h"
 
 /* Note: files opened for write can also be read. However, not vice versa. */
 typedef enum {
@@ -33,7 +35,9 @@ typedef enum {
 #define FILE_BUFFER_SIZE 4096
 #endif
 
-typedef struct {
+struct FileVtable;
+
+typedef struct File {
 	/* FD this struct is buffering */
 	int fd;
 	/* 0, or the error code of the failed operation. Further operations will
@@ -54,20 +58,38 @@ typedef struct {
 	/* Flag to indicate whether to escape non-printable characters. */
 	int escapeNonPrint;
 #endif
+	/* Buffers to maintain context information to print for the next words. */
+	Context *context;
+	int currentWordIdx;
+
+	struct FileVtable *vtable;
 } File;
+
+typedef struct FileVtable {
+	/* Functions to call for fileWrite and filePutc. Different implementations
+	   are provided such that diffing with context can be easily done. */
+	int (*fileWrite)(struct File *file, const char *buffer, int bytes);
+	int (*filePutc)(struct File *file, int c);
+	int (*fileFlush)(struct File *file);
+} FileVtable;
+
+#define fileFlush(file) ((file)->vtable->fileFlush(file))
+#define filePutc(file, c) ((file)->vtable->filePutc((file), (c)))
+#define fileWrite(file, buffer, bytes) ((file)->vtable->fileWrite((file), (buffer), (bytes)))
+
 
 File *fileWrapFD(int fd, FileMode mode);
 File *fileOpen(const char *name, FileMode mode);
 int fileGetc(File *file);
 int fileUngetc(File *file, int c);
 int fileClose(File *file);
-int fileFlush(File *file);
-int filePutc(File *file, int c);
-int fileWrite(File *file, const char *buffer, int bytes);
 int filePuts(File *file, const char *string);
 int fileRewind(File *file, FileMode mode);
 int fileError(File *file);
 int fileGetErrno(File *file);
 int fileEof(File *file);
+void fileClearEof(File *file);
+
+void fileSetContext(File *file);
 
 #endif

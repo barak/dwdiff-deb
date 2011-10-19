@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2006-2007 G.P. Halkes
+# Copyright (C) 2006-2007,2009 G.P. Halkes
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation.
@@ -102,7 +102,7 @@ add_replace_settings() {
 	for SETTING
 	do
 		NAME=`echo "${SETTING}" | sed 's/=.*/=/'`
-		if grep -q "^${NAME}" Makefile.in ; then
+		if grep "^${NAME}" Makefile.in > /dev/null ; then
 			ESCAPED_SETTING=`echo "${SETTING}" | sed 's/\//\\\\\//g'`
 			echo "s/^${NAME}.*/${ESCAPED_SETTING}/g"
 		else
@@ -128,9 +128,13 @@ create_makefile() {
 	if [ -n "${TEST_INSTALL}" ] ; then
 		[ -n "${INSTALL}" ] && TEST_INSTALL="${INSTALL}"
 		unset INSTALL
-			
+
 		for _INSTALL in ${TEST_INSTALL}
 		do
+			# Don't test the sun install program, because it is dangerous.
+			if [ "`uname`" = "SunOS" ] && [ "$_INSTALL" = "install" ] ; then
+				continue
+			fi
 			test_install "${_INSTALL}" && INSTALL="${_INSTALL}" && break
 		done
 		if [ -z "${INSTALL}" ] ; then
@@ -179,7 +183,7 @@ do
 		eval with_${_name}="no"
 	fi
 done
-_SWITCHES=`echo " ${SWITCHES}" | sed 's/[[:space:]][+-]/ /g'`
+_SWITCHES=`echo " ${SWITCHES}" | sed 's/ [+-]/ /g'`
 
 for PARAM
 do
@@ -204,7 +208,7 @@ EOF
 			[ -n "${USER_HELP}" ] && { echo ; echo "Package specific settings" ; echo "${USER_HELP}" ; }
 
 			cat <<EOF
-			
+
 Note: Environment variables may also be specified as parameters.
 EOF
 		exit 0
@@ -270,7 +274,7 @@ echo "-- configure called with $0 $@" >> config.log
 [ -z "${LINKRULE}" ] && LINKRULE='$(CC) $(CFLAGS) $(LDFLAGS) -o .config .config.o $(LDLIBS) $(TESTLIBS)'
 [ -z "${COMPILERULE}" ] && COMPILERULE='$(CC) $(CFLAGS) $(TESTFLAGS) -c -o .config.o .config.c'
 
-unset SETTINGS 
+unset SETTINGS
 [ -z "${LDLIBS}" ] || SETTINGS="LDLIBS=${LDLIBS} ${SETTINGS}"
 [ -z "${LDFLAGS}" ] || SETTINGS="LDFLAGS=${LDFLAGS} ${SETTINGS}"
 [ -z "${CFLAGS}" ] || SETTINGS="CFLAGS=${CFLAGS} ${SETTINGS}"

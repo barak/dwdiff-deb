@@ -1,4 +1,4 @@
-/* Copyright (C) 2006-2008 G.P. Halkes
+/* Copyright (C) 2006-2010 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -52,8 +52,10 @@ typedef enum {false, true} bool;
 #endif
 
 #ifndef NO_STRDUP
-#define strupA strdup
+#define strdupA strdup
 #endif
+
+#define VERSION_STRING "1.8.2"
 
 /*==== Configuration definitions ====*/
 #ifndef DIFF
@@ -76,6 +78,7 @@ typedef union CharData CharData;
 #include "stream.h"
 #include "tempfile.h"
 #include "unicode.h"
+#include "buffer.h"
 
 typedef struct {
 	const char *name;
@@ -84,6 +87,8 @@ typedef struct {
 	TempFile *tokens;
 	TempFile *whitespace;
 	int lastPrinted;
+	Context whitespaceBuffer;
+	bool whitespaceBufferUsed;
 } InputFile;
 
 typedef struct {
@@ -116,6 +121,7 @@ union CharData {
 #ifdef USE_UNICODE
 extern bool UTF8Mode;
 #endif
+extern CharData charData;
 
 void doDiff(void);
 

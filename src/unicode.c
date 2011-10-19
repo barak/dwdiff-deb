@@ -1,4 +1,4 @@
-/* Copyright (C) 2008 G.P. Halkes
+/* Copyright (C) 2008-2010 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -183,10 +183,11 @@ int convertToUTF8(UChar32 c, char *buffer) {
 	return bytes;
 }
 
-/** Write out one UCS-4 character as UTF-8.
-    @param stream The @a Stream to write.
-	@param c The character to write.
-	@return 0 for succes, EOF for failure.
+/** Convert one UCS-4 character to UTF-8, filtering surrogates.
+	@param c The character to convert.
+	@param buffer The buffer to write the result.
+	@param highSurrogate The location where highSurrogates are stored for this conversion.
+	@return the number of @a char's written to @a buffer.
 
 	This function also translates high/low surrogate pairs to a single UCS-4
 	character. Therefore it can also be used to convert UTF-16 to UTF-8. Note
@@ -194,22 +195,34 @@ int convertToUTF8(UChar32 c, char *buffer) {
 	every high surrogate has to be followed by a low surrogate, and every low
 	surrogate has to be preceeded by a high surrogate.
 */
-int putuc(Stream *stream, UChar32 c) {
-	char encoded[4];
-	int bytes;
-
+int filteredConvertToUTF8(UChar32 c, char *buffer, UChar32 *highSurrogate) {
 	if ((c & 0xFC00) == 0xD800) {
-		stream->highSurrogate = c;
+		*highSurrogate = c;
 		return 0;
 	}
 
 	if ((c & 0xFC00) == 0xDC00) {
-		ASSERT(stream->highSurrogate != 0);
-		c = c + (stream->highSurrogate << 10) + 0x10000 - (0xD800 << 10) - 0xDC00;
-		stream->highSurrogate = 0;
+		ASSERT(*highSurrogate != 0);
+		c = c + ((*highSurrogate) << 10) + 0x10000 - (0xD800 << 10) - 0xDC00;
+		*highSurrogate = 0;
 	}
 
-	bytes = convertToUTF8(c, encoded);
+	return convertToUTF8(c, buffer);
+}
+
+/** Write out one UCS-4 character as UTF-8.
+    @param stream The @a Stream to write.
+	@param c The character to write.
+	@return 0 for succes, EOF for failure.
+
+	See @a filteredConvertToUTF8 for more details on the conversion.
+*/
+int putuc(Stream *stream, UChar32 c) {
+	char encoded[4];
+	int bytes = filteredConvertToUTF8(c, encoded, &stream->highSurrogate);
+
+	if (bytes == 0)
+		return 0;
 	return fileWrite(stream->data.file, encoded, bytes) < bytes ? EOF : 0;
 }
 
@@ -220,6 +233,10 @@ int putuc(Stream *stream, UChar32 c) {
 #ifdef DEBUG
 static_assert(U_GCB_COUNT <= MAX_GCB_CLASS);
 #endif
+
+/* Latest version of the algorithm, with all its classes, can be found at
+   http://www.unicode.org/reports/tr29/
+*/
 
 /* The values of the constants _should_ not change from version to version,
    but better safe than sorry. */
@@ -254,6 +271,22 @@ static char clusterContinuationTable[MAX_GCB_CLASS][MAX_GCB_CLASS] = {
 	{1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1}
 };
 
+/** Table used for determining wheter a break exists between two characters when using backspace to overstrike characters. */
+static char backspaceContinuationTable[MAX_GCB_CLASS][MAX_GCB_CLASS] = {
+	{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0},
+	{0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0},
+	{0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0},
+	{0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+};
+
 static void addUCS4ToUTF16Buffer(UTF16Buffer *buffer, UChar32 c);
 
 /** Retrieve the Grapheme cluster break category for a character.
@@ -269,12 +302,14 @@ static int getClusterCategory(UChar32 c) {
 	return category >= MAX_GCB_CLASS ? U_GCB_OTHER : category;
 }
 
-/** Get the next Grapheme Cluster from a stream.
+
+/** Get the next Cluster from a stream.
     @param stream The @a Stream to read.
-    @param buffer The @a UTF16Buffer to store the Grapheme Cluster.
+    @param buffer The @a UTF16Buffer to store the Cluster.
+    @param continuationTable The table to use for looking up continuations.
     @return a boolean indicating whether the reading was successful.
 */
-bool getCluster(Stream *stream, UTF16Buffer *buffer) {
+static bool getClusterInternal(Stream *stream, UTF16Buffer *buffer, char continuationTable[MAX_GCB_CLASS][MAX_GCB_CLASS]) {
 	int32_t newClusterCategory;
 
 	/* Empty buffer. */
@@ -294,16 +329,37 @@ bool getCluster(Stream *stream, UTF16Buffer *buffer) {
 		stream->lastClusterCategory = newClusterCategory;
 		addUCS4ToUTF16Buffer(buffer, stream->bufferedChar);
 		if ((stream->bufferedChar = getucFiltered(stream)) < 0) {
+			if (isFileStream(stream))
+				fileClearEof(stream->data.file);
 			newClusterCategory = 0;
 			break;
 		}
 		newClusterCategory = getClusterCategory(stream->bufferedChar);
-	} while (clusterContinuationTable[stream->lastClusterCategory][newClusterCategory]);
+	} while (continuationTable[stream->lastClusterCategory][newClusterCategory]);
 
 	/* Save grapheme category for next call. */
 	stream->lastClusterCategory = newClusterCategory;
 	return true;
 }
+
+/** Get the next Grapheme Cluster from a stream.
+    @param stream The @a Stream to read.
+    @param buffer The @a UTF16Buffer to store the Grapheme Cluster.
+    @return a boolean indicating whether the reading was successful.
+*/
+bool getCluster(Stream *stream, UTF16Buffer *buffer) {
+	return getClusterInternal(stream, buffer, clusterContinuationTable);
+}
+
+/** Get the next Backspace Cluster from a stream.
+    @param stream The @a Stream to read.
+    @param buffer The @a UTF16Buffer to store the Backspace Cluster.
+    @return a boolean indicating whether the reading was successful.
+*/
+bool getBackspaceCluster(Stream *stream, UTF16Buffer *buffer) {
+	return getClusterInternal(stream, buffer, backspaceContinuationTable);
+}
+
 
 /*****************************************************************************
 UTF16Buffer operations
@@ -389,12 +445,17 @@ void casefoldChar(CharData *c) {
 #define UTF16BUFFER_INITIAL_SIZE 4
 #endif
 
-/** Initialise a UTF16Buffer struct for use. */
+/** Initialise a @a UTF16Buffer struct for use. */
 void UTF16BufferInit(UTF16Buffer *buffer) {
 	if ((buffer->data = malloc(UTF16BUFFER_INITIAL_SIZE * sizeof(UChar))) == NULL)
 		outOfMemory();
 	buffer->allocated = UTF16BUFFER_INITIAL_SIZE;
 	buffer->length = 0;
+}
+
+/** Free a @a UTF16Buffer struct. */
+void freeUTF16Buffer(UTF16Buffer *buffer) {
+	free(buffer->data);
 }
 
 /** Compare two UTF16Buffer's for sorting purposes */
