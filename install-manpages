@@ -1,0 +1,17 @@
+#!/bin/sh
+# Install manual page
+
+for lingua in ${LINGUAS} ; do
+	if [ ! -f "man/${lingua}/dwdiff.1" ] ; then
+		echo "No manual page for lingua ${lingua}"
+		continue
+	fi
+
+	${INSTALL} -d "${mandir}/${lingua}.UTF-8/man1"
+	${INSTALL} -m 644 "man/${lingua}/dwdiff.1" "${mandir}/${lingua}.UTF-8/man1"
+
+	${INSTALL} -d "${mandir}/${lingua}/man1"
+	${INSTALL} -m 644 "man/${lingua}/dwdiff.1" "${mandir}/${lingua}/man1"
+done
+
+exit 0

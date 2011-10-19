@@ -1,0 +1,144 @@
+.\" Copyright (C) 2006-2007 G.P. Halkes
+.\" This program is free software: you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License version 3, as
+.\" published by the Free Software Foundation.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program.  If not, see <http://www.gnu.org/licenses/>.
+.TH "dwdiff" "1" "05-07-2008" "Version 1.4" "dwdiff delimited word diff program"
+.SH NAME
+
+.hw /usr/share/doc/dwdiff-1.4 http://os.ghalkes.nl/dwdiff
+
+\fBdwdiff\fP \- a delimited word diff program
+.SH SYNOPSIS
+
+\fBdwdiff\fP [\fIOPTIONS\fP] <\fIOLD FILE\fP> <\fINEW FILE\fP>
+.SH DESCRIPTION
+
+\fBdwdiff\fP is a front-end for the diff program that operates at the word
+level instead of the line level. It is different from \fBwdiff\fP in that it
+allows the user to specify what should be considered whitespace, and in that
+it takes an optional list of characters that should be considered delimiters.
+Delimiters are single characters that are treated as if they are words, even
+when there is no whitespace separating them from preceding words or
+delimiters. \fBdwdiff\fP is mostly command-line compatible with \fBwdiff\fP.
+Only the \-\-autopager, \-\-terminal and \-\-avoid-wraps options are not
+supported.
+
+The default output from \fBdwdiff\fP is the new text, with the deleted and
+inserted parts annotated with markers. Command line options are available to
+change both what is printed, and the markers.
+.SH OPTIONS
+
+\fBdwdiff\fP accepts the following options (Note that all strings will first
+be escape expanded. All standard \\-escapes are supported, as well as \\u and
+\\U Unicode escapes):
+.IP "\fB\-h\fP, \fB\-\-help\fP"
+Display a short help message.
+.IP "\fB\-v\fP, \fB\-\-version\fP"
+Print version and copyright information.
+.IP "\fB\-d\fP <\fIdelimiters\fP>, \fB\-\-delimiters\fP=<\fIdelimiters\fP>"
+Specify a list of characters to be used as delimiters.
+.IP "\fB\-P\fP, \fB\-\-punctuation\fP>"
+Use punctuation characters as delimiters. The exact set of punctuation
+characters depends on the current locale.
+.IP "\fB\-W\fP <\fIwhitespace\fP>, \fB\-\-whitespace\fP=<\fIwhitespace\fP>"
+Specify a list of characters to be used as whitespace.
+.IP "\fB\-1\fP, \fB\-\-no\-deleted\fP"
+Suppress printing of words deleted from the first file.
+.IP "\fB\-2\fP, \fB\-\-no\-inserted\fP"
+Suppress printing of words inserted in the second file.
+.IP "\fB\-3\fP, \fB\-\-no\-common\fP"
+Suppress printing of words common to both files.
+.IP "\fB-L\fP[<\fIwidth\fP>], \fB\-\-line-numbers\fP[=<\fIwidth\fP>]"
+Show line numbers at the start of each line. The line numbers displayed are
+the line number in the old file and the line number in the new file
+respectively. The optional <\fIwidth\fP> argument is the minimum number of
+positions per line number.
+.IP "\fB-C\fP<\fInum\fP>, \fB\-\-context\fP=<\fInum\fP>"
+Show <\fInum\fP> lines of context before and after each changes. A line
+with only \-\- is printed between blocks of changes.
+.IP "\fB\-s\fP, \fB\-\-statistics\fP"
+Print statistics when done. The numbers printed include the number of words
+from in both files, the number of deleted words, the number of
+inserted words, and the number of changed words. The number of changed words
+is counted as the number of words that are removed from the first file, and
+the number of words that replace them from the second file. All of these
+numbers are also expressed as a percentage of the total number of words in the
+file the words came from.
+.IP "\fB\-i\fP, \fB\-\-ignore\-case\fP"
+Ignore differences in case when comparing words. This option is only
+available if the diff program that is called provides it.
+.IP "\fB\-I\fP, \fB\-\-ignore\-formatting\fP"
+Ignore differences in formatting of characters. This option switches to using
+the Unicode compatibility decomposition instead of the canonical decomposition.
+The compatibility decomposition discards formatting information. For example,
+the ligature fi will be decomposed into two separate characters for the
+purposes of comparison. However, also super- and subscript will be regarded
+equal as well as different rotations of the same character.
+.IP "\fB-D\fP <\fIoption\fP>, \fB\-\-diff\-option\fP=<\fIoption\fP>"
+Add an option to the command line of the \fBdiff\fP(1) command. This option
+can be used to tell the \fBdiff\fP command that it should change its matching
+algorithm. WARNING: make sure that the options passed do not change the output
+of the \fBdiff\fP program, or \fBdwdiff\fP will fail. The GNU and most BSD
+versions of \fBdiff\fP accept the \-d or \-\-minimal option to make \fBdiff\fP
+find a minimal diff at extra cost. See the \fBdiff\fP manual page for more
+information.
+.IP "\fB-c\fP[<\fIspec\fP>], \fB\-\-color\fP[=<\fIspec\fP>]"
+Color mode. The optional <\fIspec\fP> can be used to customise the colors.
+<\fIspec\fP> consists of [<\fIdelete\fP>],[<\fIinsert\fP>]. If either
+is ommited it will be set to its default color (bright red or bright green
+respectively). To obtain a list of permissable color names, use the word
+``list'' as <\fIspec\fP>. The default markers will not be printed in color
+mode.
+.IP "\fB\-l\fP, \fB\-\-less-mode\fP"
+As \-p but also overstrike deleted whitespace.
+.IP "\fB\-p\fP, \fB\-\-printer\fP"
+Use overstriking with an underscore and bold text to emphasize changes. This
+is implemented by first printing the underscore or a duplicate of the
+character to be printed, followed by a backspace, followed by the character.
+On regular terminals you won't see any effect. The \fBless\fP(1) command will
+however show underlined and bold text.
+
+The standard markers for the begin and end of deleted and inserted text are
+suppressed, but any markers specified on the command line will still be
+printed.
+.IP "\fB\-w <\fIstring\fP>, \fB\-\-start\-delete\fP=<\fIstring\fP>"
+Specify a string to mark begin of deleted text.
+.IP "\fB\-x <\fIstring\fP>, \fB\-\-stop\-delete\fP=<\fIstring\fP>"
+Specify a string to mark end of deleted text.
+.IP "\fB\-y <\fIstring\fP>, \fB\-\-start\-insert\fP=<\fIstring\fP>"
+Specify a string to mark begin of inserted text.
+.IP "\fB\-z <\fIstring\fP>, \fB\-\-stop\-insert\fP=<\fIstring\fP>"
+Specify a string to mark end of inserted text.
+.PP
+A single dash (\-) as a file can be used to denote standard input. Only one
+file can be read from standard input. To stop \fBdwdiff\fP from interpreting
+file names that start with a dash as options, one can specify a double dash
+(\-\-) after which \fBdwdiff\fP will interpret any following arguments as files
+to read.
+.SH BUGS
+
+If you think you have found a bug, please check that you are using the latest
+version of \fBdwdiff\fP [http://os.ghalkes.nl/dwdiff]. When reporting bugs,
+please include a minimal example that demonstrates the problem.
+.SH AUTHOR
+
+G.P. Halkes <dwdiff@ghalkes.nl>
+.SH COPYRIGHT
+
+Copyright \(co 2006-2008 G.P. Halkes
+.br
+dwdiff is licensed under the GNU General Public License version 3.
+.br
+For more details on the license, see the file COPYING in the documentation
+directory. On Un*x systems this is usually /usr/share/doc/dwdiff-1.4.
+.SH SEE ALSO
+
+\fBwdiff\fP(1), \fBdiff\fP(1)
