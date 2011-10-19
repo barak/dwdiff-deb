@@ -1,3 +1,9 @@
+dwdiff (1.9-0.1~bpo60+1) squeeze-backports; urgency=low
+
+  * Rebuild for squeeze-backports.
+
+ -- Clint Adams <clint@debian.org>  Tue, 22 Feb 2011 08:54:46 -0500
+
 dwdiff (1.9-0.1) unstable; urgency=low
 
   * NMU
