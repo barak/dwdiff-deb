@@ -1,0 +1,6 @@
+*.o
+/Makefile
+/config.log
+/dwdiff
+/dwfilter
+/po/*.mo
