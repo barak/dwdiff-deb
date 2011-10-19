@@ -62,7 +62,7 @@ DWFILTER=yes
 
 # Miscelaneous install paths
 bindir=$(prefix)/bin
-docdir=$(prefix)/share/doc/dwdiff
+docdir=$(prefix)/share/doc/dwdiff-1.9
 mandir=$(prefix)/share/man
 
 all: dwdiff $(DWFILTER:yes=dwfilter) linguas
@@ -103,7 +103,7 @@ dwdiff-install: dwdiff $(DWFILTER:yes=dwfilter)
 	$(INSTALL) -m 644 "man/dwdiff.1" "$(mandir)/man1"
 	if [ -n "$(DWFILTER)" ] ; then $(INSTALL) -m 644 "man/dwfilter.1" "$(mandir)/man1" ; fi
 	$(INSTALL) -d "$(docdir)"
-	$(INSTALL) -m 644 README "$(docdir)"
+	$(INSTALL) -m 644 README COPYING Changelog "$(docdir)"
 
 # Work around empty LINGUAS list. Some shells don't like empty lists in for-loops
 lingua-install:

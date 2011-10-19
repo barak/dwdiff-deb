@@ -1,0 +1,33 @@
+From: "Barak A. Pearlmutter" <barak+git@cs.nuim.ie>
+Date: Wed, 19 Oct 2011 23:21:41 +0100
+Subject: make install doc
+
+Change docdir installation directory in Makefile, and change
+installation rule to not install COPYING or Changelog there.
+---
+ Makefile.in |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index efd83ee..9cc2291 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -62,7 +62,7 @@ DWFILTER=yes
+ 
+ # Miscelaneous install paths
+ bindir=$(prefix)/bin
+-docdir=$(prefix)/share/doc/dwdiff-1.9
++docdir=$(prefix)/share/doc/dwdiff
+ mandir=$(prefix)/share/man
+ 
+ all: dwdiff $(DWFILTER:yes=dwfilter) linguas
+@@ -103,7 +103,7 @@ dwdiff-install: dwdiff $(DWFILTER:yes=dwfilter)
+ 	$(INSTALL) -m 644 "man/dwdiff.1" "$(mandir)/man1"
+ 	if [ -n "$(DWFILTER)" ] ; then $(INSTALL) -m 644 "man/dwfilter.1" "$(mandir)/man1" ; fi
+ 	$(INSTALL) -d "$(docdir)"
+-	$(INSTALL) -m 644 README COPYING Changelog "$(docdir)"
++	$(INSTALL) -m 644 README "$(docdir)"
+ 
+ # Work around empty LINGUAS list. Some shells don't like empty lists in for-loops
+ lingua-install:
+-- 
