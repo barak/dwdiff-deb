@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-07-27 09:12+0200\n"
+"POT-Creation-Date: 2011-02-05 16:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -43,7 +44,7 @@ msgstr ""
 msgid "Error parsing diff output\n"
 msgstr ""
 
-#: dwdiff.c:274
+#: dwdiff.c:274 dwdiff.c:418
 #, c-format
 msgid "Can't open file %s: %s\n"
 msgstr ""
@@ -58,22 +59,22 @@ msgstr ""
 msgid "Error writing to temporary file %s: %s\n"
 msgstr ""
 
-#: dwdiff.c:465
+#: dwdiff.c:562
 #, c-format
 msgid "old: 0 words\n"
 msgstr ""
 
-#: dwdiff.c:467
+#: dwdiff.c:564
 #, c-format
 msgid "old: %d words  %d %d%% common  %d %d%% deleted  %d %d%% changed\n"
 msgstr ""
 
-#: dwdiff.c:474
+#: dwdiff.c:571
 #, c-format
 msgid "new: 0 words\n"
 msgstr ""
 
-#: dwdiff.c:476
+#: dwdiff.c:573
 #, c-format
 msgid "new: %d words  %d %d%% common  %d %d%% inserted  %d %d%% changed\n"
 msgstr ""
@@ -91,16 +92,16 @@ msgstr ""
 #. - G.P. Halkes is name and should be left as is.
 #: dwfilter.c:70 option.c:535
 msgid ""
-"Copyright (C) 2006-2010 G.P. Halkes\n"
+"Copyright (C) 2006-2011 G.P. Halkes\n"
 "Licensed under the GNU General Public License version 3\n"
 msgstr ""
 
-#: dwfilter.c:108 option.c:693 option.c:699
+#: dwfilter.c:108 option.c:693 option.c:702
 #, c-format
 msgid "Option %.*s does not exist\n"
 msgstr ""
 
-#: dwfilter.c:125 option.c:714
+#: dwfilter.c:125 option.c:723
 msgid "Need two files to compare\n"
 msgstr ""
 
@@ -147,31 +148,37 @@ msgstr ""
 msgid "Value for %.*s option (%s) is not a valid boolean value\n"
 msgstr ""
 
-#: optionDescriptions.h:6
+#: optionDescriptions.h:20
 msgid "-h, --help                             Print this help message\n"
 msgstr ""
 
-#: optionDescriptions.h:7
+#: optionDescriptions.h:21
 msgid ""
 "-v, --version                          Print version and copyright "
 "information\n"
 msgstr ""
 
-#: optionDescriptions.h:10
+#: optionDescriptions.h:24
 msgid "-d <delim>, --delimiters=<delim>       Specifiy delimiters\n"
 msgstr ""
 
-#: optionDescriptions.h:11
+#: optionDescriptions.h:25
 msgid ""
 "-P, --punctuation                      Use punctuation characters as "
 "delimiters\n"
 msgstr ""
 
-#: optionDescriptions.h:12
+#: optionDescriptions.h:26
 msgid "-W <ws>, --white-space=<ws>            Specify whitespace characters\n"
 msgstr ""
 
-#: optionDescriptions.h:14
+#: optionDescriptions.h:28
+msgid ""
+"--diff-input                           Read the input as the output from "
+"diff\n"
+msgstr ""
+
+#: optionDescriptions.h:29
 msgid ""
 "-S[<marker>], --paragraph-separator[=<marker>]  Show inserted or deleted "
 "blocks\n"
@@ -179,44 +186,44 @@ msgid ""
 "marker\n"
 msgstr ""
 
-#: optionDescriptions.h:18
+#: optionDescriptions.h:33
 msgid "-1, --no-deleted                       Do not print deleted words\n"
 msgstr ""
 
-#: optionDescriptions.h:19
+#: optionDescriptions.h:34
 msgid "-2, --no-inserted                      Do not print inserted words\n"
 msgstr ""
 
-#: optionDescriptions.h:20
+#: optionDescriptions.h:35
 msgid "-3, --no-common                        Do not print common words\n"
 msgstr ""
 
-#: optionDescriptions.h:21
+#: optionDescriptions.h:36
 msgid "-L[<width>], --line-numbers[<width>]   Prepend line numbers\n"
 msgstr ""
 
-#: optionDescriptions.h:22
+#: optionDescriptions.h:37
 msgid "-C<num>, --context=<num>               Show <num> lines of context\n"
 msgstr ""
 
-#: optionDescriptions.h:23
+#: optionDescriptions.h:38
 msgid "-s, --statistics                       Print statistics when done\n"
 msgstr ""
 
-#: optionDescriptions.h:25
+#: optionDescriptions.h:40
 msgid ""
 "--wdiff-output                         Produce wdiff compatible output\n"
 msgstr ""
 
-#: optionDescriptions.h:28
+#: optionDescriptions.h:43
 msgid "-i, --ignore-case                      Ignore differences in case\n"
 msgstr ""
 
-#: optionDescriptions.h:29
+#: optionDescriptions.h:44
 msgid "-I, --ignore-formatting                Ignore formatting differences\n"
 msgstr ""
 
-#: optionDescriptions.h:30
+#: optionDescriptions.h:45
 msgid ""
 "-D <option>, --diff-option=<option>    Add <option> to the diff command-"
 "line\n"
@@ -227,7 +234,7 @@ msgstr ""
 #. the text. By using these extra context words when applying the diff program,
 #. frequently occuring words will be more likely to be matched to the
 #. correct corresponding word in the other text, thus giving a better result.
-#: optionDescriptions.h:36
+#: optionDescriptions.h:51
 msgid ""
 "-m <num>, --match-context=<num>        Use <num> words of context for "
 "matching\n"
@@ -238,50 +245,50 @@ msgstr ""
 #. first pass of diff the changes reported need refining. However, if the user
 #. can live with multiple changes that are within (2 * match-context + 1) words
 #. from eachother being reported as a single change, they can use this option.
-#: optionDescriptions.h:42
+#: optionDescriptions.h:57
 msgid ""
 "--aggregate-changes                    Allow close changes to aggregate\n"
 msgstr ""
 
-#: optionDescriptions.h:46
+#: optionDescriptions.h:61
 msgid "-c[<spec>], --color[=<spec>]           Color mode\n"
 msgstr ""
 
-#: optionDescriptions.h:47
+#: optionDescriptions.h:62
 msgid ""
 "-l, --less-mode                        As -p but also overstrike whitespace\n"
 msgstr ""
 
-#: optionDescriptions.h:48
+#: optionDescriptions.h:63
 msgid "-p, --printer                          Use overstriking and bold text\n"
 msgstr ""
 
-#: optionDescriptions.h:49
+#: optionDescriptions.h:64
 msgid ""
 "-w <string>, --start-delete=<string>   String to mark begin of deleted text\n"
 msgstr ""
 
-#: optionDescriptions.h:50
+#: optionDescriptions.h:65
 msgid ""
 "-x <string>, --stop-delete=<string>    String to mark end of deleted text\n"
 msgstr ""
 
-#: optionDescriptions.h:51
+#: optionDescriptions.h:66
 msgid ""
 "-y <string>, --start-insert=<string>   String to mark begin of inserted "
 "text\n"
 msgstr ""
 
-#: optionDescriptions.h:52
+#: optionDescriptions.h:67
 msgid ""
 "-z <string>, --stop-insert=<string>    String to mark end of inserted text\n"
 msgstr ""
 
-#: optionDescriptions.h:53
+#: optionDescriptions.h:68
 msgid "-R, --repeat-markers                   Repeat markers at newlines\n"
 msgstr ""
 
-#: optionDescriptions.h:57
+#: optionDescriptions.h:72
 msgid "-r, --reverse                          Format new as old\n"
 msgstr ""
 
@@ -421,7 +428,7 @@ msgstr ""
 msgid "Can't read both files from standard input\n"
 msgstr ""
 
-#: option.c:617 option.c:709
+#: option.c:617 option.c:712
 msgid "Too many files to compare\n"
 msgstr ""
 
@@ -439,6 +446,10 @@ msgstr ""
 #: option.c:689
 #, c-format
 msgid "Error opening temporary output file: %s\n"
+msgstr ""
+
+#: option.c:718
+msgid "Only one input file accepted with --diff-input\n"
 msgstr ""
 
 #: util.c:38

@@ -1,4 +1,4 @@
-.\" Copyright (C) 2006-2010 G.P. Halkes
+.\" Copyright (C) 2006-2011 G.P. Halkes
 .\" This program is free software: you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License version 3, as
 .\" published by the Free Software Foundation.
@@ -10,8 +10,8 @@
 .\"
 .\" You should have received a copy of the GNU General Public License
 .\" along with this program.  If not, see <http://www.gnu.org/licenses/>.
-.TH "dwdiff" "1" "27-07-2010" "Versie 1.8.2" "dwdiff afgebakend woord verschil programma"
-.hw /usr/share/doc/dwdiff-1.8.2 http://os.ghalkes.nl/dwdiff
+.TH "dwdiff" "1" "05-02-2011" "Versie 1.9" "dwdiff afgebakend woord verschil programma"
+.hw /usr/share/doc/dwdiff-1.9 http://os.ghalkes.nl/dwdiff
 
 .SH NAAM
 
@@ -19,6 +19,8 @@
 .SH OVERZICHT
 
 \fBdwdiff\fP [\fIOPTIES\fP] <\fIOUD BESTAND\fP> <\fINIEUW BESTAND\fP>
+.br
+\fBdwdiff\fP [\fIOPTIES\fP] \fB\-\-diff\-input\fP [<\fIDIFF BESTAND\fP>]
 .SH BESCHRIJVING
 
 \fBdwdiff\fP is een front-end voor het \fBdiff\fP programma dat het verschil
@@ -50,6 +52,12 @@ Gebruik alle leestekens als afbakeningskarakters. De set van leestekens is
 locale-afhankelijk.
 .IP "\fB\-W\fP <\fIwhitespace\fP>, \fB\-\-whitespace\fP=<\fIwhitespace\fP>"
 Specificeer de lijst van witruimte karakters.
+.IP "\fB\-\-diff\-input\fP"
+Interpreteer de invoer als de uitvoer van \fBdiff\fP in het Unified Diff
+formaat (meestal geproduceerd door \fBdiff -u\fP). In dit geval is er maar één
+invoerbestand toegestaan. Deze optie maakt het mogelijk om de diff uitvoer
+te herformateren met \fBdwdiff\fP, en is bijvoorbeeld nuttig om de uitvoer van
+\fBsvn diff\fP na te bewerken.
 .IP "\fB\-1\fP, \fB\-\-no\-deleted\fP"
 Toon de woorden die verwijderd zijn uit het eerste bestand niet.
 .IP "\fB\-2\fP, \fB\-\-no\-inserted\fP"
@@ -169,13 +177,13 @@ aan uw melding.
 G.P. Halkes <dwdiff@ghalkes.nl>
 .SH COPYRIGHT
 
-Copyright \(co 2006-2010 G.P. Halkes
+Copyright \(co 2006-2011 G.P. Halkes
 .br
 dwdiff is gelicenseerd onder de GNU General Public License version 3.
 .br
 Voor meer informatie over de licentie, zie het bestand COPYING in de
 documentatie map. Op Un*x systemen is dit meestal
-/usr/share/doc/dwdiff-1.8.2.
+/usr/share/doc/dwdiff-1.9.
 .SH ZIE OOK
 
 \fBdwfilter\fP(1), \fBwdiff\fP(1), \fBdiff\fP(1)

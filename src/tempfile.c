@@ -1,4 +1,4 @@
-/* Copyright (C) 2006-2010 G.P. Halkes
+/* Copyright (C) 2006-2011 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -24,14 +24,12 @@
 static TempFile *files;
 static int openIndex = 0;
 static bool inited;
+static int baseFiles = 6;
 
 /** Remove up all the created files. */
 static void cleanup(void) {
 	int i;
 	for (i = 0; i < openIndex; i++) {
-		/* File close is only necessary for the token and whitespace files. */
-		if (i < 6 && i != 1 && i != 4)
-			sfclose(files[i].stream);
 #ifndef LEAVE_FILES
 		remove(files[i].name);
 #endif
@@ -50,7 +48,9 @@ TempFile *tempFile(int depth) {
 			context /= 2;
 		}
 
-		if ((files = calloc(6 + 2 * steps, sizeof(TempFile))) == NULL)
+		baseFiles += 2 * option.diffInput;
+
+		if ((files = calloc(baseFiles + 2 * steps, sizeof(TempFile))) == NULL)
 			outOfMemory();
 		/* Make sure the umask is set so that we don't introduce a security risk. */
 		umask(~S_IRWXU);
@@ -60,9 +60,9 @@ TempFile *tempFile(int depth) {
 	}
 
 	/* The part files need to be cleaned up when new part files are needed. */
-	if (depth >= 0 && depth + 6 < openIndex) {
+	if (depth >= 0 && depth + baseFiles < openIndex) {
 		int i;
-		for (i = 6 + depth; i < openIndex; i++) {
+		for (i = baseFiles + depth; i < openIndex; i++) {
 			/* Don't close the file here, but let doDiffInternal do that such that
 			   it is flushed before diff invocation. */
 #ifndef LEAVE_FILES
@@ -70,7 +70,7 @@ TempFile *tempFile(int depth) {
 #endif
 			free(files[i].stream);
 		}
-		openIndex = 6 + depth;
+		openIndex = baseFiles + depth;
 	}
 
 	strcpy(files[openIndex].name, TEMPLATE);

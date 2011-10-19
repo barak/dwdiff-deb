@@ -1,4 +1,4 @@
-/* Copyright (C) 2006-2010 G.P. Halkes
+/* Copyright (C) 2006-2011 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -395,6 +395,100 @@ DEF_TABLE(SC)
 ONLY_UNICODE(DEF_TABLE(UTF8))
 DispatchTable *dispatch = &SCDispatch;
 
+typedef enum {
+	FIRST_HEADER,
+	FIRST,
+	OLD,
+	NEW,
+	COMMON,
+	HEADER,
+	LINE_COUNTS
+} DiffInputMode;
+
+
+void splitDiffInput(void) {
+	Stream *input;
+	TempFile *oldFile, *newFile;
+	DiffInputMode mode = FIRST_HEADER;
+
+	if (option.oldFile.name == NULL) {
+		input = option.oldFile.input;
+	} else {
+		if ((input = newFileStream(fileOpen(option.oldFile.name, FILE_READ))) == NULL)
+			fatal(_("Can't open file %s: %s\n"), option.oldFile.name, strerror(errno));
+	}
+
+	oldFile = tempFile(-1);
+	newFile = tempFile(-1);
+
+	while (getNextCharSC(input)) {
+		switch (mode) {
+			case FIRST_HEADER:
+				sputc(oldFile->stream, charData.singleChar);
+				sputc(newFile->stream, charData.singleChar);
+				mode = charData.singleChar != '@' ? HEADER : LINE_COUNTS;
+				break;
+			case FIRST:
+				if (charData.singleChar == '+') {
+					sputc(newFile->stream, ' ');
+					mode = NEW;
+				} else if (charData.singleChar == '-') {
+					sputc(oldFile->stream, ' ');
+					mode = OLD;
+				} else if (charData.singleChar == ' ') {
+					sputc(oldFile->stream, ' ');
+					sputc(newFile->stream, ' ');
+					mode = COMMON;
+				} else if (charData.singleChar == '@') {
+					sputc(oldFile->stream, charData.singleChar);
+					sputc(newFile->stream, charData.singleChar);
+					mode = LINE_COUNTS;
+				} else {
+					sputc(oldFile->stream, charData.singleChar);
+					sputc(newFile->stream, charData.singleChar);
+					mode = HEADER;
+				}
+				break;
+			case OLD:
+				sputc(oldFile->stream, charData.singleChar);
+				if (charData.singleChar == '\n')
+					mode = FIRST;
+				break;
+			case NEW:
+				sputc(newFile->stream, charData.singleChar);
+				if (charData.singleChar == '\n')
+					mode = FIRST;
+				break;
+			case COMMON:
+				sputc(oldFile->stream, charData.singleChar);
+				sputc(newFile->stream, charData.singleChar);
+				if (charData.singleChar == '\n')
+					mode = FIRST;
+				break;
+
+			case HEADER:
+				sputc(oldFile->stream, charData.singleChar);
+				sputc(newFile->stream, charData.singleChar);
+				if (charData.singleChar == '\n')
+					mode = FIRST_HEADER;
+				break;
+
+			case LINE_COUNTS:
+				sputc(oldFile->stream, charData.singleChar);
+				sputc(newFile->stream, charData.singleChar);
+				if (charData.singleChar == '\n')
+					mode = FIRST;
+				break;
+			default:
+				PANIC();
+		}
+	}
+	sfclose(oldFile->stream);
+	sfclose(newFile->stream);
+	option.oldFile.name = oldFile->name;
+	option.newFile.name = newFile->name;
+}
+
 /** Main. */
 int main(int argc, char *argv[]) {
 #if defined(USE_GETTEXT) || defined(USE_UNICODE)
@@ -448,6 +542,9 @@ int main(int argc, char *argv[]) {
 #endif
 
 	parseCmdLine(argc, argv);
+
+	if (option.diffInput)
+		splitDiffInput();
 
 	initBuffer(&whitespaceBuffer, INITIAL_WORD_BUFFER_SIZE);
 

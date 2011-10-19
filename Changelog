@@ -1,3 +1,9 @@
+Version 1.9:
+    New features:
+    - an option for reading the output of diff (in Unified Diff) format was
+      added (--diff-input) which can be used to reformat diffs for enhanced
+      readability.
+
 Version 1.8.2:
     New features:
     - when parsing options, \e is understood to mean the escape character

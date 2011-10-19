@@ -1,3 +1,17 @@
+/* Copyright (C) 2010-2011 G.P. Halkes
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License version 3, as
+   published by the Free Software Foundation.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #ifndef OPTIONDESCRIPTIONS_H
 #define OPTIONDESCRIPTIONS_H
 
@@ -11,6 +25,7 @@ N_("-d <delim>, --delimiters=<delim>       Specifiy delimiters\n"),
 N_("-P, --punctuation                      Use punctuation characters as delimiters\n"),
 N_("-W <ws>, --white-space=<ws>            Specify whitespace characters\n"),
 #ifdef DWDIFF_COMPILE
+N_("--diff-input                           Read the input as the output from diff\n"),
 N_("-S[<marker>], --paragraph-separator[=<marker>]  Show inserted or deleted blocks\n"
    "                               of empty lines, optionally overriding the marker\n"),
 

@@ -1,4 +1,4 @@
-/* Copyright (C) 2006-2010 G.P. Halkes
+/* Copyright (C) 2006-2011 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -55,7 +55,7 @@ typedef enum {false, true} bool;
 #define strdupA strdup
 #endif
 
-#define VERSION_STRING "1.8.2"
+#define VERSION_STRING "1.9"
 
 /*==== Configuration definitions ====*/
 #ifndef DIFF
@@ -73,7 +73,7 @@ typedef enum {false, true} bool;
 
 #define DIFF_COMMAND DIFF MINUS_A
 
-typedef union CharData CharData;
+typedef struct CharData CharData;
 
 #include "stream.h"
 #include "tempfile.h"
@@ -106,7 +106,7 @@ extern int differences;
 #define RESET_BIT(x, b) do { (x)[(b)>>3] &= ~(1 << ((b) & 0x7)); } while (0);
 #define TEST_BIT(x, b) ((x)[(b)>>3] & (1 << ((b) & 0x7)))
 
-union CharData {
+struct CharData {
 	int singleChar;
 
 #ifdef USE_UNICODE
