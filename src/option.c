@@ -1,4 +1,4 @@
-/* Copyright (C) 2006-2010 G.P. Halkes
+/* Copyright (C) 2006-2011 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -532,7 +532,7 @@ PARSE_FUNCTION(parseCmdLine)
 				   - If the (C) symbol (that is the c in a circle) is not available,
 					 leave as it as is. (Unicode code point 0x00A9)
 				   - G.P. Halkes is name and should be left as is. */
-				_("Copyright (C) 2006-2010 G.P. Halkes\nLicensed under the GNU General Public License version 3\n"), stdout);
+				_("Copyright (C) 2006-2011 G.P. Halkes\nLicensed under the GNU General Public License version 3\n"), stdout);
 			exit(EXIT_SUCCESS);
 		END_OPTION
 		OPTION('1', "no-deleted", NO_ARG)
@@ -695,6 +695,9 @@ PARSE_FUNCTION(parseCmdLine)
 		OPTION('R', "repeat-markers", NO_ARG)
 			option.repeatMarkers = true;
 		END_OPTION
+		LONG_OPTION("diff-input", NO_ARG)
+			option.diffInput = true;
+		END_OPTION
 
 		fatal(_("Option %.*s does not exist\n"), OPTPRARG);
 	NO_OPTION
@@ -710,8 +713,15 @@ PARSE_FUNCTION(parseCmdLine)
 		}
 	END_OPTIONS
 	/* Check that we have something to work with. */
-	if (noOptionCount != 2)
-		fatal(_("Need two files to compare\n"));
+	if (option.diffInput) {
+		if (noOptionCount > 1)
+			fatal(_("Only one input file accepted with --diff-input\n"));
+		if (noOptionCount == 0)
+			option.oldFile.input = newFileStream(fileWrapFD(STDIN_FILENO, FILE_READ));
+	} else {
+		if (noOptionCount != 2)
+			fatal(_("Need two files to compare\n"));
+	}
 
 	/* Check and set some values */
 	if (option.delStart == NULL) {

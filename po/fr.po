@@ -92,10 +92,10 @@ msgstr ""
 #. - G.P. Halkes is name and should be left as is.
 #: dwfilter.c:70 option.c:524
 msgid ""
-"Copyright (C) 2006-2010 G.P. Halkes\n"
+"Copyright (C) 2006-2011 G.P. Halkes\n"
 "Licensed under the GNU General Public License version 3\n"
 msgstr ""
-"Copyright (C) 2006-2010 G.P. Halkes\n"
+"Copyright (C) 2006-2011 G.P. Halkes\n"
 "Soumis à la GNU General Public License version 3\n"
 
 #: dwfilter.c:108 option.c:683 option.c:686

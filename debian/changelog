@@ -1,3 +1,12 @@
+dwdiff (1.9-0.1) unstable; urgency=low
+
+  * NMU
+  * New upstream release.  closes: #612771.
+  * Change dh_clean -k to dh_prep.
+  * Add a watch file.
+
+ -- Clint Adams <clint@debian.org>  Thu, 10 Feb 2011 10:12:00 -0500
+
 dwdiff (1.8.2-0.1) unstable; urgency=low
 
   * NMU

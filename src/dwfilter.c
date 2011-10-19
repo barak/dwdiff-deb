@@ -1,4 +1,4 @@
-/* Copyright (C) 2010 G.P. Halkes
+/* Copyright (C) 2010-2011 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -67,7 +67,7 @@ static PARSE_FUNCTION(parseCmdLine)
 				   - If the (C) symbol (that is the c in a circle) is not available,
 					 leave as it as is. (Unicode code point 0x00A9)
 				   - G.P. Halkes is name and should be left as is. */
-				_("Copyright (C) 2006-2010 G.P. Halkes\nLicensed under the GNU General Public License version 3\n"), stdout);
+				_("Copyright (C) 2006-2011 G.P. Halkes\nLicensed under the GNU General Public License version 3\n"), stdout);
 			exit(EXIT_SUCCESS);
 		END_OPTION
 		OPTION('i', "ignore-case", NO_ARG)

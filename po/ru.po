@@ -1,6 +1,6 @@
 # Russian translations for dwdiff package.
 # This file is distributed under the same license as the dwdiff package.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: dwdiff-1.7\n"
@@ -86,10 +86,10 @@ msgstr "Использование: dwfilter [опции] <СТАРЫЙ ФАЙЛ
 #. - G.P. Halkes is name and should be left as is.
 #: dwfilter.c:70 option.c:524
 msgid ""
-"Copyright (C) 2006-2010 G.P. Halkes\n"
+"Copyright (C) 2006-2011 G.P. Halkes\n"
 "Licensed under the GNU General Public License version 3\n"
 msgstr ""
-"Copyright (C) 2006-2010 G.P. Halkes\n"
+"Copyright (C) 2006-2011 G.P. Halkes\n"
 "Распространяется по лицензии GNU General Public License версии 3\n"
 
 #: dwfilter.c:108 option.c:683 option.c:686

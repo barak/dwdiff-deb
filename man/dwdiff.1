@@ -1,4 +1,4 @@
-.\" Copyright (C) 2006-2010 G.P. Halkes
+.\" Copyright (C) 2006-2011 G.P. Halkes
 .\" This program is free software: you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License version 3, as
 .\" published by the Free Software Foundation.
@@ -10,8 +10,8 @@
 .\"
 .\" You should have received a copy of the GNU General Public License
 .\" along with this program.  If not, see <http://www.gnu.org/licenses/>.
-.TH "dwdiff" "1" "27-07-2010" "Version 1.8.2" "delimited word diff program"
-.hw /usr/share/doc/dwdiff-1.8.2 http://os.ghalkes.nl/dwdiff
+.TH "dwdiff" "1" "05-02-2011" "Version 1.9" "delimited word diff program"
+.hw /usr/share/doc/dwdiff-1.9 http://os.ghalkes.nl/dwdiff
 
 .SH NAME
 
@@ -19,6 +19,8 @@
 .SH SYNOPSIS
 
 \fBdwdiff\fP [\fIOPTIONS\fP] <\fIOLD FILE\fP> <\fINEW FILE\fP>
+.br
+\fBdwdiff\fP [\fIOPTIONS\fP] \fB\-\-diff\-input\fP [<\fIDIFF FILE\fP>]
 .SH DESCRIPTION
 
 \fBdwdiff\fP is a front-end for the \fBdiff\fP program that operates at the word
@@ -50,6 +52,11 @@ Use punctuation characters as delimiters. The exact set of punctuation
 characters depends on the current locale.
 .IP "\fB\-W\fP <\fIwhitespace\fP>, \fB\-\-whitespace\fP=<\fIwhitespace\fP>"
 Specify a list of characters to be used as whitespace.
+.IP "\fB\-\-diff\-input\fP"
+Interpret the input as the output from \fBdiff\fP in the Unified Diff format
+(usually produced by \fBdiff -u\fP). In this case only one input file is
+allowed. This option allows reformating diff output with \fBdwdiff\fP, and is
+useful for example to post-process the output of \fBsvn diff\fP.
 .IP "\fB\-1\fP, \fB\-\-no\-deleted\fP"
 Suppress printing of words deleted from the first file.
 .IP "\fB\-2\fP, \fB\-\-no\-inserted\fP"
@@ -161,12 +168,12 @@ please include a minimal example that demonstrates the problem.
 G.P. Halkes <dwdiff@ghalkes.nl>
 .SH COPYRIGHT
 
-Copyright \(co 2006-2010 G.P. Halkes
+Copyright \(co 2006-2011 G.P. Halkes
 .br
 dwdiff is licensed under the GNU General Public License version 3.
 .br
 For more details on the license, see the file COPYING in the documentation
-directory. On Un*x systems this is usually /usr/share/doc/dwdiff-1.8.2.
+directory. On Un*x systems this is usually /usr/share/doc/dwdiff-1.9.
 .SH SEE ALSO
 
 \fBdwfilter\fP(1), \fBwdiff\fP(1), \fBdiff\fP(1)
