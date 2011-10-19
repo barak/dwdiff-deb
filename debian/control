@@ -2,7 +2,7 @@ Source: dwdiff
 Section: utils
 Priority: extra
 Maintainer: Olexandr Kravchuk <sashko.debian@gmail.com>
-Build-Depends: debhelper (>= 8), autotools-dev, libicu-dev
+Build-Depends: debhelper (>= 8), libicu-dev
 Standards-Version: 3.9.2
 Homepage: http://os.ghalkes.nl/dwdiff.html
 
