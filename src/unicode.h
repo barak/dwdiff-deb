@@ -1,4 +1,4 @@
-/* Copyright (C) 2008-2010 G.P. Halkes
+/* Copyright (C) 2008-2011 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -40,17 +40,8 @@ dos2unix to convert their documents if need be. */
 #include <unicode/uchar.h>
 #include <unicode/unorm.h>
 
-typedef struct {
-	UChar *data;
-	int32_t allocated;
-	int32_t length;
-} UTF16Buffer;
-
-typedef struct {
-	UTF16Buffer *list;
-	int allocated;
-	int used;
-} CharList;
+typedef VECTOR(UChar, UTF16Buffer);
+typedef VECTOR(UTF16Buffer, CharList);
 
 bool getCluster(Stream *stream, UTF16Buffer *buffer);
 bool getBackspaceCluster(Stream *stream, UTF16Buffer *buffer);
@@ -61,8 +52,6 @@ int putuc(Stream *stream, UChar32 c);
 void decomposeChar(CharData *c);
 void casefoldChar(CharData *c);
 
-void UTF16BufferInit(UTF16Buffer *buffer);
-void freeUTF16Buffer(UTF16Buffer *buffer);
 int compareUTF16Buffer(const UTF16Buffer *a, const UTF16Buffer *b);
 bool isUTF16Punct(UTF16Buffer *buffer);
 bool isUTF16Whitespace(UTF16Buffer *buffer);

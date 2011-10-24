@@ -23,8 +23,8 @@ struct {
 	const char *delStart,
 		*delStop,
 		*addStart,
-		*addStop,
-		*delColor,
+		*addStop;
+	char *delColor,
 		*addColor;
 	size_t delStartLen,
 		delStopLen,
@@ -54,11 +54,10 @@ struct {
 		ignoreCase,
 		colorMode;
 	bool transliterate;
-	const char *diffOption;
 	int lineNumbers;
 	bool context;
 	int contextLines;
-	int matchContext;
+	unsigned matchContext;
 	bool aggregateChanges;
 	bool paraDelim;
 	const char *paraDelimMarker;

@@ -1,4 +1,4 @@
-/* Copyright (C) 2008-2010 G.P. Halkes
+/* Copyright (C) 2008-2011 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -50,8 +50,7 @@ Stream *newFileStream(File *file) {
 	if (file == NULL)
 		return NULL;
 
-	if ((retval = malloc(sizeof(Stream))) == NULL)
-		outOfMemory();
+	retval = safe_malloc(sizeof(Stream));
 
 	retval->vtable = &fileVtable;
 	retval->data.file = file;
@@ -85,8 +84,7 @@ static StreamVtable stringVtable = { getCharString, ungetCharString };
 Stream *newStringStream(const char *string, size_t length) {
 	Stream *retval;
 
-	if ((retval = malloc(sizeof(Stream))) == NULL)
-		outOfMemory();
+	retval = safe_malloc(sizeof(Stream));
 
 	retval->vtable = &stringVtable;
 	retval->data.string.string = string;
@@ -100,4 +98,9 @@ Stream *newStringStream(const char *string, size_t length) {
 
 bool isFileStream(const Stream *stream) {
 	return stream->vtable == &fileVtable;
+}
+
+void sfclose(Stream *stream) {
+	fileClose(stream->data.file);
+	free(stream);
 }

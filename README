@@ -1,14 +1,14 @@
 Introduction
 ============
 
-dwdiff is a front-end for the diff program that operates at the word level
-instead of the line level. It is different from wdiff in that it allows the
-user to specify what should be considered whitespace, and in that it takes an
-optional list of characters that should be considered delimiters. Delimiters
-are single characters that are treated as if they are words, even when there
-is no whitespace separating them from preceding words or delimiters. dwdiff
-is mostly commandline compatible with wdiff. Only the --autopager, --terminal
-and --avoid-wraps options are not supported.
+dwdiff is a diff program that operates at the word level instead of the line
+level. It is different from wdiff in that it allows the user to specify what
+should be considered whitespace, and in that it takes an optional list of
+characters that should be considered delimiters. Delimiters are single
+characters that are treated as if they are words, even when there is no
+whitespace separating them from preceding words or delimiters. dwdiff is mostly
+commandline compatible with wdiff. Only the --autopager, --terminal and
+--avoid-wraps options are not supported.
 
 The default output from dwdiff is the new text, with the deleted and inserted
 parts annotated with markers. Command line options are available to change
@@ -37,13 +37,6 @@ was replaced by "SomeOtherType".
 Prerequisites and installation
 ==============================
 
-dwdiff is a front-end for diff, so the diff utility should be available. The
-configure script will test for the -a (assume input is text) option. If it is
-not available (this option is not in the POSIX specifications) a work-around
-for the -a option is enabled. If a diff command is available that does provide
-this option but the command has a different name, one can set the diff command
-to be used by adding --diff=<command> to the configure command-line.
-
 dwdiff relies on the GNU gettext library for providing localised messages, and
 on libicu (http://icu-project.org) for Unicode support. dwdiff can be compiled
 without support for either of these libraries, which means all messages will be
@@ -66,8 +59,10 @@ Manually editing the Makefile to suit your computer:
 ---
 
 $ cp Makefile.in Makefile
-Edit the values for GETTEXTFLAGS, GETTEXTLIBS, LOCALEDIR, DIFF, DIFF_FLAGS,
-LINGUAS, ICUFLAGS, ICULIBS and prefix
+
+Edit the values for GETTEXTFLAGS, GETTEXTLIBS, LOCALEDIR, LINGUAS, ICUFLAGS,
+ICULIBS and prefix in Makefile
+
 $ make all
 $ make install
 (assumes working install program)
@@ -76,15 +71,15 @@ The Makefile.in in the distribution should work on all POSIX compatible make's.
 I have tested it with both GNU make and BSD make.
 
 dwdiff uses several POSIX functions, namely: mkstemp, open, read, lseek, write,
-close, umask, popen, pclose, snprintf. dwdiff should compile on any Un*x system
-that provides these functions.
+close, umask, snprintf. dwdiff should compile on any Un*x system that provides
+these functions.
 
 Reporting bugs
 ==============
 
 If you think you have found a bug, please check that you are using the latest
-version of dwdiff [http://os.ghalkes.nl/dwdiff]. When reporting bugs, please
-include a minimal example that demonstrates the problem.
+version of dwdiff [http://os.ghalkes.nl/dwdiff.html]. When reporting bugs,
+please include a minimal example that demonstrates the problem.
 
 Author
 ======

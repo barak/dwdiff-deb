@@ -294,26 +294,14 @@ void postProcessOptionsSC(void) {
 		}
 	}
 
-#ifndef NO_MINUS_A
-	/* Not needed if there is no -a option, as option.transliterate will always
-	   be true then. */
-
 	if (!TEST_BIT(option.whitespace, '\n'))
 		option.transliterate = true;
-#endif
 }
 
 #ifdef USE_UNICODE
 /*===============================================================*/
 /* UTF-8 versions of the addCharacters and checkOverlap routines.
    Descriptions can be found in the definition of the DispatchTable struct. */
-
-static void reallocList(CharList *list) {
-	list->allocated *= 2;
-	ASSERT(list->allocated > 0);
-	if ((list->list = realloc(list->list, list->allocated * sizeof(UTF16Buffer))) == NULL)
-		outOfMemory();
-}
 
 /** Add all characters to the specified list.
 	@param chars The string with characters to add to the list or bitmap.
@@ -327,49 +315,50 @@ void addCharactersUTF8(const char *chars, size_t length, CHARLIST *list, char bi
 	/* Suppress unused parameter warning in semi-portable way. */
 	(void) bitmap;
 
-	UTF16BufferInit(&cluster.UTF8Char.original);
-	UTF16BufferInit(&cluster.UTF8Char.converted);
+	VECTOR_INIT_ALLOCATED(cluster.UTF8Char.original);
+	VECTOR_INIT_ALLOCATED(cluster.UTF8Char.converted);
 	charStream = newStringStream(chars, length);
 
 	while (getCluster(charStream, &cluster.UTF8Char.original)) {
-		int i;
+		UTF16Buffer tmp;
+		size_t i;
 
 		decomposeChar(&cluster);
 
 		/* Check for duplicates */
 		for (i = 0; i < list->used; i++)
-			if (compareUTF16Buffer(&cluster.UTF8Char.converted, &list->list[i]) == 0)
+			if (compareUTF16Buffer(&cluster.UTF8Char.converted, &list->data[i]) == 0)
 				break; /* continue won't work because we're in a for-loop */
 		if (i != list->used)
 			continue;
 
-		if (list->allocated == list->used)
-			reallocList(list);
-		list->list[list->used].length = cluster.UTF8Char.converted.length;
-		list->list[list->used].data = malloc(cluster.UTF8Char.converted.length * sizeof(UChar));
-		if (list->list[list->used].data == NULL)
-			outOfMemory();
-		memcpy(list->list[list->used].data, cluster.UTF8Char.converted.data, cluster.UTF8Char.converted.length * sizeof(UChar));
-		list->used++;
+		tmp.used = cluster.UTF8Char.converted.used;
+		tmp.data = safe_malloc(cluster.UTF8Char.converted.used * sizeof(UChar));
+		tmp.allocated = cluster.UTF8Char.converted.used;
+		memcpy(tmp.data, cluster.UTF8Char.converted.data, cluster.UTF8Char.converted.used * sizeof(UChar));
+		VECTOR_APPEND(*list, tmp);
 	}
+	VECTOR_FREE(cluster.UTF8Char.original);
+	VECTOR_FREE(cluster.UTF8Char.converted);
 	free(charStream);
 }
 
 /** Check for overlap in whitespace and delimiter sets. */
 void checkOverlapUTF8(void) {
-	int i, j;
+	size_t i, j;
 
 	if (!option.whitespaceSet)
 		return;
 
 	/* Check for overlap can be done in O(N) because the lists have already been sorted in postProcessOptionsUTF8. */
 	for (i = 0, j = 0; i < option.delimiterList.used; i++) {
-		for (; j < option.whitespaceList.used && compareUTF16Buffer(&option.delimiterList.list[i], &option.whitespaceList.list[j]) > 0; j++) /* NO-OP */;
+		for (; j < option.whitespaceList.used && compareUTF16Buffer(&option.delimiterList.data[i],
+				&option.whitespaceList.data[j]) > 0; j++) /* NO-OP */;
 
 		if (j == option.whitespaceList.used)
 			break;
 
-		if (compareUTF16Buffer(&option.delimiterList.list[i], &option.whitespaceList.list[j]) == 0)
+		if (compareUTF16Buffer(&option.delimiterList.data[i], &option.whitespaceList.data[j]) == 0)
 			fatal(_("Whitespace and delimiter sets overlap\n"));
 	}
 
@@ -377,7 +366,7 @@ void checkOverlapUTF8(void) {
 		return;
 
 	for (i = 0; i < option.whitespaceList.used; i++) {
-		if (isUTF16Punct(&option.whitespaceList.list[i]))
+		if (isUTF16Punct(&option.whitespaceList.data[i]))
 			fatal(_("Whitespace and delimiter sets overlap\n"));
 	}
 	return;
@@ -388,34 +377,32 @@ void setPunctuationUTF8(void) {
 }
 
 void initOptionsUTF8(void) {
-	option.whitespaceList.allocated = 16;
-	reallocList(&option.whitespaceList);
-	option.delimiterList.allocated = 16;
-	reallocList(&option.delimiterList);
+	VECTOR_INIT_ALLOCATED(option.whitespaceList);
+	VECTOR_INIT_ALLOCATED(option.delimiterList);
 }
 
 void postProcessOptionsUTF8(void) {
 	UTF16Buffer newline;
 	UChar newlineData[1] = { '\n' };
 	newline.data = newlineData;
-	newline.length = 1;
+	newline.used = 1;
 
-	qsort(option.delimiterList.list, option.delimiterList.used,	sizeof(UTF16Buffer),
+	qsort(option.delimiterList.data, option.delimiterList.used,	sizeof(UTF16Buffer),
 		(int (*)(const void *, const void *)) compareUTF16Buffer);
 
-	qsort(option.whitespaceList.list, option.whitespaceList.used, sizeof(UTF16Buffer),
+	qsort(option.whitespaceList.data, option.whitespaceList.used, sizeof(UTF16Buffer),
 		(int (*)(const void *, const void *)) compareUTF16Buffer);
 
 	/* Check if all newline characters are considered whitespace (not only newlines
 	   followed by something else). If that is not the case, the input needs to be
 	   transliterated. */
 	if (option.whitespaceSet) {
-		if (bsearch(&newline, option.whitespaceList.list, option.whitespaceList.used,
+		if (bsearch(&newline, option.whitespaceList.data, option.whitespaceList.used,
 				sizeof(UTF16Buffer), (int (*)(const void *, const void *)) compareUTF16Buffer) == NULL) {
 			option.transliterate = true;
 		}
 	} else {
-		if (bsearch(&newline, option.delimiterList.list, option.delimiterList.used,
+		if (bsearch(&newline, option.delimiterList.data, option.delimiterList.used,
 				sizeof(UTF16Buffer), (int (*)(const void *, const void *)) compareUTF16Buffer) != NULL) {
 			option.transliterate = true;
 		}
@@ -467,7 +454,7 @@ static char *parseColor(const char *_color) {
 				}
 			}
 			if (colors[i].backgroundSequence == NULL)
-				fatal(_("Invalid color %s\n"), colon);
+				fatal(_("Invalid background color %s\n"), colon);
 		}
 	}
 
@@ -498,9 +485,6 @@ PARSE_FUNCTION(parseCmdLine)
 	ONLY_UNICODE(option.decomposition = UNORM_NFD;)
 
 	option.needStartStop = true;
-#ifdef NO_MINUS_A
-	option.transliterate = true;
-#endif
 
 	option.paraDelimMarker = "<-->";
 	option.paraDelimMarkerLength = strlen(option.paraDelimMarker);
@@ -532,7 +516,7 @@ PARSE_FUNCTION(parseCmdLine)
 				   - If the (C) symbol (that is the c in a circle) is not available,
 					 leave as it as is. (Unicode code point 0x00A9)
 				   - G.P. Halkes is name and should be left as is. */
-				_("Copyright (C) 2006-2011 G.P. Halkes\nLicensed under the GNU General Public License version 3\n"), stdout);
+				_("Copyright (C) 2006-2011 G.P. Halkes and others\nLicensed under the GNU General Public License version 3\n"), stdout);
 			exit(EXIT_SUCCESS);
 		END_OPTION
 		OPTION('1', "no-deleted", NO_ARG)
@@ -620,9 +604,6 @@ PARSE_FUNCTION(parseCmdLine)
 		DOUBLE_DASH
 			NO_MORE_OPTIONS;
 		END_OPTION
-		OPTION('D', "diff-option", REQUIRED_ARG)
-			option.diffOption = optArg;
-		END_OPTION
 		OPTION('c', "color", OPTIONAL_ARG)
 			option.colorMode = true;
 			if (optArg != NULL) {
@@ -697,6 +678,20 @@ PARSE_FUNCTION(parseCmdLine)
 		END_OPTION
 		LONG_OPTION("diff-input", NO_ARG)
 			option.diffInput = true;
+		END_OPTION
+		OPTION('A', "algorithm", REQUIRED_ARG)
+			if (strcmp(optArg, "best") == 0) {
+				minimal = true;
+				speed_large_files = false;
+			} else if (strcmp(optArg, "normal") == 0) {
+				minimal = false;
+				speed_large_files = false;
+			} else if (strcmp(optArg, "fast") == 0) {
+				minimal = false;
+				speed_large_files = true;
+			} else {
+				fatal(_("Invalid algorithm name\n"));
+			}
 		END_OPTION
 
 		fatal(_("Option %.*s does not exist\n"), OPTPRARG);

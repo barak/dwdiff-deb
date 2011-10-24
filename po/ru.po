@@ -15,13 +15,8 @@ msgstr ""
 
 #: util.h:28 util.h:30
 #, c-format
-msgid "Program logic error at %s:%d\n"
+msgid "Program-logic error at %s:%d\n"
 msgstr "Ошибка в программной логике на %s:%d\n"
-
-#: doDiff.c:59
-#, c-format
-msgid "Failed to execute diff: %s\n"
-msgstr "Не удалось запустить diff: %s\n"
 
 #: doDiff.c:153 doDiff.c:192 doDiff.c:224 doDiff.c:247 doDiff.c:307
 #: doDiff.c:471
@@ -33,12 +28,6 @@ msgstr "Ошибка чтения ввода\n"
 #, c-format
 msgid "Could not create temporary file: %s\n"
 msgstr "Не могу создать временный файл: %s\n"
-
-#: doDiff.c:512 doDiff.c:524 doDiff.c:527 doDiff.c:536 doDiff.c:546
-#: doDiff.c:552 doDiff.c:563 doDiff.c:568 doDiff.c:616 doDiff.c:621
-#: doDiff.c:626 doDiff.c:631 doDiff.c:634 doDiff.c:746
-msgid "Error parsing diff output\n"
-msgstr "Ошибка разбора вывода diff\n"
 
 #: dwdiff.c:275
 #, c-format
@@ -205,10 +194,6 @@ msgstr ""
 #: optionDescriptions.h:29
 msgid "-I, --ignore-formatting                Ignore formatting differences\n"
 msgstr ""
-
-#: optionDescriptions.h:30
-msgid "-D <option>, --diff-option=<option>    Add <option> to the diff command-line\n"
-msgstr "-D <опции>, --diff-option=<опции>    Добавить <опции> коммандной строки при вызове diff\n"
 
 #. TRANSLATORS:
 #. The context meant here are words preceeding and succeeding each word in
@@ -420,11 +405,6 @@ msgstr ""
 #: option.c:679
 #, c-format
 msgid "Error opening temporary output file: %s\n"
-msgstr ""
-
-#: util.c:38
-#, c-format
-msgid "Could not allocate memory: %s\n"
 msgstr ""
 
 #: util.c:38

@@ -1,4 +1,4 @@
-/* Copyright (C) 2008-2010 G.P. Halkes
+/* Copyright (C) 2008-2011 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -55,7 +55,6 @@ Stream *newStringStream(const char *string, size_t length);
 bool isFileStream(const Stream *stream);
 
 #define sferror(s) (fileError((s)->data.file))
-#define sfclose(s) (fileClose((s)->data.file))
 #define sfflush(s) (fileFlush((s)->data.file))
 #define srewind(s) (fileRewind((s)->data.file, FILE_READ))
 #define sfeof(s) (fileEof((s)->data.file))
@@ -65,5 +64,7 @@ bool isFileStream(const Stream *stream);
 #define sputc(s, c) (filePutc((s)->data.file, c))
 #define swrite(s, buf, bytes) (fileWrite((s)->data.file, buf, bytes))
 #define sgeterrno(s) (fileGetErrno((s)->data.file))
+
+void sfclose(Stream *stream);
 
 #endif

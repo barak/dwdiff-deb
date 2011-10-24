@@ -51,43 +51,35 @@ typedef enum {false, true} bool;
 #include <stdbool.h>
 #endif
 
+/*==== Configuration definitions ====*/
 #ifndef NO_STRDUP
 #define strdupA strdup
 #endif
 
-#define VERSION_STRING "1.9"
-
-/*==== Configuration definitions ====*/
-#ifndef DIFF
-#	define DIFF "diff"
-#endif
-
-/* Solaris diff does not provide -a, but does distinguish between binary and
-   text files. Therefore, we need to take special measures to allow diffs on
-   all kinds of semi-binary files. */
-#ifdef NO_MINUS_A
-#	define MINUS_A ""
-#else
-#	define MINUS_A " -a"
-#endif
-
-#define DIFF_COMMAND DIFF MINUS_A
+#define VERSION_STRING "2.0"
 
 typedef struct CharData CharData;
 
+#include "vector.h"
 #include "stream.h"
 #include "tempfile.h"
 #include "unicode.h"
 #include "buffer.h"
+#include "diff/diff.h"
+
+typedef lin ValueType;
+#define VALUE_MAX LIN_MAX
+
+typedef VECTOR(ValueType, ValueTypeVector);
 
 typedef struct {
 	const char *name;
 	Stream *input;
-	TempFile *diffTokens;
+	ValueTypeVector diffTokens;
 	TempFile *tokens;
 	TempFile *whitespace;
 	int lastPrinted;
-	Context whitespaceBuffer;
+	CharBuffer whitespaceBuffer;
 	bool whitespaceBufferUsed;
 } InputFile;
 
@@ -124,5 +116,4 @@ extern bool UTF8Mode;
 extern CharData charData;
 
 void doDiff(void);
-
 #endif

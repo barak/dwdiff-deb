@@ -1,4 +1,4 @@
-/* Copyright (C) 2006-2010 G.P. Halkes
+/* Copyright (C) 2006-2011 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -22,12 +22,13 @@
 #include "stream.h"
 #include "buffer.h"
 #include "unicode.h"
+#include "diff/diff.h"
+#include "hashtable.h"
 
 static const char resetColor[] = "\033[0m";
 static const char eraseLine[] = "\033[K";
 static unsigned int oldLineNumber = 1, newLineNumber = 1;
 static bool lastWasLinefeed = true, lastWasDelete = false, lastWasCarriageReturn = false;
-static int recursionIndex = -1;
 
 /** Check whether the last-read character equals a certain value. */
 static bool charDataEquals(int c) {
@@ -50,12 +51,12 @@ static bool readNextChar(Stream *stream) {
 static void addCharData(bool common) {
 #ifdef USE_UNICODE
 	if (UTF8Mode) {
-		int32_t i;
+		size_t i;
 		char encoded[4];
 		int bytes, j;
 		UChar32 highSurrogate = 0;
 
-		for (i = 0; i < charData.UTF8Char.original.length; i++) {
+		for (i = 0; i < charData.UTF8Char.original.used; i++) {
 			bytes = filteredConvertToUTF8(charData.UTF8Char.original.data[i], encoded, &highSurrogate);
 
 			for (j = 0; j < bytes; j++)
@@ -65,42 +66,6 @@ static void addCharData(bool common) {
 	}
 #endif
 	addchar(charData.singleChar, common);
-}
-
-/** Start the diff program. */
-static FILE *startDiff(TempFile *oldDiffTokens, TempFile *newDiffTokens) {
-	FILE *diff;
-	char *command;
-	size_t length;
-
-	/* Allocate memory to hold the diff command with arguments. */
-	length = strlen(DIFF_COMMAND) + 1 + strlen(oldDiffTokens->name) + 1 + strlen(newDiffTokens->name) + 1;
-	if (option.diffOption != NULL)
-		length += strlen(option.diffOption) + 1;
-
-	errno = 0;
-	if ((command = malloc(length)) == NULL)
-		outOfMemory();
-
-	/* Compose the diff command. */
-	strcpy(command, DIFF_COMMAND);
-	strcat(command, " ");
-	if (option.diffOption != NULL) {
-		strcat(command, option.diffOption);
-		strcat(command, " ");
-	}
-	strcat(command, oldDiffTokens->name);
-	strcat(command, " ");
-	strcat(command, newDiffTokens->name);
-
-	/* Start diff */
-#ifdef LEAVE_FILES
-	fprintf(stderr, "%s\n", command);
-#endif
-	if ((diff = popen(command, "r")) == NULL)
-		fatal(_("Failed to execute diff: %s\n"), strerror(errno));
-	free(command);
-	return diff;
 }
 
 /* Note: ADD should be 0, OLD_COMMON should be DEL + COMMON. */
@@ -193,11 +158,11 @@ static void handleWhitespaceChar(bool print, Mode mode) {
 */
 static void handleNextWhitespace(InputFile *file, bool print, Mode mode) {
 	if (file->whitespaceBufferUsed) {
-		Stream *stream = newStringStream(file->whitespaceBuffer.line, file->whitespaceBuffer.filled);
+		Stream *stream = newStringStream(file->whitespaceBuffer.data, file->whitespaceBuffer.used);
 		while (readNextChar(stream))
 			handleWhitespaceChar(print, mode);
 		free(stream);
-		file->whitespaceBuffer.filled = 0;
+		file->whitespaceBuffer.used = 0;
 		file->whitespaceBufferUsed = false;
 	} else {
 		while (readNextChar(file->whitespace->stream)) {
@@ -443,8 +408,8 @@ void printToCommonWord(int idx) {
 	@param file The @a InputFile to print from.
 	@param mode Either ADD or DEL, used for printing of start/stop markers.
 */
-static void printWords(int *range, InputFile *file, bool print, Mode mode) {
-	ASSERT(file->lastPrinted == range[0] - 1);
+static void printWords(lin start, lin count, InputFile *file, bool print, Mode mode) {
+	ASSERT(file->lastPrinted == start);
 
 	/* Print the first word. As we need to add the markers AFTER the first bit of
 	   white space, we can't just use handleWord */
@@ -472,7 +437,7 @@ static void printWords(int *range, InputFile *file, bool print, Mode mode) {
 	handleNextToken(file->tokens, print, mode);
 	file->lastPrinted++;
 	/* Print following words */
-	handleWord(file, range[range[1] >= 0 ? 1: 0], print, mode);
+	handleWord(file, start + count, print, mode);
 
 	if (print)
 		doPostLinefeed(mode);
@@ -492,15 +457,15 @@ static void printWords(int *range, InputFile *file, bool print, Mode mode) {
 /** Print (or skip if the user doesn't want to see) deleted words.
 	@param range The range of words to print (or skip).
 */
-void printDeletedWords(int *range) {
-	printWords(range, &option.oldFile, option.printDeleted, DEL);
+void printDeletedWords(struct change *script) {
+	printWords(script->line0, script->deleted, &option.oldFile, option.printDeleted, DEL);
 }
 
 /** Print (or skip if the user doesn't want to see) inserted words.
 	@param range The range of words to print (or skip).
 */
-void printAddedWords(int *range) {
-	printWords(range, &option.newFile, option.printAdded, ADD);
+void printAddedWords(struct change *script) {
+	printWords(script->line1, script->inserted, &option.newFile, option.printAdded, ADD);
 }
 
 /** Print (or skip if the user doesn't want to see) the last (common) words of both files. */
@@ -523,7 +488,7 @@ static bool loadNextWhitespace(InputFile *file) {
 	bool newlineFound = false;
 
 	file->whitespaceBufferUsed = true;
-	file->whitespaceBuffer.filled = 0;
+	file->whitespaceBuffer.used = 0;
 	while (readNextChar(file->whitespace->stream)) {
 		if (charDataEquals(0))
 			return newlineFound;
@@ -538,328 +503,238 @@ static bool loadNextWhitespace(InputFile *file) {
 
 #ifdef USE_UNICODE
 		if (UTF8Mode) {
-			int32_t i;
+			size_t i;
 			char encoded[4];
 			int bytes, j;
 			UChar32 highSurrogate = 0;
 
-			for (i = 0; i < charData.UTF8Char.original.length; i++) {
+			for (i = 0; i < charData.UTF8Char.original.used; i++) {
 				bytes = filteredConvertToUTF8(charData.UTF8Char.original.data[i], encoded, &highSurrogate);
 
-				ensureBufferSpace(&file->whitespaceBuffer, bytes);
 				for (j = 0; j < bytes; j++)
-					file->whitespaceBuffer.line[file->whitespaceBuffer.filled++] = encoded[j];
+					VECTOR_APPEND(file->whitespaceBuffer, encoded[j]);
 			}
 		} else
 #endif
 		{
-			ensureBufferSpace(&file->whitespaceBuffer, 1);
-			file->whitespaceBuffer.line[file->whitespaceBuffer.filled++] = charData.singleChar;
+			VECTOR_APPEND(file->whitespaceBuffer, charData.singleChar);
 		}
 	}
 	return newlineFound;
 }
 
-#define NEEDS_OUTPUT (processedLines >= startLine && processedLines < endLine && i >= startToken && i < endToken)
-/** Split the tokens from the diff output.
-	@param diff The pipe to the diff program.
-	@param oldPart A pointer to the return value for the new 'old' set of diff-tokens.
-	@param oldPart A pointer to the return value for the new 'new' set of diff-tokens.
-	@param context The size of the context used.
-	@param newContext The desired size of the context for the output.
+/** Create an array of integers to represent the aggregation of several tokens to a token with context.
+    @param diffTokens The array of integers representing the words in the input.
+    @param range An array of two integers representing the start and length in
+        @p diffTokens (or @c NULL for complete array).
+    @param context The number of context tokens to use (half on either side).
+    @param file The ::file_data struct to fill.
 */
-static int splitDifference(FILE *diff, TempFile **oldPart, TempFile **newPart, int context, int newContext, int *range) {
-	int tokenLengths[option.matchContext + 1];
-	int c, i, j;
-	int processedLines = 0;
-	Stream *output;
 
-	int startLine = (context - newContext) / 2;
-	int endLineOld = range[1] - range[0] - startLine + 1;
-	int endLineNew = range[3] - range[2] - startLine + 1;
-	int startToken = (context - newContext) / 2;
-	int endToken = startToken + newContext + 1;
+static ValueType *initializeContextDiffTokens(ValueTypeVector *diffTokens, lin *range, unsigned context, struct file_data *file) {
+	ValueType *contextDiffTokens, *dataBase;
+	size_t dataRange;
+	size_t i, idx = 0;
 
-	if ((*oldPart = tempFile(recursionIndex * 2)) == NULL)
-		fatal(_("Could not create temporary file: %s\n"), strerror(errno));
-	if ((*newPart = tempFile(recursionIndex * 2 + 1)) == NULL)
-		fatal(_("Could not create temporary file: %s\n"), strerror(errno));
+	if (range == NULL)
+		dataRange = diffTokens->used;
+	else
+		dataRange = range[1];
 
-	output = (*oldPart)->stream;
-	while ((c = getc(diff)) != EOF) {
-		bool printed = false;
-		memset(tokenLengths, 0, sizeof(tokenLengths));
+	contextDiffTokens = safe_malloc((dataRange + context) * sizeof(ValueType));
 
-		if (c == '<' || c == '>') {
-			int endLine = c == '<' ? endLineOld : endLineNew;
+	dataBase = diffTokens->data;
+	if (range != NULL)
+		dataBase += range[0];
 
-			/* Skip any spaces */
-			while ((c = getc(diff)) != EOF && c == ' ') {}
-			/* '0' + 16 is a special marker that indicates an empty token used for
-			   padding the start and end. This is to ensure that they are different
-			   from empty tokens, which are inserted for paragraph separators (empty
-			   lines). */
-			if (c == EOF || c < '0' || c > ('0' + 16))
-				fatal(_("Error parsing diff output\n"));
+	for (i = 1; i <= context; i++)
+		contextDiffTokens[idx++] = getValue(dataBase, i * sizeof(ValueType));
 
-			tokenLengths[0] = c == ('0' + 16) ? 0 : c - '0';
+	for (i = 0; i < dataRange - context; i++)
+		contextDiffTokens[idx++] = getValue(dataBase + i, (context + 1) * sizeof(ValueType));
 
-			/* Read token lengths */
-			for (i = 0; i < context + 1; i++) {
-				while ((c = getc(diff)) != EOF && c != ',') {
-					if (!(c < '0' || c > ('0' + 15)))
-						tokenLengths[i] = tokenLengths[i] * 16 + (c - '0');
-					else if (c == ('0' + 16))
-						tokenLengths[i] = 0;
-					else
-						fatal(_("Error parsing diff output\n"));
-					if (NEEDS_OUTPUT && newContext != 0)
-						sputc(output, c);
-				}
-				if (NEEDS_OUTPUT && newContext != 0)
-					sputc(output, ',');
+	for (i = 0; i < context; i++)
+		contextDiffTokens[idx++] = getValue(dataBase + dataRange - context + i, (context - i) * sizeof(ValueType));
 
-				if (c == EOF)
-					fatal(_("Error parsing diff output\n"));
-			}
 
-			for (i = 0; i < context + 1; i++) {
-				if (NEEDS_OUTPUT)
-					printed = true;
-				for (j = 0; j < tokenLengths[i]; j++) {
-					if ((c = getc(diff)) == EOF)
-						fatal(_("Error parsing diff output\n"));
+	ASSERT(idx == dataRange + context);
 
-					if (NEEDS_OUTPUT)
-						sputc(output, c);
-#ifdef NO_MINUS_A
-					/* If the output stream was escaped, the tokenLengths don't take
-					   that into account so we have handle a couple of extra bytes
-					   here. */
-					if (c == '%') {
-						if ((c = getc(diff)) == EOF)
-							fatal(_("Error parsing diff output\n"));
-						if (NEEDS_OUTPUT)
-							sputc(output, c);
-						if (c == '%')
-							continue;
-						if ((c = getc(diff)) == EOF)
-							fatal(_("Error parsing diff output\n"));
-						if (NEEDS_OUTPUT)
-							sputc(output, c);
-					}
-#endif
-				}
-			}
-			if (printed)
-				sputc(output, '\n');
-			processedLines++;
-			if (getc(diff) != '\n')
-				fatal(_("Error parsing diff output\n"));
-		} else if (c == '-') {
-			/* Skip lines between diff lines */
-			while ((c = getc(diff)) != EOF && c != '\n') {}
-			if (c == EOF)
-				fatal(_("Error parsing diff output\n"));
-			output = (*newPart)->stream;
-			processedLines = 0;
-		} else {
-			return c;
-		}
-	}
-	return c;
+	file->equivs = contextDiffTokens;
+	file->buffered_lines = dataRange + context;
+	return contextDiffTokens;
 }
-
 
 /** Read the output of the diff command, and call the appropriate print routines.
 	@param baseRange The range associated with the diff-token files, or NULL if the whole file.
 	@param context The size of the context used.
-	@param oldDiffTokens The file with diff-tokens from the 'old' file.
-	@param newDiffTokens The file with diff-tokens from the 'new' file.
 */
-static void doDiffInternal(int *baseRange, int context, TempFile *oldDiffTokens, TempFile *newDiffTokens) {
-	int c, command, currentIndex, range[4];
+static void doDiffInternal(lin *baseRange, unsigned context) {
+	enum { C_ADD, C_DEL, C_CHANGE } command;
 	bool reverseDeleteAdd = false;
-	FILE *diff;
-	recursionIndex++;
+	struct change *script = NULL, *ptr;
+	struct comparison cmp;
 
-	diff = startDiff(oldDiffTokens, newDiffTokens);
+	if (context == 0) {
+		if (baseRange == NULL) {
+			cmp.file[0].equivs = option.oldFile.diffTokens.data;
+			cmp.file[0].buffered_lines = option.oldFile.diffTokens.used;
+			cmp.file[1].equivs = option.newFile.diffTokens.data;
+			cmp.file[1].buffered_lines = option.newFile.diffTokens.used;
+		} else {
+			cmp.file[0].equivs = option.oldFile.diffTokens.data + baseRange[0];
+			cmp.file[0].buffered_lines = baseRange[1];
+			cmp.file[1].equivs = option.newFile.diffTokens.data + baseRange[2];
+			cmp.file[1].buffered_lines = baseRange[3];
+		}
+		cmp.file[0].equiv_max = cmp.file[1].equiv_max = baseHashMax;
+
+		script = diff_2_files(&cmp);
+	} else {
+		ValueType *oldDiffTokens, *newDiffTokens;
+
+		/* Because we don't actually produce the empty tokens at the start and
+		   end of the file or range, we can't produce a set of context tokens
+		   when the context is larger than the range we try to cover. Therefore
+		   we trim the context to the smallest range. This may move some
+		   changes forward a little. */
+		if (baseRange != 0) {
+			if (context > baseRange[1])
+				context = baseRange[1];
+			if (context > baseRange[3])
+				context = baseRange[3];
+		} else {
+			if (context > option.oldFile.diffTokens.used)
+				context = option.oldFile.diffTokens.used;
+			if (context > option.newFile.diffTokens.used)
+				context = option.newFile.diffTokens.used;
+		}
+		/* Make sure the context is a multiple of 2. */
+		context &= ~1;
+		if (context == 0) {
+			doDiffInternal(baseRange, context);
+			return;
+		}
+
+		oldDiffTokens = initializeContextDiffTokens(&option.oldFile.diffTokens, baseRange, context, cmp.file);
+		newDiffTokens = initializeContextDiffTokens(&option.newFile.diffTokens,
+			baseRange == NULL ? NULL : baseRange + 2, context, cmp.file + 1);
+		cmp.file[0].equiv_max = getHashMax();
+
+		script = diff_2_files(&cmp);
+
+		free(oldDiffTokens);
+		free(newDiffTokens);
+	}
 
 	if (option.needMarkers && baseRange == NULL)
 		puts("======================================================================");
 
-	while ((c = getc(diff)) != EOF) {
-	  nextChar:
-		if (c == '<' || c == '>' || c == '-') {
-			/* Skip all lines showing differences */
-			while ((c = getc(diff)) != EOF && c != '\n') {}
-			if (c == EOF)
-				break;
-		} else if (isdigit(c)) {
-			/* Initialise values for next diff */
-			currentIndex = 0;
-			memset(range, 0xff, sizeof(range));
-			range[0] = c - '0';
-			command = 0;
-			/* Read until the end of the line, or the end of the input */
-			while ((c = getc(diff)) != EOF && c != '\n') {
-				if (isdigit(c)) {
-					/* Line number */
-					range[currentIndex] = range[currentIndex] * 10 + (c - '0');
-				} else if (c == ',') {
-					/* Line number separator */
-					if (currentIndex == 3 || currentIndex == 1)
-						fatal(_("Error parsing diff output\n"));
-					range[++currentIndex] = 0;
-				} else if (strchr("acd", c) != NULL) {
-					/* Command code */
-					if (currentIndex == 3 || command != 0)
-						fatal(_("Error parsing diff output\n"));
-					command = c;
-					currentIndex = 2;
-					range[currentIndex] = 0;
-				} else {
-					fatal(_("Error parsing diff output\n"));
-				}
-			}
-			/* Check that a command is set */
-			if (command == 0)
-				fatal(_("Error parsing diff output\n"));
-			differences = 1;
-			if (currentIndex != 2 && currentIndex != 3)
-				fatal(_("Error parsing diff output\n"));
-
-			if (option.matchContext && context != 0) {
-				/* If the match-context option was specified, the diff output will
-				   generally be too long. Here we trim the ranges to the minimum
-				   range required to show the diff. However, the ranges are only
-				   too long when the difference is a change, not when it is an add
-				   or delete. */
-				if (command == 'c') {
-					if (range[1] == -1) {
-						range[0]--;
-						range[3]--;
-						command = 'a';
-					} else if (range[3] == -1) {
-						range[2]--;
-						range[1]--;
-						command = 'd';
-					} else if (range[1] - context < range[0]) {
-						range[0]--;
-						range[3] -= range[1] - range[0];
-						range[1] = -1;
-						command = 'a';
-					} else if (range[3] - context < range[2]) {
-						range[2]--;
-						range[1] -= range[3] - range[2];
-						range[3] = -1;
-						command = 'd';
-					} else if (!option.aggregateChanges &&
-							/* Only split when the change is not trivial. */
-							range[1] - range[0] > context &&
-							range[3] - range[2] > context) {
-						TempFile *oldPart, *newPart;
-						int newContext = (context / 4) * 2;
-
-						c = splitDifference(diff, &oldPart, &newPart, context, newContext, range);
-						sfclose(oldPart->stream);
-						sfclose(newPart->stream);
-						if (baseRange != NULL) {
-							int i;
-							for (i = 0; i < 4; i++) {
-								if (range[i] >= 0)
-									range[i] += baseRange[i & 0xFE] - 1;
-							}
-						}
-						doDiffInternal(range, newContext, oldPart, newPart);
-						if (c == EOF)
-							break;
-						else
-							goto nextChar;
-					} else {
-						range[1] -= context;
-						range[3] -= context;
-					}
-				}
-			}
-
-			if (baseRange != NULL) {
-				int i;
-				for (i = 0; i < 4; i++) {
-					if (range[i] >= 0)
-						range[i] += baseRange[i & 0xFE] - 1;
-				}
-			}
-
-			/* Print common words. For delete commands we need to take into
-			   account that the words were BEFORE the named line. */
-			printToCommonWord(command != 'd' ? range[2] - 1 : range[2]);
-
-			/* Load whitespace for both files and analyse. If old ws does not
-			   contain a newline, don't bother with loading the new because we need
-			   regular printing. Otherwise, determine if we need reverse printing or
-			   need to change the new ws into a single space */
-			if (command == 'c' && !option.wdiffOutput) {
-				if (loadNextWhitespace(&option.oldFile)) {
-					if (loadNextWhitespace(&option.newFile)) {
-						option.newFile.whitespaceBuffer.line[0] = ' ';
-						option.newFile.whitespaceBuffer.filled = 1;
-					} else {
-						reverseDeleteAdd = true;
-					}
-				}
-			}
-
-			if (reverseDeleteAdd) {
-				/* This only happens for change commands, so we don't have to check
-				   the command letter anymore. */
-				printAddedWords(range + 2);
-				printDeletedWords(range);
-				reverseDeleteAdd = false;
-			} else {
-				if (command != 'a')
-					printDeletedWords(range);
-				if (command != 'd')
-					printAddedWords(range + 2);
-			}
-			if (option.needMarkers) {
-				puts("\n======================================================================");
-				lastWasLinefeed = true;
-			}
-
-			if (command == 'd' && option.printDeleted && !option.wdiffOutput)
-				lastWasDelete = true;
-
-			/* Update statistics */
-			switch (command) {
-				case 'a':
-					statistics.added += range[3] >= 0 ? range[3] - range[2] + 1 : 1;
-					break;
-				case 'd':
-					statistics.deleted += range[1] >= 0 ? range[1] - range[0] + 1 : 1;
-					break;
-				case 'c':
-					statistics.newChanged += range[3] >= 0 ? range[3] - range[2] + 1 : 1;
-					statistics.oldChanged += range[1] >= 0 ? range[1] - range[0] + 1 : 1;
-					break;
-				default:
-					PANIC();
-			}
-			if (c == EOF)
-				break;
-		} else {
-			fatal(_("Error parsing diff output\n"));
+	while (script != NULL) {
+		if (baseRange != NULL) {
+			script->line0 += baseRange[0];
+			script->line1 += baseRange[2];
 		}
+
+		command = script->inserted == 0 ? C_DEL : (script->deleted == 0 ? C_ADD : C_CHANGE);
+		differences = 1;
+
+		if (option.matchContext && context != 0) {
+			/* If the match-context option was specified, the diff output will
+			   generally be too long. Here we trim the ranges to the minimum
+			   range required to show the diff. However, the ranges are only
+			   too long when the difference is a change, not when it is an add
+			   or delete. */
+			if (command == C_CHANGE) {
+				if (script->deleted <= context || script->inserted <= context) {
+					ASSERT(script->deleted != script->inserted);
+					if (script->deleted < script->inserted) {
+						script->inserted -= script->deleted;
+						command = C_ADD;
+					} else {
+						script->deleted -= script->inserted;
+						command = C_DEL;
+					}
+				} else if (!option.aggregateChanges) {
+					/* Result must be multiple of two, so divide by 4 first, and
+					   then multiply by 2. */
+					unsigned newContext = (context / 4) * 2;
+					lin range[4] = { script->line0, script->deleted - context, script->line1, script->inserted - context };
+
+					doDiffInternal(range, newContext);
+					goto nextDiff;
+				} else {
+					script->deleted -= context;
+					script->inserted -= context;
+				}
+			}
+		}
+
+		/* Print common words. */
+		printToCommonWord(script->line1);
+
+		/* Load whitespace for both files and analyse. If old ws does not
+		   contain a newline, don't bother with loading the new because we need
+		   regular printing. Otherwise, determine if we need reverse printing or
+		   need to change the new ws into a single space */
+		if (command == C_CHANGE && !option.wdiffOutput) {
+			if (loadNextWhitespace(&option.oldFile)) {
+				if (loadNextWhitespace(&option.newFile)) {
+					option.newFile.whitespaceBuffer.data[0] = ' ';
+					option.newFile.whitespaceBuffer.used = 1;
+				} else {
+					reverseDeleteAdd = true;
+				}
+			}
+		}
+
+		if (reverseDeleteAdd) {
+			/* This only happens for change commands, so we don't have to check
+			   the command anymore. */
+			printAddedWords(script);
+			printDeletedWords(script);
+			reverseDeleteAdd = false;
+		} else {
+			if (command != C_ADD)
+				printDeletedWords(script);
+			if (command != C_DEL)
+				printAddedWords(script);
+		}
+		if (option.needMarkers) {
+			puts("\n======================================================================");
+			lastWasLinefeed = true;
+		}
+
+		if (command == C_DEL && option.printDeleted && !option.wdiffOutput)
+			lastWasDelete = true;
+
+		/* Update statistics */
+		switch (command) {
+			case C_ADD:
+				statistics.added += script->inserted;
+				break;
+			case C_DEL:
+				statistics.deleted += script->deleted;
+				break;
+			case C_CHANGE:
+				statistics.newChanged += script->inserted;
+				statistics.oldChanged += script->deleted;
+				break;
+			default:
+				PANIC();
+		}
+nextDiff:
+		ptr = script;
+		script = script->link;
+		free(ptr);
 	}
-	/* FIXME: Check return value of pclose! */
-	pclose(diff);
-	recursionIndex--;
 }
 
 /** Do the difference action. */
 void doDiff(void) {
-	initBuffer(&option.oldFile.whitespaceBuffer, INITIAL_WORD_BUFFER_SIZE);
-	initBuffer(&option.newFile.whitespaceBuffer, INITIAL_WORD_BUFFER_SIZE);
-	doDiffInternal(NULL, option.matchContext, option.oldFile.diffTokens, option.newFile.diffTokens);
+	VECTOR_INIT_ALLOCATED(option.oldFile.whitespaceBuffer);
+	VECTOR_INIT_ALLOCATED(option.newFile.whitespaceBuffer);
+	option.oldFile.lastPrinted = 0;
+	option.newFile.lastPrinted = 0;
+	doDiffInternal(NULL, option.matchContext);
 	printEnd();
 }

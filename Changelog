@@ -1,3 +1,17 @@
+Version 2.0:
+    New features:
+    - dwdiff is no longer a front-end for the diff program, but includes its
+      own diff-algorithm implementation (taken from GNU diff). This makes
+      dwdiff much faster, and ensures that results are the same across all
+      platforms.
+
+    Bug fixes:
+    - when two additions are made with a single common token in between, dwdiff
+      incorrectly reported the common token as replaced by the two additions
+      and the common token.
+    - when using the --diff-input option, in some cases dwdiff would report
+      changes spanning multiple diff sections.
+
 Version 1.9:
     New features:
     - an option for reading the output of diff (in Unified Diff) format was

@@ -10,8 +10,8 @@
 .\"
 .\" You should have received a copy of the GNU General Public License
 .\" along with this program.  If not, see <http://www.gnu.org/licenses/>.
-.TH "dwdiff" "1" "05-02-2011" "Versie 1.9" "dwdiff afgebakend woord verschil programma"
-.hw /usr/share/doc/dwdiff-1.9 http://os.ghalkes.nl/dwdiff
+.TH "dwdiff" "1" "22-10-2011" "Versie 2.0" "dwdiff afgebakend woord verschil programma"
+.hw /usr/share/doc/dwdiff-2.0 http://os.ghalkes.nl/dwdiff.html
 
 .SH NAAM
 
@@ -23,10 +23,10 @@
 \fBdwdiff\fP [\fIOPTIES\fP] \fB\-\-diff\-input\fP [<\fIDIFF BESTAND\fP>]
 .SH BESCHRIJVING
 
-\fBdwdiff\fP is een front-end voor het \fBdiff\fP programma dat het verschil
-tussen twee bestanden bepaald in woorden, in plaats van in regels. Het verschilt
-van \fBwdiff\fP omdat het de gebruiker toestaat om te specificeren wat witruimte
-is, en omdat het een optionele lijst van afbakeningskarakters kan gebruiken.
+\fBdwdiff\fP is een programma dat het verschil
+tussen twee bestanden bepaalt in woorden, in plaats van in regels. Het verschilt
+van \fBwdiff\fP in dat het de gebruiker toestaat om te specificeren wat witruimte
+is, en in dat het een optionele lijst van afbakeningskarakters kan gebruiken.
 Afbakeningskarakters worden behandeld als of ze afzonderlijke woorden zijn,
 zelfs als er geen witruimte is gelaten tussen het karakter en het voorafgaande
 of volgende woord. \fBdwdiff\fP is grotendeels commando-regel compatibel met
@@ -91,15 +91,6 @@ van de canonieke decompositie. De compatibiliteitsdecompositie gooit opmaak
 informatie weg. Bijvoorbeeld, de ligatuur fi wordt vertaald naar twee losse
 letters voor de vergelijking. Echter, ook super- en subscript worden ook als
 gelijk gezien, evenals verschillende rotaties van hetzelfde karakter.
-.IP "\fB\-D\fP <\fIoption\fP>, \fB\-\-diff\-option\fP=<\fIoption\fP>"
-Voeg een optie toe aan de commando-regel voor het \fBdiff\fP(1) programma.
-Deze optie kan gebruikt worden om het \fBdiff\fP programma op te dragen dat
-het zijn algoritme moet aanpassen. WAARSCHUWING: zorg ervoor dat de opties die
-u toevoegt aan de commando-regel niet de uitvoer van het \fBdiff\fP programma
-veranderen, omdat anders \fBdwdiff\fP zal falen. De GNU en de meeste BSD
-versies van het \fBdiff\fP programma accepteren de \-d of \-\-minimal optie om
-een zo klein mogelijk verschil te vinden. Zie de \fBdiff\fP man pagina voor
-meer informatie.
 .IP "\fB\-c\fP[<\fIspec\fP>], \fB\-\-color\fP[=<\fIspec\fP>]"
 Kleurenmodus. De optionele specificatie <\fIspec\fP> kan gebruikt worden om
 de gebruikte kleuren aan te passen. <\fIspec\fP> bestaat uit
@@ -140,6 +131,13 @@ Laat nabije veranderingen versmelten tot één verandering, als context woorden
 gebruikt worden (zie \fB\-\-match\-context\fP). Deze optie verminderd de
 benodigde rekentijd door de veranderingen die het \fBdiff\fP programma
 rapporteerd niet nader te verfijnen.
+.IP "\fB\-A\fP <\fIalgorithm\fP>, \fB\-\-algorithm\fP=<\fIalgorithm\fP>"
+Kies het algoritme dat gebruikt wordt om de verschillen te bepalen. Er zijn
+drie mogelijke waarden voor \fIalgorithm\fP: \fIbest\fP, welke een minimaal
+aantal verschillen probeert te vinden, \fInormal\fP, welke enige optimaliteit
+uitruilt voor snelheid, en \fIfast\fP, welke er van uit gaat dat er slechts
+enkele wijzigingen zijn op een lange tekst. Standaard wordt het \fInormal\fP
+algoritme gebruikt.
 .IP "\fB\-S\fP[<\fImarker\fP>], \fB\-\-paragraph\-separator\fP[=<\fImarker\fP>]"
 Toon toegevoegde of verwijderde blokken van regels met alleen maar witruimte
 karakters. Een speciale markering wordt aan de uitvoer toegevoegd om deze
@@ -169,7 +167,7 @@ argumenten als bestandsnamen zal interpreteren.
 .SH BUGS
 
 Als u denkt een bug gevonden te hebben, controleer dan dat u de nieuwste versie
-van \fBdwdiff\fP [http://os.ghalkes.nl/dwdiff] gebruikt. Als u een bug wil
+van \fBdwdiff\fP [http://os.ghalkes.nl/dwdiff.html] gebruikt. Als u een bug wil
 rapporteren, voeg dan een minimaal voorbeeld dat het probleem demonstreert toe
 aan uw melding.
 .SH AUTEUR
@@ -177,13 +175,13 @@ aan uw melding.
 G.P. Halkes <dwdiff@ghalkes.nl>
 .SH COPYRIGHT
 
-Copyright \(co 2006-2011 G.P. Halkes
+Copyright \(co 2006-2011 G.P. Halkes and others
 .br
 dwdiff is gelicenseerd onder de GNU General Public License version 3.
 .br
 Voor meer informatie over de licentie, zie het bestand COPYING in de
 documentatie map. Op Un*x systemen is dit meestal
-/usr/share/doc/dwdiff-1.9.
+/usr/share/doc/dwdiff-2.0.
 .SH ZIE OOK
 
 \fBdwfilter\fP(1), \fBwdiff\fP(1), \fBdiff\fP(1)

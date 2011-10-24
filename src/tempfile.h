@@ -1,4 +1,4 @@
-/* Copyright (C) 2008-2010 G.P. Halkes
+/* Copyright (C) 2008-2011 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -23,8 +23,11 @@
 typedef struct {
 	Stream *stream;
 	char name[TEMPLATE_LENGTH];
+	bool closed;
 } TempFile;
 
-TempFile *tempFile(int depth);
+TempFile *tempFile(void);
+void closeTempFile(TempFile *file);
+void resetTempFiles(void);
 
 #endif

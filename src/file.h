@@ -1,4 +1,4 @@
-/* Copyright (C) 2008-2010 G.P. Halkes
+/* Copyright (C) 2008-2011 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -54,13 +54,6 @@ typedef struct File {
 
 	/* Flag to indicate whether filling the buffer hit end of file. */
 	EOFState eof;
-#ifdef NO_MINUS_A
-	/* Flag to indicate whether to escape non-printable characters. */
-	int escapeNonPrint;
-#endif
-	/* Buffers to maintain context information to print for the next words. */
-	Context *context;
-	int currentWordIdx;
 
 	struct FileVtable *vtable;
 } File;
@@ -89,7 +82,5 @@ int fileError(File *file);
 int fileGetErrno(File *file);
 int fileEof(File *file);
 void fileClearEof(File *file);
-
-void fileSetContext(File *file);
 
 #endif
