@@ -1,4 +1,4 @@
-dwdiff (1.9-1) unstable; urgency=low
+dwdiff (2.0-1) unstable; urgency=low
 
   * Upgrade debian packaging to dh 8.
   * Fix tiny typo in debian/copyright.
@@ -8,8 +8,13 @@ dwdiff (1.9-1) unstable; urgency=low
   * Migrate upstream install script tweaks into quilt patches.
   * Rework upstream install script tweaks as commands in debian/rules.
   * Address lintian "(c)" vs "Copyright (c)" warning in debian/copyright.
+  * New upstream release.
+    - Update description.
+    - Tweak debian/rules to force installation of all linguas.
+  * Hi Jack!  Maintainer swizzled; listing old maintainer as co-maint.
+  * Expose packaging git repo in debian/control vcs-* field.
 
- -- Barak A. Pearlmutter <bap@debian.org>  Thu, 20 Oct 2011 12:39:19 +0100
+ -- Barak A. Pearlmutter <bap@debian.org>  Mon, 24 Oct 2011 22:30:15 +0100
 
 dwdiff (1.9-0.1) unstable; urgency=low
 
