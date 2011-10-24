@@ -1,4 +1,4 @@
-/* Copyright (C) 2008-2010 G.P. Halkes
+/* Copyright (C) 2008-2011 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -35,7 +35,7 @@ void fatal(const char *fmt, ...) {
 
 /** Print an out of memory message and exit. */
 void outOfMemory(void) {
-	fatal(_("Could not allocate memory: %s\n"), errno ? strerror(errno) : _("Out of memory"));
+	fatal("%s", _("Out of memory"));
 }
 
 /** Perform tolower for the ASCII character set. */
@@ -57,4 +57,26 @@ char *safe_strdup(const char *orig) {
 	if (result == NULL)
 		outOfMemory();
 	return result;
+}
+
+void *safe_malloc(size_t size) {
+	void *result = malloc(size);
+
+	if (result == NULL)
+		outOfMemory();
+	return result;
+}
+
+void *safe_calloc(size_t size) {
+	void *result = calloc(1, size);
+
+	if (result == NULL)
+		outOfMemory();
+	return result;
+}
+
+void *safe_realloc(void *ptr, size_t size) {
+	if ((ptr = realloc(ptr, size)) == NULL)
+		outOfMemory();
+	return ptr;
 }

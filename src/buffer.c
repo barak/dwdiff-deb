@@ -1,4 +1,4 @@
-/* Copyright (C) 2007-2010 G.P. Halkes
+/* Copyright (C) 2007-2011 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -20,6 +20,7 @@
 #include "definitions.h"
 #include "util.h"
 #include "option.h"
+#include "buffer.h"
 
 typedef enum {
 	PRINTING_CHANGED,
@@ -32,53 +33,20 @@ typedef enum {
 	BUFFERING_INITIAL
 } PrintState;
 
-static Context *contextBuffers;
+static CharBuffer *contextBuffers;
 static PrintState state = PRE_BUFFERING_INITIAL;
 static int bufferIndex;
 static int afterContextLines;
-
-/** Initialize a single buffer.
-	@param buffer The buffer to initialize.
-*/
-void initBuffer(Context *buffer, size_t size) {
-	buffer->filled = 0;
-	buffer->flags = 0;
-	buffer->allocated = size;
-	errno = 0;
-	if ((buffer->line = malloc(size)) == NULL)
-		outOfMemory();
-}
-
-/** Ensure that a buffer has sufficient unused storage remaining.
-	@param buffer The context buffer to check.
-	@param required The number of bytes required in the buffer.
-*/
-void ensureBufferSpace(Context *buffer, size_t required) {
-	if (buffer->allocated - buffer->filled >= required)
-		return;
-
-	while (buffer->allocated - buffer->filled < required) {
-		buffer->allocated *= 2;
-		/* Sanity check for overflow of allocated variable. Prevents infinite loops. */
-		ASSERT(buffer->allocated > buffer->filled);
-	}
-
-	errno = 0;
-	if ((buffer->line = realloc(buffer->line, buffer->allocated)) == NULL)
-		outOfMemory();
-}
 
 /** Initialize the context buffers. */
 void initContextBuffers(void) {
 	int i;
 
 	errno = 0;
-	if ((contextBuffers = (Context *) malloc((option.contextLines + 1) * sizeof(Context))) == NULL)
-		outOfMemory();
+	contextBuffers = (CharBuffer *) safe_malloc((option.contextLines + 1) * sizeof(CharBuffer));
 
-	contextBuffers[0].filled = 0;
 	for (i = 0; i <= option.contextLines; i++)
-		initBuffer(contextBuffers + i, INITIAL_BUFFER_SIZE);
+		VECTOR_INIT(contextBuffers[i]);
 }
 
 /** Write a character, buffering if necessary.
@@ -109,14 +77,14 @@ void addchar(char c, bool common) {
 				ignore = fwrite("--\n", 1, 3, option.output);
 			case BUFFERING_INITIAL:
 				for (i = bufferIndex + 1; i <= option.contextLines; i++)
-					ignore = fwrite(contextBuffers[i].line, 1, contextBuffers[i].filled, option.output);
+					ignore = fwrite(contextBuffers[i].data, 1, contextBuffers[i].used, option.output);
 				/* FALLTHROUGH */
 			/* In pre-buffering state, only the first buffers are used. Once we start
 			   wrapping around, we change state to a regular buffering state. */
 			case PRE_BUFFERING:
 			case PRE_BUFFERING_INITIAL:
 				for (i = 0; i <= bufferIndex; i++)
-					ignore = fwrite(contextBuffers[i].line, 1, contextBuffers[i].filled, option.output);
+					ignore = fwrite(contextBuffers[i].data, 1, contextBuffers[i].used, option.output);
 				break;
 			default:
 				PANIC();
@@ -130,8 +98,7 @@ void addchar(char c, bool common) {
 		case PRE_BUFFERING:
 		case BUFFERING_INITIAL:
 		case PRE_BUFFERING_INITIAL:
-			ensureBufferSpace(&contextBuffers[bufferIndex], 1);
-			contextBuffers[bufferIndex].line[contextBuffers[bufferIndex].filled++] = c;
+			VECTOR_APPEND(contextBuffers[bufferIndex], c);
 			break;
 		case PRINTING_AFTER_CONTEXT:
 		case PRINTING_CHANGED:
@@ -179,7 +146,7 @@ void addchar(char c, bool common) {
 		/* We just saw a newline, so we have either entered a buffering state,
 		   or already were in one, and finished filling the old buffer. The new
 		   buffer must be filled from the start. */
-		contextBuffers[bufferIndex].filled = 0;
+		contextBuffers[bufferIndex].used = 0;
 	}
 }
 
@@ -204,24 +171,24 @@ void printLineNumbers(int oldLineNumber, int newLineNumber) {
 		case PRE_BUFFERING:
 		case BUFFERING_INITIAL:
 		case PRE_BUFFERING_INITIAL:
-			allowed = contextBuffers[bufferIndex].allocated - contextBuffers[bufferIndex].filled;
+			allowed = contextBuffers[bufferIndex].allocated - contextBuffers[bufferIndex].used;
 			/* SUSv2 specification of snprintf does not handle zero sized buffers nicely :-(
 			   Therefore, we have to ensure that there is at least room for one byte, but as
 			   we will be printing 2 numbers and a colon and a space, we might as well ask for
 			   4 bytes. */
-			ensureBufferSpace(&contextBuffers[bufferIndex], 4);
-			printed = snprintf(contextBuffers[bufferIndex].line + contextBuffers[bufferIndex].filled, allowed, LINENUMBERS_FMT_ARGS);
+			VECTOR_ALLOCATE(contextBuffers[bufferIndex], 4);
+			printed = snprintf(contextBuffers[bufferIndex].data + contextBuffers[bufferIndex].used, allowed, LINENUMBERS_FMT_ARGS);
 			/* If there was not enough room to hold all the bytes for the line numbers,
 			   resize the buffer and try again. */
 			if (printed > allowed) {
-				ensureBufferSpace(&contextBuffers[bufferIndex], printed);
-				allowed = contextBuffers[bufferIndex].allocated - contextBuffers[bufferIndex].filled;
-				printed = snprintf(contextBuffers[bufferIndex].line + contextBuffers[bufferIndex].filled, allowed, LINENUMBERS_FMT_ARGS);
+				VECTOR_ALLOCATE(contextBuffers[bufferIndex], printed);
+				allowed = contextBuffers[bufferIndex].allocated - contextBuffers[bufferIndex].used;
+				printed = snprintf(contextBuffers[bufferIndex].data + contextBuffers[bufferIndex].used, allowed, LINENUMBERS_FMT_ARGS);
 			}
 			/* Sanity check: the number of characters printed should be at least 2
 			   [probably 4, but I don't know all possible number systems]. */
 			ASSERT(printed >= 2);
-			contextBuffers[bufferIndex].filled += printed;
+			contextBuffers[bufferIndex].used += printed;
 			break;
 		case PRINTING_AFTER_CONTEXT:
 		case PRINTING_CHANGED:
@@ -251,9 +218,9 @@ void writeString(const char *string, size_t bytes) {
 		case PRE_BUFFERING:
 		case BUFFERING_INITIAL:
 		case PRE_BUFFERING_INITIAL:
-			ensureBufferSpace(&contextBuffers[bufferIndex], bytes);
-			memcpy(contextBuffers[bufferIndex].line + contextBuffers[bufferIndex].filled, string, bytes);
-			contextBuffers[bufferIndex].filled += bytes;
+			VECTOR_ALLOCATE(contextBuffers[bufferIndex], bytes);
+			memcpy(contextBuffers[bufferIndex].data + contextBuffers[bufferIndex].used, string, bytes);
+			contextBuffers[bufferIndex].used += bytes;
 			break;
 		case PRINTING_AFTER_CONTEXT:
 		case PRINTING_CHANGED:

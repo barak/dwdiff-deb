@@ -18,21 +18,14 @@ msgstr ""
 
 #: util.h:28 util.h:30
 #, c-format
-msgid "Program logic error at %s:%d\n"
-msgstr "Programma logica fout op %s:%d\n"
-
-#: doDiff.c:101
-#, c-format
-msgid "Failed to execute diff: %s\n"
-msgstr "Kon diff niet uitvoeren: %s\n"
+msgid "Program-logic error at %s:%d\n"
+msgstr "Programmalogica fout op %s:%d\n"
 
 #: doDiff.c:209 doDiff.c:246 doDiff.c:274 doDiff.c:296 doDiff.c:350
 #: doDiff.c:360 doDiff.c:533
 msgid "Error reading back input\n"
 msgstr "Fout tijdens het teruglezen van de invoer\n"
 
-#: doDiff.c:584 doDiff.c:586 dwdiff.c:277 dwdiff.c:280 dwdiff.c:289
-#: dwfilter.c:147
 #, c-format
 msgid "Could not create temporary file: %s\n"
 msgstr "Kon tijdelijk bestand niet aanmaken: %s\n"
@@ -40,9 +33,6 @@ msgstr "Kon tijdelijk bestand niet aanmaken: %s\n"
 #: doDiff.c:603 doDiff.c:615 doDiff.c:623 doDiff.c:631 doDiff.c:641
 #: doDiff.c:647 doDiff.c:658 doDiff.c:663 doDiff.c:712 doDiff.c:717
 #: doDiff.c:722 doDiff.c:727 doDiff.c:730 doDiff.c:851
-msgid "Error parsing diff output\n"
-msgstr "Fout tijdens het parseren van de output van diff\n"
-
 #: dwdiff.c:274 dwdiff.c:418
 #, c-format
 msgid "Can't open file %s: %s\n"
@@ -93,6 +83,18 @@ msgid ""
 "Licensed under the GNU General Public License version 3\n"
 msgstr ""
 "Copyright © 2006-2011 G.P. Halkes\n"
+"Gelicenseerd onder de GNU General Public License version 3\n"
+
+#. TRANSLATORS:
+#. - If the (C) symbol (that is the c in a circle) is not available,
+#. leave as it as is. (Unicode code point 0x00A9)
+#. - G.P. Halkes is name and should be left as is.
+#: option.c:519
+msgid ""
+"Copyright (C) 2006-2011 G.P. Halkes and others\n"
+"Licensed under the GNU General Public License version 3\n"
+msgstr ""
+"Copyright © 2006-2011 G.P. Halkes en anderen\n"
 "Gelicenseerd onder de GNU General Public License version 3\n"
 
 #: dwfilter.c:108 option.c:693 option.c:702
@@ -214,12 +216,6 @@ msgstr "-i, --ignore-case                      Negeer hoofd/kleine letter versch
 #: optionDescriptions.h:44
 msgid "-I, --ignore-formatting                Ignore formatting differences\n"
 msgstr "-I, --ignore-formatting                Negeer verschillen in opmaak\n"
-
-#: optionDescriptions.h:45
-msgid "-D <option>, --diff-option=<option>    Add <option> to the diff command-line\n"
-msgstr ""
-"-D <option>, --diff-option=<option>    Voeg <option> toe aan de diff\n"
-"                                       commando-regel\n"
 
 #. TRANSLATORS:
 #. The context meant here are words preceeding and succeeding each word in
@@ -392,10 +388,15 @@ msgstr "Witruimte en afbakeningskarakters verzamelingen overlappen\n"
 msgid "Invalid color specification %s\n"
 msgstr "Ongeldige kleur specificatie %s\n"
 
-#: option.c:458 option.c:470
+#: option.c:458
 #, c-format
 msgid "Invalid color %s\n"
 msgstr "Ongeldige kleur %s\n"
+
+#: option.c:470
+#, c-format
+msgid "Invalid background color %s\n"
+msgstr "Ongeldige achtergrond kleur %s\n"
 
 #: option.c:523
 #, c-format
@@ -446,10 +447,15 @@ msgid "Only one input file accepted with --diff-input\n"
 msgstr "Slechts één invoerbestand toegestaan met --diff-input\n"
 
 #: util.c:38
-#, c-format
-msgid "Could not allocate memory: %s\n"
-msgstr "Kon geen geheugen verkrijgen: %s\n"
-
-#: util.c:38
 msgid "Out of memory"
 msgstr "Onvoldoende geheugen beschikbaar"
+
+#: optionDescriptions.h:57
+msgid ""
+"-A <alg>, --algorithm=<alg>            Choose algorithm: best, normal, fast\n"
+msgstr ""
+"-A <alg>, --algorithm=<alg>            Kies het algoritme: best, normal, fast\n"
+
+#: option.c:693
+msgid "Invalid algorithm name\n"
+msgstr "Ongeldige algorithme naam\n"

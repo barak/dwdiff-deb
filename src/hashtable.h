@@ -1,4 +1,4 @@
-/* Copyright (C) 2008-2011 G.P. Halkes
+/* Copyright (C) 2011 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -12,19 +12,16 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef BUFFER_H
-#define BUFFER_H
+#ifndef HASHTABLE_H
+#define HASHTABLE_H
 
-#include "vector.h"
+#include <limits.h>
+#include "definitions.h"
+#include "buffer.h"
 
-typedef VECTOR(char, CharBuffer);
+ValueType getValueFromContext(CharBuffer *word);
+ValueType getValue(void *data, size_t size);
+ValueType getHashMax(void);
 
-void initContextBuffers(void);
-void addchar(char c, bool common);
-void printLineNumbers(int oldLineNumber, int newLineNumber);
-void writeString(const char *string, size_t bytes);
-
-#define INITIAL_BUFFER_SIZE 80
-#define INITIAL_WORD_BUFFER_SIZE 32
-
+extern ValueType baseHashMax;
 #endif

@@ -18,13 +18,8 @@ msgstr ""
 
 #: util.h:28 util.h:30
 #, c-format
-msgid "Program logic error at %s:%d\n"
+msgid "Program-logic error at %s:%d\n"
 msgstr "Programmlogikfehler bei %s:%d\n"
-
-#: doDiff.c:59
-#, c-format
-msgid "Failed to execute diff: %s\n"
-msgstr "Konnte diff nicht ausführen: %s\n"
 
 #: doDiff.c:153 doDiff.c:192 doDiff.c:224 doDiff.c:247 doDiff.c:307
 #: doDiff.c:471
@@ -36,12 +31,6 @@ msgstr "Fehler beim zurücklesen der Eingabe\n"
 #, c-format
 msgid "Could not create temporary file: %s\n"
 msgstr "Konnte temporäre Datei nicht anlegen: %s\n"
-
-#: doDiff.c:512 doDiff.c:524 doDiff.c:527 doDiff.c:536 doDiff.c:546
-#: doDiff.c:552 doDiff.c:563 doDiff.c:568 doDiff.c:616 doDiff.c:621
-#: doDiff.c:626 doDiff.c:631 doDiff.c:634 doDiff.c:746
-msgid "Error parsing diff output\n"
-msgstr "Fehler beim Parsen der Ausgabe von diff\n"
 
 #: dwdiff.c:275
 #, c-format
@@ -107,11 +96,6 @@ msgstr "Benötige zwei Dateien, um zu vergleichen\n"
 #: dwfilter.c:113
 msgid "No post processor specified\n"
 msgstr ""
-
-#: dwfilter.c:145
-#, c-format
-msgid "Could not execute %s: %s\n"
-msgstr "Konnte %s nicht ausführen: %s\n"
 
 #: dwfilter.c:149
 #, c-format
@@ -210,12 +194,6 @@ msgstr "-i, --ignore-case                      Groß- und Kleinschreibung ignori
 #: optionDescriptions.h:29
 msgid "-I, --ignore-formatting                Ignore formatting differences\n"
 msgstr "-I, --ignore-formatting                Ignoriere Formatierungsunterschiede\n"
-
-#: optionDescriptions.h:30
-msgid "-D <option>, --diff-option=<option>    Add <option> to the diff command-line\n"
-msgstr ""
-"-D <option>, --diff-option=<option>    Füge <option> zu den diff\n"
-"                                       Kommando-Regeln hinzu\n"
 
 #. TRANSLATORS:
 #. The context meant here are words preceeding and succeeding each word in
@@ -433,11 +411,6 @@ msgstr ""
 #, fuzzy, c-format
 msgid "Error opening temporary output file: %s\n"
 msgstr "Fehler beim Schreiben in temporäre Datei %s: %s\n"
-
-#: util.c:38
-#, c-format
-msgid "Could not allocate memory: %s\n"
-msgstr "Konnte keinen Speicher allozieren: %s\n"
 
 #: util.c:38
 msgid "Out of memory"

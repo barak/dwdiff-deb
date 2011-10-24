@@ -19,58 +19,34 @@
 
 #include "definitions.h"
 #include "stream.h"
-#include "option.h"
 
-static TempFile *files;
-static int openIndex = 0;
-static bool inited;
-static int baseFiles = 6;
+static TempFile files[6];
+static unsigned openIndex = 0;
 
-/** Remove up all the created files. */
-static void cleanup(void) {
-	int i;
-	for (i = 0; i < openIndex; i++) {
 #ifndef LEAVE_FILES
-		remove(files[i].name);
+static bool inited;
+
 #endif
-	}
-}
 
 /** Create a temporary file. */
-TempFile *tempFile(int depth) {
+TempFile *tempFile(void) {
 	int fd;
 
+	ASSERT(openIndex < sizeof(files) / sizeof(files[0]));
+
+#ifdef LEAVE_FILES
+	strcpy(files[openIndex].name, "dwdiffTemp");
+	snprintf(files[openIndex].name + strlen(files[openIndex].name), "%d", openIndex);
+	if ((files[openIndex].stream = newFileStream(fileOpen(files[openIndex].name, FILE_WRITE))) == NULL)
+		return NULL;
+#else
+	/* Create temporary file. */
 	if (!inited) {
-		int steps = 0, context = option.matchContext;
-
-		while (context > 0) {
-			steps++;
-			context /= 2;
-		}
-
-		baseFiles += 2 * option.diffInput;
-
-		if ((files = calloc(baseFiles + 2 * steps, sizeof(TempFile))) == NULL)
-			outOfMemory();
 		/* Make sure the umask is set so that we don't introduce a security risk. */
 		umask(~S_IRWXU);
 		/* Make sure we will remove temporary files on exit. */
-		atexit(cleanup);
+		atexit(resetTempFiles);
 		inited = true;
-	}
-
-	/* The part files need to be cleaned up when new part files are needed. */
-	if (depth >= 0 && depth + baseFiles < openIndex) {
-		int i;
-		for (i = baseFiles + depth; i < openIndex; i++) {
-			/* Don't close the file here, but let doDiffInternal do that such that
-			   it is flushed before diff invocation. */
-#ifndef LEAVE_FILES
-			remove(files[i].name);
-#endif
-			free(files[i].stream);
-		}
-		openIndex = baseFiles + depth;
 	}
 
 	strcpy(files[openIndex].name, TEMPLATE);
@@ -78,5 +54,34 @@ TempFile *tempFile(int depth) {
 		return NULL;
 	if ((files[openIndex].stream = newFileStream(fileWrapFD(fd, FILE_WRITE))) == NULL)
 		return NULL;
+#endif
+
 	return files + openIndex++;
+}
+
+/** Closes a temporary file by closing its stream.
+    @param file The ::TempFile to close.
+
+    This function will close the stream, but it does not remove the temporary
+    file. This will be done by the ::cleanup function at exit. It is
+    permissible to call this function with the same argument more than once.
+*/
+void closeTempFile(TempFile *file) {
+	if (!file->closed) {
+		sfclose(file->stream);
+		file->closed = true;
+	}
+}
+
+/** Remove all the created temporary files and reset the data structures. */
+void resetTempFiles(void) {
+	unsigned i;
+	for (i = 0; i < openIndex; i++) {
+		closeTempFile(&files[i]);
+		remove(files[i].name);
+		files[i].closed = false;
+		files[i].stream = NULL;
+		memset(files[i].name, 0, sizeof(files[i].name));
+	}
+	openIndex = 0;
 }

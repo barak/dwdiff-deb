@@ -45,14 +45,6 @@ LINGUAS=
 ICUFLAGS=
 ICULIBS=
 
-# diff program configuration
-# DIFF should contain the diff program to be used
-# DIFF_FLAGS can contain any of the following flags:
-# -DNO_MINUS_A if the diff program does not provide the -a option to treat all
-#   files as text files.
-DIFF=diff
-DIFF_FLAGS=
-
 # Install program to use (should provide -m and -d options)
 INSTALL=install
 
@@ -62,14 +54,14 @@ DWFILTER=yes
 
 # Miscelaneous install paths
 bindir=$(prefix)/bin
-docdir=$(prefix)/share/doc/dwdiff-1.9
+docdir=$(prefix)/share/doc/dwdiff-2.0
 mandir=$(prefix)/share/man
 
 all: dwdiff $(DWFILTER:yes=dwfilter) linguas
 
 .PHONY: all clean dist-clean install dwdiff-install lingua-install linguas
 
-CSOURCES_DWDIFF=src/buffer.c src/doDiff.c src/dwdiff.c src/file.c src/option.c src/stream.c src/tempfile.c src/unicode.c src/util.c
+CSOURCES_DWDIFF=src/buffer.c src/diff/analyze.c src/doDiff.c src/dwdiff.c src/file.c src/hashtable.c src/option.c src/stream.c src/tempfile.c src/unicode.c src/util.c
 OBJECTS_DWDIFF=$(CSOURCES_DWDIFF:.c=.o)
 CSOURCES_DWFILTER=src/dwfilter.c src/util.c
 OBJECTS_DWFILTER=$(CSOURCES_DWFILTER:.c=.o)
@@ -81,7 +73,7 @@ dist-clean: clean
 	rm -rf dwdiff config.log Makefile
 
 .c.o:
-	$(CC) $(CFLAGS) $(GETTEXTFLAGS) $(DIFF_FLAGS) -DDIFF=\"$(DIFF)\" -DDWDIFF=\"$(bindir)/dwdiff\" -DLOCALEDIR=\"$(LOCALEDIR)\" $(ICUFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -Isrc $(GETTEXTFLAGS) -DLOCALEDIR=\"$(LOCALEDIR)\" $(ICUFLAGS) -c -o $@ $<
 
 dwdiff: $(OBJECTS_DWDIFF)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o dwdiff $(OBJECTS_DWDIFF) $(LDLIBS) $(ICULIBS) $(GETTEXTLIBS)

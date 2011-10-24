@@ -1,4 +1,4 @@
-/* Copyright (C) 2008-2010 G.P. Halkes
+/* Copyright (C) 2008-2011 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -47,7 +47,6 @@ File *fileWrapFD(int fd, FileMode mode) {
 	retval->eof = EOF_NO;
 	retval->mode = mode;
 	retval->vtable = &vtableReal;
-	retval->context = NULL;
 #ifdef NO_MINUS_A
 	retval->escapeNonPrint = 0;
 #endif
@@ -173,7 +172,6 @@ static int flushBuffer(File *file) {
 
 /** Close a @a File. */
 int fileClose(File *file) {
-	int i;
 	int retval = flushBuffer(file);
 
 	if (close(file->fd) < 0 && retval == 0) {
@@ -181,13 +179,6 @@ int fileClose(File *file) {
 	} else {
 		retval = 0;
 	}
-
-	if (file->context != NULL) {
-		for (i = 0; i < option.matchContext + 1; i++)
-			free(file->context[i].line);
-		free(file->context);
-	}
-
 
 	free(file);
 	return retval;
@@ -318,97 +309,6 @@ int fileEof(File *file) {
 /** Get the errno for the failing action on a @a File. */
 int fileGetErrno(File *file) {
 	return file->errNo;
-}
-
-static int fileWriteContext(File *file, const char *buffer, int bytes) {
-	Context *currentBuffer = file->context + file->currentWordIdx;
-	ensureBufferSpace(currentBuffer, bytes);
-	memcpy(currentBuffer->line + currentBuffer->filled, buffer, bytes);
-	currentBuffer->filled += bytes;
-	return 0;
-}
-
-#define FLAG_CONTEXT_PADDING (1<<0)
-#define NUM_BUFFER_SIZE (sizeof(int) * 2)
-static int filePutcContext(File *file, int c) {
-	int i;
-	/* Add character to buffer if it is not the word separator. */
-	if (c != '\n') {
-		char _c = c;
-		return fileWriteContext(file, &_c, 1);
-	}
-
-	for (i = 0; i < option.matchContext + 1; i ++) {
-		char numBuffer[NUM_BUFFER_SIZE];
-		int numBufferIdx = 0;
-		bool printed = false;
-		int value, j;
-
-		Context *currentBuffer = file->context + ((file->currentWordIdx + i + 1) % (option.matchContext + 1));
-
-		if (currentBuffer->flags & FLAG_CONTEXT_PADDING) {
-			/* Use '0' + 16 as special marker, such that the range of characters
-			   is continuous */
-			numBuffer[numBufferIdx++] = '0' + 16;
-		} else {
-			/* We don't use snprintf or similar as the number formatting is locale
-			   dependant. Also, we can use a simple hex encoding, which is more
-			   efficient. */
-			for (j = sizeof(int) * 2 - 1; j >= 0; j--) {
-				if ((value = currentBuffer->filled >> (j * 4) & 0xF) || printed) {
-					printed = true;
-					numBuffer[numBufferIdx++] = value + '0';
-				}
-			}
-			if (!printed)
-				numBuffer[numBufferIdx++] = '0';
-		}
-
-		fileWriteReal(file,  numBuffer, numBufferIdx);
-		filePutcReal(file, ',');
-	}
-
-	for (i = 0; i < option.matchContext + 1; i ++) {
-		Context *currentBuffer = file->context + ((file->currentWordIdx + i + 1) % (option.matchContext + 1));
-		fileWriteReal(file, currentBuffer->line, currentBuffer->filled);
-	}
-
-	file->currentWordIdx++;
-	file->currentWordIdx %= option.matchContext + 1;
-	file->context[file->currentWordIdx].filled = 0;
-	file->context[file->currentWordIdx].flags = 0;
-
-	return filePutcReal(file, '\n');
-}
-
-static int fileFlushContext(File *file) {
-	int i;
-	for (i = 0; i < option.matchContext ; i++) {
-		file->context[file->currentWordIdx].flags = FLAG_CONTEXT_PADDING;
-		filePutcContext(file, '\n');
-	}
-
-	return fileFlushReal(file);
-}
-
-static FileVtable vtableContext = { fileWriteContext, filePutcContext, fileFlushContext };
-
-/** Initialise this @a File to keep match context. */
-void fileSetContext(File *file) {
-	int i;
-
-	errno = 0;
-	if ((file->context = (Context *) malloc((option.matchContext + 1) * sizeof(Context))) == NULL)
-		outOfMemory();
-
-	for (i = 0; i < option.matchContext + 1; i++) {
-		initBuffer(file->context + i, INITIAL_BUFFER_SIZE);
-		file->context[i].flags = FLAG_CONTEXT_PADDING;
-	}
-	file->context[0].flags = 0;
-	file->currentWordIdx = 0;
-
-	file->vtable = &vtableContext;
 }
 
 void fileClearEof(File *file) {

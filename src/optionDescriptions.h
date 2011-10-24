@@ -42,7 +42,6 @@ N_("--wdiff-output                         Produce wdiff compatible output\n"),
 /* Options changing the matching */
 N_("-i, --ignore-case                      Ignore differences in case\n"),
 N_("-I, --ignore-formatting                Ignore formatting differences\n"),
-N_("-D <option>, --diff-option=<option>    Add <option> to the diff command-line\n"),
 /* TRANSLATORS:
    The context meant here are words preceeding and succeeding each word in
    the text. By using these extra context words when applying the diff program,
@@ -55,6 +54,7 @@ N_("-m <num>, --match-context=<num>        Use <num> words of context for matchi
    can live with multiple changes that are within (2 * match-context + 1) words
    from eachother being reported as a single change, they can use this option. */
 N_("--aggregate-changes                    Allow close changes to aggregate\n"),
+N_("-A <alg>, --algorithm=<alg>            Choose algorithm: best, normal, fast\n"),
 
 #ifdef DWDIFF_COMPILE
 /* Options changing the appearance of the output */

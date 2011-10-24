@@ -1,4 +1,4 @@
-/* Copyright (C) 2008-2010 G.P. Halkes
+/* Copyright (C) 2008-2011 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -313,7 +313,7 @@ static bool getClusterInternal(Stream *stream, UTF16Buffer *buffer, char continu
 	int32_t newClusterCategory;
 
 	/* Empty buffer. */
-	buffer->length = 0;
+	buffer->used = 0;
 
 	/* Check if we have already read a character on a previous occasion. */
 	if (stream->bufferedChar < 0) {
@@ -374,18 +374,11 @@ static void addUCS4ToUTF16Buffer(UTF16Buffer *buffer, UChar32 c) {
 	if (c > 0x10000)
 		chars = 2;
 
-	if (buffer->allocated - buffer->length < chars) {
-		ASSERT(buffer->allocated < INT32_MAX / 2);
-		buffer->allocated <<= 1;
-		if ((buffer->data = realloc(buffer->data, buffer->allocated * sizeof(UChar))) == NULL)
-			outOfMemory();
-	}
-
 	if (c > 0x10000) {
-		buffer->data[buffer->length++] = 0xD800 - (0x10000 >> 10) + (c >> 10);
-		buffer->data[buffer->length++] = 0xDC00 | (c & 0x3FF);
+		VECTOR_APPEND(*buffer, 0xD800 - (0x10000 >> 10) + (c >> 10));
+		VECTOR_APPEND(*buffer, 0xDC00 | (c & 0x3FF));
 	} else {
-		buffer->data[buffer->length++] = (UChar) c;
+		VECTOR_APPEND(*buffer, (UChar) c);
 	}
 }
 
@@ -394,22 +387,20 @@ static void addUCS4ToUTF16Buffer(UTF16Buffer *buffer, UChar32 c) {
 */
 void decomposeChar(CharData *c) {
 	UErrorCode error = U_ZERO_ERROR;
-	int32_t requiredLength;
-	requiredLength = unorm_normalize(c->UTF8Char.original.data, c->UTF8Char.original.length, option.decomposition, 0,
+	size_t requiredLength;
+	requiredLength = unorm_normalize(c->UTF8Char.original.data, c->UTF8Char.original.used, option.decomposition, 0,
 		c->UTF8Char.converted.data, c->UTF8Char.converted.allocated, &error);
 
 	if (requiredLength > c->UTF8Char.converted.allocated) {
 		ASSERT(error == U_BUFFER_OVERFLOW_ERROR);
 		error = U_ZERO_ERROR;
 
-		if ((c->UTF8Char.converted.data = realloc(c->UTF8Char.converted.data, requiredLength * sizeof(UChar))) == NULL)
-			outOfMemory();
-		c->UTF8Char.converted.allocated = requiredLength;
-		requiredLength = unorm_normalize(c->UTF8Char.original.data, c->UTF8Char.original.length, option.decomposition, 0,
+		VECTOR_ALLOCATE(c->UTF8Char.converted, requiredLength * sizeof(UChar));
+		requiredLength = unorm_normalize(c->UTF8Char.original.data, c->UTF8Char.original.used, option.decomposition, 0,
 			c->UTF8Char.converted.data, c->UTF8Char.converted.allocated, &error);
 	}
 	ASSERT(U_SUCCESS(error));
-	c->UTF8Char.converted.length = requiredLength;
+	c->UTF8Char.converted.used = requiredLength;
 }
 
 /** Fold the case of a Grapheme Cluster.
@@ -417,23 +408,22 @@ void decomposeChar(CharData *c) {
 */
 void casefoldChar(CharData *c) {
 	UErrorCode error = U_ZERO_ERROR;
-	int32_t requiredLength;
+	size_t requiredLength;
 
 	requiredLength = u_strFoldCase(c->UTF8Char.casefolded.data, c->UTF8Char.casefolded.allocated, c->UTF8Char.converted.data,
-		c->UTF8Char.converted.length, U_FOLD_CASE_DEFAULT, &error);
+		c->UTF8Char.converted.used, U_FOLD_CASE_DEFAULT, &error);
 
 	if (requiredLength > c->UTF8Char.casefolded.allocated) {
 		ASSERT(error == U_BUFFER_OVERFLOW_ERROR);
 		error = U_ZERO_ERROR;
 
-		if ((c->UTF8Char.casefolded.data = realloc(c->UTF8Char.casefolded.data, requiredLength * sizeof(UChar))) == NULL)
-			outOfMemory();
+		c->UTF8Char.casefolded.data = realloc(c->UTF8Char.casefolded.data, requiredLength * sizeof(UChar));
 		c->UTF8Char.casefolded.allocated = requiredLength;
 		requiredLength = u_strFoldCase(c->UTF8Char.casefolded.data, c->UTF8Char.casefolded.allocated, c->UTF8Char.converted.data,
-			c->UTF8Char.converted.length, U_FOLD_CASE_DEFAULT, &error);
+			c->UTF8Char.converted.used, U_FOLD_CASE_DEFAULT, &error);
 	}
 	ASSERT(U_SUCCESS(error));
-	c->UTF8Char.casefolded.length = requiredLength;
+	c->UTF8Char.casefolded.used = requiredLength;
 }
 
 /* An initial size of 4 will provide sufficient space for most graphmes. There
@@ -445,22 +435,9 @@ void casefoldChar(CharData *c) {
 #define UTF16BUFFER_INITIAL_SIZE 4
 #endif
 
-/** Initialise a @a UTF16Buffer struct for use. */
-void UTF16BufferInit(UTF16Buffer *buffer) {
-	if ((buffer->data = malloc(UTF16BUFFER_INITIAL_SIZE * sizeof(UChar))) == NULL)
-		outOfMemory();
-	buffer->allocated = UTF16BUFFER_INITIAL_SIZE;
-	buffer->length = 0;
-}
-
-/** Free a @a UTF16Buffer struct. */
-void freeUTF16Buffer(UTF16Buffer *buffer) {
-	free(buffer->data);
-}
-
 /** Compare two UTF16Buffer's for sorting purposes */
 int compareUTF16Buffer(const UTF16Buffer *a, const UTF16Buffer *b) {
-	int32_t minlen = a->length < b->length ? a->length : b->length;
+	size_t minlen = a->used < b->used ? a->used : b->used;
 	int result;
 
 	result = memcmp(a->data, b->data, minlen * sizeof(UChar));
@@ -468,19 +445,19 @@ int compareUTF16Buffer(const UTF16Buffer *a, const UTF16Buffer *b) {
 	if (result)
 		return result;
 
-	if (b->length > minlen)
+	if (b->used > minlen)
 		return -1;
-	if (a->length > minlen)
+	if (a->used > minlen)
 		return 1;
 	return 0;
 }
 
 #define UTF16CharCondition(name, condition) bool isUTF16##name(UTF16Buffer *buffer) { \
-	UChar32 c; int32_t i; \
-	for (i = 0; i < buffer->length; i++) { \
+	UChar32 c; size_t i; \
+	for (i = 0; i < buffer->used; i++) { \
 \
 		if ((buffer->data[i] & 0xFC00) == 0xD800) { \
-			ASSERT(i + 1 < buffer->length); \
+			ASSERT(i + 1 < buffer->used); \
 			c = ((((UChar32) buffer->data[i]) & 0x3FF) << 10) + 0x10000 + (buffer->data[i + 1] & 0x3FF); \
 			i++; \
 		} else { \

@@ -91,13 +91,13 @@ static PARSE_FUNCTION(parseCmdLine)
 		DOUBLE_DASH
 			NO_MORE_OPTIONS;
 		END_OPTION
-		OPTION('D', "diff-option", REQUIRED_ARG)
-		END_OPTION
 		OPTION('C', "context", REQUIRED_ARG)
 		END_OPTION
 		OPTION('m', "match-context", REQUIRED_ARG)
 		END_OPTION
 		BOOLEAN_LONG_OPTION("aggregate-changes", discard)
+		OPTION('A', "algorithm", REQUIRED_ARG)
+		END_OPTION
 		BOOLEAN_LONG_OPTION("wdiff-output", discard)
 		/* FIXME: make this work again, after fixing dwdiff */
 /* 		OPTION('S', "paragraph-separator", OPTIONAL_ARG)
@@ -182,10 +182,8 @@ int main(int argc, char *argv[]) {
 
 	parseCmdLine(argc, argv);
 	createTempfile();
-	if ((cmdArgs = malloc(sizeof(char *) * (option.postProcessorStart + 7))) == NULL)
-		outOfMemory();
-	if ((outputArg = malloc(sizeof(char) * (strlen(tempfile) + sizeof(OUTPUT_OPTION)))) == NULL)
-		outOfMemory();
+	cmdArgs = safe_malloc(sizeof(char *) * (option.postProcessorStart + 7));
+	outputArg = safe_malloc(sizeof(char) * (strlen(tempfile) + sizeof(OUTPUT_OPTION)));
 
 	cmdArgs[0] = safe_strdup(DWDIFF);
 	/* argument has been allocated to correct size above, so we can safely use sprintf */
@@ -212,8 +210,7 @@ int main(int argc, char *argv[]) {
 	free(outputArg);
 	free(cmdArgs);
 
-	if ((cmdArgs = malloc(sizeof(char *) * (argc - option.postProcessorStart + 3))) == NULL)
-		outOfMemory();
+	cmdArgs = safe_malloc(sizeof(char *) * (argc - option.postProcessorStart + 3));
 
 	for (i = option.postProcessorStart, j = 0; i < argc; i++, j++)
 		cmdArgs[j] = argv[i];

@@ -25,6 +25,8 @@
 #include "stream.h"
 #include "unicode.h"
 #include "dispatch.h"
+#include "buffer.h"
+#include "hashtable.h"
 
 typedef enum {
 	NONE,
@@ -36,7 +38,11 @@ int differences = 0;
 Statistics statistics;
 bool UTF8Mode;
 
-Context whitespaceBuffer;
+/** Contains the (partial) word currently being read in. We only need one copy
+	of this for all files, because all files are read sequentially. */
+static CharBuffer currentWord;
+
+CharBuffer whitespaceBuffer;
 bool tokenWritten;
 
 /** Contains the last read character. This is a global variable, because many
@@ -65,9 +71,14 @@ static bool writeEscape(File *file, int ch) {
 }
 
 static void writeEndOfToken(InputFile *file) {
+	ValueType wordValue;
 	sputc(file->tokens->stream, '\n');
-	sputc(file->diffTokens->stream, '\n');
+
+	wordValue = getValueFromContext(&currentWord);
 	tokenWritten = true;
+	VECTOR_APPEND(file->diffTokens, wordValue);
+	/* Reset current word */
+	currentWord.used = 0;
 }
 
 /*===============================================================*/
@@ -89,8 +100,7 @@ bool isDelimiterSC(void) {
 void writeTokenCharSC(InputFile *file) {
 	int diffChar = option.ignoreCase ? tolower(charData.singleChar) : charData.singleChar;
 
-	if (writeEscape(file->diffTokens->stream->data.file, diffChar))
-		filePutc(file->diffTokens->stream->data.file, diffChar);
+	VECTOR_APPEND(currentWord, diffChar);
 	if (writeEscape(file->tokens->stream->data.file, charData.singleChar))
 		filePutc(file->tokens->stream->data.file, charData.singleChar);
 }
@@ -99,11 +109,10 @@ void writeWhitespaceCharSC(InputFile *file) {
 	/* Don't want to change interface (yet), so prevent warning. */
 	(void) file;
 
-	ensureBufferSpace(&whitespaceBuffer, 2);
 	if (charData.singleChar == 0 || charData.singleChar == '\\')
-		whitespaceBuffer.line[whitespaceBuffer.filled++] = '\\';
+		VECTOR_APPEND(whitespaceBuffer, '\\');
 
-	whitespaceBuffer.line[whitespaceBuffer.filled++] = charData.singleChar;
+	VECTOR_APPEND(whitespaceBuffer, charData.singleChar);
 }
 
 void writeWhitespaceDelimiterSC(InputFile *file) {
@@ -124,7 +133,7 @@ bool getNextCharUTF8(Stream *file) {
 
 bool isWhitespaceUTF8(void) {
 	if (option.whitespaceSet)
-		return bsearch(&charData.UTF8Char.converted, option.whitespaceList.list, option.whitespaceList.used,
+		return bsearch(&charData.UTF8Char.converted, option.whitespaceList.data, option.whitespaceList.used,
 			sizeof(UTF16Buffer), (int (*)(const void *, const void *)) compareUTF16Buffer) != NULL;
 	else
 		return isUTF16Whitespace(&charData.UTF8Char.converted);
@@ -132,13 +141,14 @@ bool isWhitespaceUTF8(void) {
 }
 
 bool isDelimiterUTF8(void) {
-	return bsearch(&charData.UTF8Char.converted, option.delimiterList.list, option.delimiterList.used,
+	return bsearch(&charData.UTF8Char.converted, option.delimiterList.data, option.delimiterList.used,
 		sizeof(UTF16Buffer), (int (*)(const void *, const void *)) compareUTF16Buffer) != NULL || (option.punctuationMask && isUTF16Punct(&charData.UTF8Char.converted));
 }
 
 void writeTokenCharUTF8(InputFile *file) {
+	UChar32 highSurrogate = 0;
 	UTF16Buffer *writeBuffer;
-	int32_t i;
+	size_t i;
 
 	if (option.ignoreCase) {
 		casefoldChar(&charData);
@@ -150,23 +160,30 @@ void writeTokenCharUTF8(InputFile *file) {
 	/* Write the "original" characters. Note that high and low surrogates
 	   and other invalid characters have been converted to REPLACEMENT
 	   CHARACTER. */
-	for (i = 0; i < charData.UTF8Char.original.length; i++)
+	for (i = 0; i < charData.UTF8Char.original.used; i++)
 		if (writeEscape(file->tokens->stream->data.file, charData.UTF8Char.original.data[i]))
 			putuc(file->tokens->stream, charData.UTF8Char.original.data[i]);
 
-	for (i = 0; i < writeBuffer->length; i++)
-		if (writeEscape(file->diffTokens->stream->data.file, writeBuffer->data[i]))
-			putuc(file->diffTokens->stream, writeBuffer->data[i]);
+	for (i = 0; i < writeBuffer->used; i++) {
+		char utf8char[4];
+		size_t bytes;
+
+		if ((bytes = filteredConvertToUTF8(writeBuffer->data[i], utf8char, &highSurrogate)) == 0)
+			continue;
+		VECTOR_ALLOCATE(currentWord, bytes);
+		memcpy(currentWord.data + currentWord.used, &utf8char, bytes);
+		currentWord.used += bytes;
+	}
 }
 
 void writeWhitespaceCharUTF8(InputFile *file) {
 	UChar32 highSurrogate = 0;
-	int32_t i;
+	size_t i;
 
 	/* Don't want to change interface (yet), so prevent warning. */
 	(void) file;
 
-	for (i = 0; i < charData.UTF8Char.original.length; i++) {
+	for (i = 0; i < charData.UTF8Char.original.used; i++) {
 		char utf8char[4];
 		size_t bytes;
 
@@ -174,13 +191,13 @@ void writeWhitespaceCharUTF8(InputFile *file) {
 			continue;
 
 		/* Make sure we have at least room for the char and backshlash. Not optimal, but easy. */
-		ensureBufferSpace(&whitespaceBuffer, bytes + 1);
+		VECTOR_ALLOCATE(whitespaceBuffer, bytes + 1);
 
 		if (charData.UTF8Char.original.data[i] == 0 || charData.UTF8Char.original.data[i] == '\\')
-			whitespaceBuffer.line[whitespaceBuffer.filled++] = '\\';
+			whitespaceBuffer.data[whitespaceBuffer.used++] = '\\';
 
-		memcpy(whitespaceBuffer.line + whitespaceBuffer.filled, utf8char, bytes);
-		whitespaceBuffer.filled += bytes;
+		memcpy(whitespaceBuffer.data + whitespaceBuffer.used, utf8char, bytes);
+		whitespaceBuffer.used += bytes;
 	}
 }
 
@@ -190,6 +207,10 @@ void writeWhitespaceDelimiterUTF8(InputFile *file) {
 
 /*===============================================================*/
 #endif
+
+DEF_TABLE(SC)
+ONLY_UNICODE(DEF_TABLE(UTF8))
+DispatchTable *dispatch = &SCDispatch;
 
 /** Handle the end of a whitespace sequence.
 	@param file The @a InputFile from which the whitespace came.
@@ -202,8 +223,8 @@ void handleWhitespaceEnd(InputFile *file) {
 		size_t i, firstNewline = 0;
 		bool firstNewlineFound = false;
 
-		for (i = 0; i < whitespaceBuffer.filled; i++) {
-			if (whitespaceBuffer.line[i] != '\n')
+		for (i = 0; i < whitespaceBuffer.used; i++) {
+			if (whitespaceBuffer.data[i] != '\n')
 				continue;
 			if (!firstNewlineFound) {
 				firstNewlineFound = true;
@@ -218,33 +239,33 @@ void handleWhitespaceEnd(InputFile *file) {
 		   whitespace where two newlines are required for an empty line. */
 		if (firstNewlineFound && !tokenWritten) {
 			/* Write everything upto but excluding the first newline */
-			swrite(file->whitespace->stream, whitespaceBuffer.line, firstNewline);
+			swrite(file->whitespace->stream, whitespaceBuffer.data, firstNewline);
 			writeWhitespaceDelimiter(file);
 
-			swrite(file->whitespace->stream, whitespaceBuffer.line + firstNewline, whitespaceBuffer.filled - firstNewline);
+			swrite(file->whitespace->stream, whitespaceBuffer.data + firstNewline, whitespaceBuffer.used - firstNewline);
 			writeWhitespaceDelimiter(file);
 			writeEndOfToken(file);
-			whitespaceBuffer.filled = 0;
+			whitespaceBuffer.used = 0;
 			return;
 		}
 
-		if (i != whitespaceBuffer.filled) {
+		if (i != whitespaceBuffer.used) {
 			/* Write everything upto and including the first newline */
-			swrite(file->whitespace->stream, whitespaceBuffer.line, firstNewline + 1);
+			swrite(file->whitespace->stream, whitespaceBuffer.data, firstNewline + 1);
 			writeWhitespaceDelimiter(file);
 
-			swrite(file->whitespace->stream, whitespaceBuffer.line + firstNewline + 1, whitespaceBuffer.filled - (firstNewline + 1));
+			swrite(file->whitespace->stream, whitespaceBuffer.data + firstNewline + 1, whitespaceBuffer.used - (firstNewline + 1));
 			writeWhitespaceDelimiter(file);
 			writeEndOfToken(file);
-			whitespaceBuffer.filled = 0;
+			whitespaceBuffer.used = 0;
 			return;
 		}
 		/* Fall through to default case */
 	}
 
-	swrite(file->whitespace->stream, whitespaceBuffer.line, whitespaceBuffer.filled);
+	swrite(file->whitespace->stream, whitespaceBuffer.data, whitespaceBuffer.used);
 	writeWhitespaceDelimiter(file);
-	whitespaceBuffer.filled = 0;
+	whitespaceBuffer.used = 0;
 }
 
 enum {
@@ -273,19 +294,12 @@ static int readFile(InputFile *file) {
 	if (file->name != NULL && (file->input = newFileStream(fileOpen(file->name, FILE_READ))) == NULL)
 		fatal(_("Can't open file %s: %s\n"), file->name, strerror(errno));
 
-	if ((file->tokens = tempFile(-1)) == NULL)
+	if ((file->tokens = tempFile()) == NULL)
 		fatal(_("Could not create temporary file: %s\n"), strerror(errno));
 
-	if ((file->diffTokens = tempFile(-1)) == NULL)
-		fatal(_("Could not create temporary file: %s\n"), strerror(errno));
-	if (option.matchContext)
-		fileSetContext(file->diffTokens->stream->data.file);
+	VECTOR_INIT(file->diffTokens);
 
-#ifdef NO_MINUS_A
-	file->diffTokens->stream->data.file->escapeNonPrint = 1;
-#endif
-
-	if ((file->whitespace = tempFile(-1)) == NULL)
+	if ((file->whitespace = tempFile()) == NULL)
 		fatal(_("Could not create temporary file: %s\n"), strerror(errno));
 
 	tokenWritten = false;
@@ -383,17 +397,21 @@ static int readFile(InputFile *file) {
 		fatal(_("Error writing to temporary file %s: %s\n"), file->name, strerror(sgeterrno(file->tokens->stream)));
 	srewind(file->tokens->stream);
 
-	sfflush(file->diffTokens->stream);
-	if (sferror(file->diffTokens->stream))
-		fatal(_("Error writing to temporary file %s: %s\n"), file->name, strerror(sgeterrno(file->diffTokens->stream)));
-	sfclose(file->diffTokens->stream);
-
 	return wordCount;
 }
 
-DEF_TABLE(SC)
-ONLY_UNICODE(DEF_TABLE(UTF8))
-DispatchTable *dispatch = &SCDispatch;
+/** Read the input files and perform the diff. */
+static void prepareAndExecuteDiff(void) {
+	statistics.oldTotal = readFile(&option.oldFile);
+	statistics.newTotal = readFile(&option.newFile);
+	baseHashMax = getHashMax();
+
+	/* Whitespace buffer and currentWord won't be used after this. */
+	VECTOR_FREE(currentWord);
+	VECTOR_FREE(whitespaceBuffer);
+
+	doDiff();
+}
 
 typedef enum {
 	FIRST_HEADER,
@@ -405,7 +423,7 @@ typedef enum {
 	LINE_COUNTS
 } DiffInputMode;
 
-
+/** Split the input, if it is the output from diff -u or similar. */
 void splitDiffInput(void) {
 	Stream *input;
 	TempFile *oldFile, *newFile;
@@ -418,14 +436,13 @@ void splitDiffInput(void) {
 			fatal(_("Can't open file %s: %s\n"), option.oldFile.name, strerror(errno));
 	}
 
-	oldFile = tempFile(-1);
-	newFile = tempFile(-1);
+	oldFile = tempFile();
+	newFile = tempFile();
 
 	while (getNextCharSC(input)) {
 		switch (mode) {
 			case FIRST_HEADER:
-				sputc(oldFile->stream, charData.singleChar);
-				sputc(newFile->stream, charData.singleChar);
+				putchar(charData.singleChar);
 				mode = charData.singleChar != '@' ? HEADER : LINE_COUNTS;
 				break;
 			case FIRST:
@@ -439,14 +456,21 @@ void splitDiffInput(void) {
 					sputc(oldFile->stream, ' ');
 					sputc(newFile->stream, ' ');
 					mode = COMMON;
-				} else if (charData.singleChar == '@') {
-					sputc(oldFile->stream, charData.singleChar);
-					sputc(newFile->stream, charData.singleChar);
-					mode = LINE_COUNTS;
 				} else {
-					sputc(oldFile->stream, charData.singleChar);
-					sputc(newFile->stream, charData.singleChar);
-					mode = HEADER;
+					closeTempFile(oldFile);
+					closeTempFile(newFile);
+
+					option.oldFile.name = oldFile->name;
+					option.newFile.name = newFile->name;
+
+					prepareAndExecuteDiff();
+
+					resetTempFiles();
+					oldFile = tempFile();
+					newFile = tempFile();
+
+					putchar(charData.singleChar);
+					mode = charData.singleChar == '@' ? LINE_COUNTS : HEADER;
 				}
 				break;
 			case OLD:
@@ -467,15 +491,13 @@ void splitDiffInput(void) {
 				break;
 
 			case HEADER:
-				sputc(oldFile->stream, charData.singleChar);
-				sputc(newFile->stream, charData.singleChar);
+				putchar(charData.singleChar);
 				if (charData.singleChar == '\n')
 					mode = FIRST_HEADER;
 				break;
 
 			case LINE_COUNTS:
-				sputc(oldFile->stream, charData.singleChar);
-				sputc(newFile->stream, charData.singleChar);
+				putchar(charData.singleChar);
 				if (charData.singleChar == '\n')
 					mode = FIRST;
 				break;
@@ -483,10 +505,13 @@ void splitDiffInput(void) {
 				PANIC();
 		}
 	}
-	sfclose(oldFile->stream);
-	sfclose(newFile->stream);
+	closeTempFile(oldFile);
+	closeTempFile(newFile);
+
 	option.oldFile.name = oldFile->name;
 	option.newFile.name = newFile->name;
+
+	prepareAndExecuteDiff();
 }
 
 /** Main. */
@@ -512,8 +537,7 @@ int main(int argc, char *argv[]) {
 
 		if ((lc_ctype = setlocale(LC_CTYPE, NULL)) == NULL)
 			goto end_utf8_check;
-		if ((lc_ctype = strdupA(lc_ctype)) == NULL)
-			outOfMemory();
+		lc_ctype = safe_strdup(lc_ctype);
 
 		/* Use ASCII specific tolower function here, because it is not certain
 		   that using tolower with the user locale will give correct results. */
@@ -534,27 +558,26 @@ int main(int argc, char *argv[]) {
 
 #ifdef USE_UNICODE
 	if (UTF8Mode) {
-		UTF16BufferInit(&charData.UTF8Char.original);
-		UTF16BufferInit(&charData.UTF8Char.converted);
-		UTF16BufferInit(&charData.UTF8Char.casefolded);
+		VECTOR_INIT_ALLOCATED(charData.UTF8Char.original);
+		VECTOR_INIT_ALLOCATED(charData.UTF8Char.converted);
+		VECTOR_INIT_ALLOCATED(charData.UTF8Char.casefolded);
 		dispatch = &UTF8Dispatch;
 	}
 #endif
+	VECTOR_INIT(currentWord);
 
 	parseCmdLine(argc, argv);
 
+	VECTOR_INIT(whitespaceBuffer);
+
+	/* If we are reading the output from diff -u, then we need to first split
+	   the input into two separate files. After that, we can use our normal
+	   algorithm for determining the difference between two files. */
 	if (option.diffInput)
 		splitDiffInput();
+	else
+		prepareAndExecuteDiff();
 
-	initBuffer(&whitespaceBuffer, INITIAL_WORD_BUFFER_SIZE);
-
-	statistics.oldTotal = readFile(&option.oldFile);
-	statistics.newTotal = readFile(&option.newFile);
-
-	/* Whitespace buffer won't be used after this. */
-	free(whitespaceBuffer.line);
-
-	doDiff();
 
 	if (option.statistics) {
 		int common = statistics.oldTotal - statistics.deleted - statistics.oldChanged;
@@ -579,5 +602,14 @@ int main(int argc, char *argv[]) {
 
 	fflush(option.output);
 
+#ifdef DEBUG_MEMORY
+	free(option.oldFile.diffTokens.data);
+	free(option.newFile.diffTokens.data);
+	free(charData.UTF8Char.original.data);
+	free(charData.UTF8Char.converted.data);
+	free(charData.UTF8Char.casefolded.data);
+	free(option.delColor);
+	free(option.addColor);
+#endif
 	return differences;
 }

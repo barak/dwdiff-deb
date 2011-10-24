@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2010 G.P. Halkes
+# Copyright (C) 2006-2011 G.P. Halkes
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation.
@@ -13,7 +13,7 @@
 
 
 SWITCHES="+gettext +unicode +dwfilter"
-OPTIONS="localedir diff icu-config"
+OPTIONS="localedir icu-config"
 
 COMPILERULE='$(CC) $(CFLAGS) $(GETTEXTFLAGS) $(ICUFLAGS) -c -o $@ $<'
 LINKRULE='$(CC) $(CFLAGS) $(LDFLAGS) -o .config .config.o $(LDLIBS) $(GETTEXTLIBS) $(ICULIBS)'
@@ -25,32 +25,17 @@ USERRULES='.SUFFIXES: .mo .po
 
 TEST_INSTALL="install $PWD/install.sh"
 
-DEFAULT_LINGUAS="de fr nl ru "
+DEFAULT_LINGUAS=" nl"
 [ -f config.pkg.langpack ] && . config.pkg.langpack
 
 USER_HELP="  --without-gettext  Disable gettext translations
   --without-unicode  Disable Unicode support
   --icu-config=<path>  Path to icu-config script
   --localedir=<dir>  Installation directory for locales [prefix/share/locale]
-  --diff=<diff>      The diff program to use
 
 Environment variables:
   LINGUAS            List of languages to install. Available languages are:
     ${DEFAULT_LINGUAS}"
-
-
-rundiff() {
-	echo "Running ${DIFF} $@" >> config.log
-	LANG="C" "${DIFF}" "$@" > .config.diff 2>&1
-	RESULT=$?
-	cat .config.diff >> config.log
-	return "${RESULT}"
-}
-
-checkdiff() {
-	echo "Checking output for '1c1'" >> config.log
-	grep '^1c1$' config.log > /dev/null
-}
 
 checkfunction() {
 	clean .config.o
@@ -76,39 +61,6 @@ EOF
 }
 
 config() {
-	# Check the diff program for correct operation
-	if [ -n "${option_diff}" ] ; then
-		DIFF="${option_diff}"
-		echo "${DIFF}" | grep "^\." > /dev/null && error "!! Do not use a relative path for the diff program"
-	else
-		DIFF=diff
-	fi
-
-	check_message "Checking for working diff program (${DIFF})... "
-	clean .config.a .config.b .config.c
-
-	echo "text" > .config.a
-	echo "text" > .config.b
-	echo "TEXT" > .config.c
-
-	clean .config.diff
-	if not rundiff .config.a .config.b || rundiff .config.a .config.c || not checkdiff ; then
-		check_message_result "no"
-		exit 1
-	fi
-	check_message_result "yes"
-
-	check_message "Checking for diff program has -a... "
-
-	if not rundiff -a .config.a .config.b ; then
-		check_message_result "no"
-		DIFF_FLAGS="-DNO_MINUS_A"
-	else
-		check_message_result "yes"
-	fi
-
-	clean .config.a .config.b .config.c .config.diff
-
 	# Test for all required functionality
 
 	cat > .config.c <<EOF
@@ -119,7 +71,6 @@ config() {
 #include <fcntl.h>
 
 int main(int argc, char *argv[]) {
-	FILE *file;
 	int fd;
 	char buffer[10];
 	fd = mkstemp("fooXXXXXX");
@@ -129,8 +80,6 @@ int main(int argc, char *argv[]) {
 	write(fd, buffer, 10);
 	close(fd);
 	umask(~S_IRWXU);
-	file = popen("echo", "r");
-	pclose(file);
 	snprintf(buffer, 10, "%s", "foo");
 	return 0;
 }
@@ -148,8 +97,6 @@ EOF
 		checkfunction "write" "int fd; char buffer[10]; write(fd, buffer, 10);" "<unistd.h>"
 		checkfunction "close" 'int fd; close(fd);' "<unistd.h>"
 		checkfunction "umask" 'umask(~S_IRWXU);' "<sys/stat.h>"
-		checkfunction "popen" 'popen("echo", "r");' "<stdio.h>"
-		checkfunction "pclose" 'pclose((void *)0);' "<stdio.h>"
 		checkfunction "snprintf" 'char buffer[10]; snprintf(buffer, 10, "%s", "foo");' "<stdio.h>"
 		check_message_result "!! A required function is not available."
 		exit 1
@@ -190,7 +137,8 @@ EOF
 	# Check for gettext functionality
 	if [ "yes" = "${with_gettext}" ] ; then
 		cat > .config.c <<EOF
-#include "src/definitions.h"
+#include <locale.h>
+#include <libintl.h>
 
 int main(int argc, char *argv[]) {
 	setlocale(LC_ALL, "");
@@ -201,10 +149,10 @@ int main(int argc, char *argv[]) {
 }
 EOF
 		{
-			test_compile "gettext and related functions" GETTEXTFLAGS=-DUSE_GETTEXT && {
-				test_link "gettext in standard library" GETTEXTFLAGS=-DUSE_GETTEXT ||
-				{ test_link "gettext in -lintl" GETTEXTFLAGS=-DUSE_GETTEXT GETTEXTLIBS=-lintl && GETTEXTLIBS=-lintl ; } ||
-				{ test_link "gettext in -lintl -liconv" GETTEXTFLAGS=-DUSE_GETTEXT "GETTEXTLIBS=-lintl -liconv" && GETTEXTLIBS="-lintl -liconv" ; }
+			test_compile "gettext and related functions" && {
+				test_link "gettext in standard library" ||
+				{ test_link "gettext in -lintl" GETTEXTLIBS=-lintl && GETTEXTLIBS=-lintl ; } ||
+				{ test_link "gettext in -lintl -liconv" "GETTEXTLIBS=-lintl -liconv" && GETTEXTLIBS="-lintl -liconv" ; }
 			} && {
 				clean .config.po .config.mo
 				cat > .config.po <<EOF
@@ -310,7 +258,9 @@ EOF
 		fi
 	fi
 
-	create_makefile "GETTEXTFLAGS=${GETTEXTFLAGS}" "GETTEXTLIBS=${GETTEXTLIBS}" "LINGUAS=${linguas}" "DIFF=${DIFF}" "DIFF_FLAGS=${DIFF_FLAGS}" ${option_localedir:+"LOCALEDIR=${option_localedir}"} "ICUFLAGS=${ICUFLAGS}" "ICULIBS=${ICULIBS}" $DWFILTER
+	create_makefile "GETTEXTFLAGS=${GETTEXTFLAGS}" "GETTEXTLIBS=${GETTEXTLIBS}" \
+		"LINGUAS=${linguas}" ${option_localedir:+"LOCALEDIR=${option_localedir}"} \
+		"ICUFLAGS=${ICUFLAGS}" "ICULIBS=${ICULIBS}" $DWFILTER
 }
 
 sed_lines() {
