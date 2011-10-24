@@ -6,6 +6,10 @@
 %:
 	dh $@ --parallel
 
+# Use LINGUAS to force installation of all available linguas.
+
+LINGUAS=$(shell ls po | egrep '[.]po$$' | sed 's/.po//' | tr '\n' ' ')
+
 # squelch unknown flags passed to ./configure by dh_auto_configure
 #  ./configure: --build=x86_64-linux-gnu --prefix=/usr
 #    --includedir='$${prefix}/include' --mandir='$${prefix}/share/man'
@@ -16,11 +20,17 @@
 override_dh_auto_configure:
 	./configure --prefix=/usr --mandir='$${prefix}/share/man'
 
+override_dh_auto_build:
+	dh_auto_build -- LINGUAS="$(LINGUAS)"
+
 # Work around Makefile not using DESTDIR.
 # Work around Makefile using docdir that includes version postfix.
 # Work around Makefile installing Changelog and COPYING into docdir.
 
 override_dh_auto_install:
-	$(MAKE) prefix=$(CURDIR)/debian/dwdiff/usr docdir='$$(prefix)/share/doc/dwdiff' install
+	$(MAKE) prefix=$(CURDIR)/debian/dwdiff/usr \
+		docdir='$$(prefix)/share/doc/dwdiff' \
+		LINGUAS="$(LINGUAS)" \
+		install
 	-rm debian/dwdiff/usr/share/doc/dwdiff/Changelog debian/dwdiff/usr/share/doc/dwdiff/COPYING
 	-rm -r debian/dwdiff/usr/share/man/*.UTF-8
