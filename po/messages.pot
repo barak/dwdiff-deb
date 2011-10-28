@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-26 20:32+0200\n"
+"POT-Creation-Date: 2011-10-28 12:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,8 +22,8 @@ msgstr ""
 msgid "Program-logic error at %s:%d\n"
 msgstr ""
 
-#: doDiff.c:178 doDiff.c:217 doDiff.c:245 doDiff.c:267 doDiff.c:321
-#: doDiff.c:492
+#: doDiff.c:178 doDiff.c:219 doDiff.c:247 doDiff.c:269 doDiff.c:323
+#: doDiff.c:494
 msgid "Error reading back input\n"
 msgstr ""
 

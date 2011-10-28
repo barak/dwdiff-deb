@@ -1,3 +1,8 @@
+Version 2.0.2:
+    Bug fixes:
+    - add support for DESTDIR in the Makefile install target.
+    - fix build error on --without-unicode compiles.
+
 Version 2.0.1:
     Bug fixes:
     - escape parsing for unknown escapes (like for example \;) would result

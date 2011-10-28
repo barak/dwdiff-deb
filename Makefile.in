@@ -54,7 +54,7 @@ DWFILTER=yes
 
 # Miscelaneous install paths
 bindir=$(prefix)/bin
-docdir=$(prefix)/share/doc/dwdiff-2.0.1
+docdir=$(prefix)/share/doc/dwdiff-2.0.2
 mandir=$(prefix)/share/man
 
 all: dwdiff $(DWFILTER:yes=dwfilter) linguas
@@ -85,21 +85,26 @@ dwfilter: $(OBJECTS_DWFILTER)
 linguas:
 	cd po && $(MAKE) "LINGUAS=$(LINGUAS)" linguas
 
+# Macros to make DESTDIR support more readable
+_bindir=$(DESTDIR)$(bindir)
+_docdir=$(DESTDIR)$(docdir)
+_mandir=$(DESTDIR)$(mandir)
+
 install: dwdiff-install lingua-install
 
 dwdiff-install: dwdiff $(DWFILTER:yes=dwfilter)
-	$(INSTALL) -d "$(bindir)"
-	$(INSTALL) dwdiff "$(bindir)"
-	if [ -n "$(DWFILTER)" ] ; then $(INSTALL) dwfilter "$(bindir)" ; fi
-	$(INSTALL) -d "$(mandir)/man1"
-	$(INSTALL) -m 644 "man/dwdiff.1" "$(mandir)/man1"
-	if [ -n "$(DWFILTER)" ] ; then $(INSTALL) -m 644 "man/dwfilter.1" "$(mandir)/man1" ; fi
-	$(INSTALL) -d "$(docdir)"
-	$(INSTALL) -m 644 README COPYING Changelog "$(docdir)"
+	$(INSTALL) -d "$(_bindir)"
+	$(INSTALL) dwdiff "$(_bindir)"
+	if [ -n "$(DWFILTER)" ] ; then $(INSTALL) dwfilter "$(_bindir)" ; fi
+	$(INSTALL) -d "$(_mandir)/man1"
+	$(INSTALL) -m 644 "man/dwdiff.1" "$(_mandir)/man1"
+	if [ -n "$(DWFILTER)" ] ; then $(INSTALL) -m 644 "man/dwfilter.1" "$(_mandir)/man1" ; fi
+	$(INSTALL) -d "$(_docdir)"
+	$(INSTALL) -m 644 README COPYING Changelog "$(_docdir)"
 
 # Work around empty LINGUAS list. Some shells don't like empty lists in for-loops
 lingua-install:
 	if [ -n "$(LINGUAS)" ] ; then \
-		mandir="$(mandir)" LINGUAS="$(LINGUAS)" INSTALL="$(INSTALL)" ./install-manpages $(DWFILTER) ;\
-		cd po && $(MAKE) "LOCALEDIR=$(LOCALEDIR)" "INSTALL=$(INSTALL)" "LINGUAS=$(LINGUAS)" lingua-install ;\
+		mandir="$(_mandir)" LINGUAS="$(LINGUAS)" INSTALL="$(INSTALL)" ./install-manpages $(DWFILTER) ;\
+		cd po && $(MAKE) "LOCALEDIR=$(DESTDIR)$(LOCALEDIR)" "INSTALL=$(INSTALL)" "LINGUAS=$(LINGUAS)" lingua-install ;\
 	fi
