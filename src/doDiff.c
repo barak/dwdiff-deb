@@ -190,7 +190,9 @@ static void handleNextWhitespace(InputFile *file, bool print, Mode mode) {
 	whitespace.
 */
 static void handleSynchronizedNextWhitespace(bool printNew) {
+#ifdef USE_UNICODE
 	static_assert(CRLF_GRAPHEME_CLUSTER_BREAK == 0);
+#endif
 
 	bool BValid = true;
 	unsigned int *lineNumberA, *lineNumberB;
