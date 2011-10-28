@@ -1,3 +1,11 @@
+dwdiff (2.0.2-1) unstable; urgency=low
+
+  * New upstream release.
+  * Use DESTDIR facility (debian/rules).
+  * Upstream Makefile installs README, no need to do it here (debian/docs).
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Fri, 28 Oct 2011 16:44:20 +0100
+
 dwdiff (2.0-1) unstable; urgency=low
 
   * Upgrade debian packaging to dh 8.
