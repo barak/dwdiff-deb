@@ -35,6 +35,9 @@ The problem here is that there is hardly a good solution, that will satisfy
 all cases in an intuitive manner. Therefore, I'm going to stick with the
 Unix EOL convention instead of using the official Unicode way. Users can run
 dos2unix to convert their documents if need be. */
+/* WARNING: changing this to 1 will break the code. DO NOT change!. Places
+   which will definately break if this is changed to 1 will have a static
+   assert on this value being 0. */
 #define CRLF_GRAPHEME_CLUSTER_BREAK 0
 
 #include <unicode/uchar.h>

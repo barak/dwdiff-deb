@@ -30,13 +30,15 @@ static bool inited;
 
 /** Create a temporary file. */
 TempFile *tempFile(void) {
+#ifndef LEAVE_FILES
 	int fd;
+#endif
 
 	ASSERT(openIndex < sizeof(files) / sizeof(files[0]));
 
 #ifdef LEAVE_FILES
 	strcpy(files[openIndex].name, "dwdiffTemp");
-	snprintf(files[openIndex].name + strlen(files[openIndex].name), "%d", openIndex);
+	sprintf(files[openIndex].name + strlen(files[openIndex].name), "%d", openIndex);
 	if ((files[openIndex].stream = newFileStream(fileOpen(files[openIndex].name, FILE_WRITE))) == NULL)
 		return NULL;
 #else

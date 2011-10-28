@@ -56,7 +56,7 @@ typedef enum {false, true} bool;
 #define strdupA strdup
 #endif
 
-#define VERSION_STRING "2.0"
+#define VERSION_STRING "2.0.1"
 
 typedef struct CharData CharData;
 
@@ -116,4 +116,12 @@ extern bool UTF8Mode;
 extern CharData charData;
 
 void doDiff(void);
+
+enum {
+	CAT_OTHER,
+	CAT_DELIMITER,
+	CAT_WHITESPACE
+};
+
+int classifyChar(void);
 #endif

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-22 12:57+0200\n"
+"POT-Creation-Date: 2011-10-26 20:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,47 +22,47 @@ msgstr ""
 msgid "Program-logic error at %s:%d\n"
 msgstr ""
 
-#: doDiff.c:174 doDiff.c:211 doDiff.c:239 doDiff.c:261 doDiff.c:315
-#: doDiff.c:325 doDiff.c:498
+#: doDiff.c:178 doDiff.c:217 doDiff.c:245 doDiff.c:267 doDiff.c:321
+#: doDiff.c:492
 msgid "Error reading back input\n"
 msgstr ""
 
-#: dwdiff.c:295 dwdiff.c:436
+#: dwdiff.c:292 dwdiff.c:430
 #, c-format
 msgid "Can't open file %s: %s\n"
 msgstr ""
 
-#: dwdiff.c:298 dwdiff.c:303 dwfilter.c:147
+#: dwdiff.c:295 dwdiff.c:300 dwfilter.c:147
 #, c-format
 msgid "Could not create temporary file: %s\n"
 msgstr ""
 
-#: dwdiff.c:373
+#: dwdiff.c:367
 #, c-format
 msgid "Error reading file %s: %s\n"
 msgstr ""
 
-#: dwdiff.c:392 dwdiff.c:397
+#: dwdiff.c:386 dwdiff.c:391
 #, c-format
 msgid "Error writing to temporary file %s: %s\n"
 msgstr ""
 
-#: dwdiff.c:585
+#: dwdiff.c:579
 #, c-format
 msgid "old: 0 words\n"
 msgstr ""
 
-#: dwdiff.c:587
+#: dwdiff.c:581
 #, c-format
 msgid "old: %d words  %d %d%% common  %d %d%% deleted  %d %d%% changed\n"
 msgstr ""
 
-#: dwdiff.c:594
+#: dwdiff.c:588
 #, c-format
 msgid "new: 0 words\n"
 msgstr ""
 
-#: dwdiff.c:596
+#: dwdiff.c:590
 #, c-format
 msgid "new: %d words  %d %d%% common  %d %d%% inserted  %d %d%% changed\n"
 msgstr ""
@@ -84,12 +84,12 @@ msgid ""
 "Licensed under the GNU General Public License version 3\n"
 msgstr ""
 
-#: dwfilter.c:108 option.c:674 option.c:697
+#: dwfilter.c:108 option.c:662 option.c:685
 #, c-format
 msgid "Option %.*s does not exist\n"
 msgstr ""
 
-#: dwfilter.c:125 option.c:718
+#: dwfilter.c:125 option.c:706
 msgid "Need two files to compare\n"
 msgstr ""
 
@@ -381,22 +381,22 @@ msgstr ""
 msgid "Whitespace and delimiter sets overlap\n"
 msgstr ""
 
-#: option.c:432 option.c:628
+#: option.c:420 option.c:616
 #, c-format
 msgid "Invalid color specification %s\n"
 msgstr ""
 
-#: option.c:445
+#: option.c:433
 #, c-format
 msgid "Invalid color %s\n"
 msgstr ""
 
-#: option.c:457
+#: option.c:445
 #, c-format
 msgid "Invalid background color %s\n"
 msgstr ""
 
-#: option.c:507
+#: option.c:495
 #, c-format
 msgid "Usage: dwdiff [OPTIONS] <OLD FILE> <NEW FILE>\n"
 msgstr ""
@@ -405,56 +405,56 @@ msgstr ""
 #. - If the (C) symbol (that is the c in a circle) is not available,
 #. leave as it as is. (Unicode code point 0x00A9)
 #. - G.P. Halkes is name and should be left as is.
-#: option.c:519
+#: option.c:507
 msgid ""
 "Copyright (C) 2006-2011 G.P. Halkes and others\n"
 "Licensed under the GNU General Public License version 3\n"
 msgstr ""
 
-#: option.c:548
+#: option.c:536
 #, c-format
 msgid "Option %.*s is only supported for UTF-8 mode\n"
 msgstr ""
 
-#: option.c:551
+#: option.c:539
 #, c-format
 msgid "Support for option %.*s is not compiled into this version of dwdiff\n"
 msgstr ""
 
-#: option.c:558 option.c:569 option.c:588
+#: option.c:546 option.c:557 option.c:576
 #, c-format
 msgid "Option %.*s is not supported\n"
 msgstr ""
 
-#: option.c:597
+#: option.c:585
 msgid "Can't read both files from standard input\n"
 msgstr ""
 
-#: option.c:601 option.c:707
+#: option.c:589 option.c:695
 msgid "Too many files to compare\n"
 msgstr ""
 
 #. TRANSLATORS:
 #. "Name" and "Description" are table headings for the color name list.
 #. Make sure you keep the alignment of the headings over the text.
-#: option.c:617
+#: option.c:605
 msgid "Name            Description\n"
 msgstr ""
 
-#: option.c:622
+#: option.c:610
 msgid "The colors black through gray are also usable as background color\n"
 msgstr ""
 
-#: option.c:670
+#: option.c:658
 #, c-format
 msgid "Error opening temporary output file: %s\n"
 msgstr ""
 
-#: option.c:693
+#: option.c:681
 msgid "Invalid algorithm name\n"
 msgstr ""
 
-#: option.c:713
+#: option.c:701
 msgid "Only one input file accepted with --diff-input\n"
 msgstr ""
 

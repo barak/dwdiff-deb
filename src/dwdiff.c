@@ -51,28 +51,9 @@ bool tokenWritten;
     sense in this case. */
 CharData charData;
 
-/** Write an escaped character.
-	@param file The file to write to.
-	@param ch The character to write.
-	@return A boolean that indicates whether the character should still be written.
-*/
-static bool writeEscape(File *file, int ch) {
-	/* ch is either a single byte, or a UTF-16 char. */
-	if (option.transliterate) {
-		if (ch == '\n') {
-			fileWrite(file, "\\n", 2);
-			return false;
-		} else if (ch == '\\') {
-			fileWrite(file, "\\\\", 2);
-			return false;
-		}
-	}
-	return true;
-}
-
 static void writeEndOfToken(InputFile *file) {
 	ValueType wordValue;
-	sputc(file->tokens->stream, '\n');
+	sputc(file->tokens->stream, 0);
 
 	wordValue = getValueFromContext(&currentWord);
 	tokenWritten = true;
@@ -101,16 +82,19 @@ void writeTokenCharSC(InputFile *file) {
 	int diffChar = option.ignoreCase ? tolower(charData.singleChar) : charData.singleChar;
 
 	VECTOR_APPEND(currentWord, diffChar);
-	if (writeEscape(file->tokens->stream->data.file, charData.singleChar))
-		filePutc(file->tokens->stream->data.file, charData.singleChar);
+
+	if (charData.singleChar == 0 || charData.singleChar == 1)
+		filePutc(file->tokens->stream->data.file, 1);
+
+	filePutc(file->tokens->stream->data.file, charData.singleChar);
 }
 
 void writeWhitespaceCharSC(InputFile *file) {
 	/* Don't want to change interface (yet), so prevent warning. */
 	(void) file;
 
-	if (charData.singleChar == 0 || charData.singleChar == '\\')
-		VECTOR_APPEND(whitespaceBuffer, '\\');
+	if (charData.singleChar == 0 || charData.singleChar == 1)
+		VECTOR_APPEND(whitespaceBuffer, 1);
 
 	VECTOR_APPEND(whitespaceBuffer, charData.singleChar);
 }
@@ -142,7 +126,8 @@ bool isWhitespaceUTF8(void) {
 
 bool isDelimiterUTF8(void) {
 	return bsearch(&charData.UTF8Char.converted, option.delimiterList.data, option.delimiterList.used,
-		sizeof(UTF16Buffer), (int (*)(const void *, const void *)) compareUTF16Buffer) != NULL || (option.punctuationMask && isUTF16Punct(&charData.UTF8Char.converted));
+		sizeof(UTF16Buffer), (int (*)(const void *, const void *)) compareUTF16Buffer) != NULL ||
+		(option.punctuationMask && isUTF16Punct(&charData.UTF8Char.converted));
 }
 
 void writeTokenCharUTF8(InputFile *file) {
@@ -157,13 +142,6 @@ void writeTokenCharUTF8(InputFile *file) {
 		writeBuffer = &charData.UTF8Char.converted;
 	}
 
-	/* Write the "original" characters. Note that high and low surrogates
-	   and other invalid characters have been converted to REPLACEMENT
-	   CHARACTER. */
-	for (i = 0; i < charData.UTF8Char.original.used; i++)
-		if (writeEscape(file->tokens->stream->data.file, charData.UTF8Char.original.data[i]))
-			putuc(file->tokens->stream, charData.UTF8Char.original.data[i]);
-
 	for (i = 0; i < writeBuffer->used; i++) {
 		char utf8char[4];
 		size_t bytes;
@@ -174,6 +152,17 @@ void writeTokenCharUTF8(InputFile *file) {
 		memcpy(currentWord.data + currentWord.used, &utf8char, bytes);
 		currentWord.used += bytes;
 	}
+
+	/* Write the "original" characters. Note that high and low surrogates
+	   and other invalid characters have been converted to REPLACEMENT
+	   CHARACTER. */
+	if (charData.UTF8Char.original.data[0] == 0 || charData.UTF8Char.original.data[0] == 1) {
+		sputc(file->tokens->stream, 1);
+		sputc(file->tokens->stream, charData.UTF8Char.original.data[0]);
+	} else {
+		for (i = 0; i < charData.UTF8Char.original.used; i++)
+			putuc(file->tokens->stream, charData.UTF8Char.original.data[i]);
+	}
 }
 
 void writeWhitespaceCharUTF8(InputFile *file) {
@@ -183,6 +172,16 @@ void writeWhitespaceCharUTF8(InputFile *file) {
 	/* Don't want to change interface (yet), so prevent warning. */
 	(void) file;
 
+	/* 0 and 1 are always considered to be a grapheme cluster on their own, and
+	   are therefore always the only thing in the charData buffer if we
+	   encouter them. Furthermore, we use 0 as line end, and 1 as escape
+	   character in the temporary file. So we handle them separately here. */
+	if (charData.UTF8Char.original.data[0] == 0 || charData.UTF8Char.original.data[0] == 1) {
+		VECTOR_APPEND(whitespaceBuffer, 1);
+		VECTOR_APPEND(whitespaceBuffer, charData.UTF8Char.original.data[0]);
+		return;
+	}
+
 	for (i = 0; i < charData.UTF8Char.original.used; i++) {
 		char utf8char[4];
 		size_t bytes;
@@ -190,11 +189,7 @@ void writeWhitespaceCharUTF8(InputFile *file) {
 		if ((bytes = filteredConvertToUTF8(charData.UTF8Char.original.data[i], utf8char, &highSurrogate)) == 0)
 			continue;
 
-		/* Make sure we have at least room for the char and backshlash. Not optimal, but easy. */
-		VECTOR_ALLOCATE(whitespaceBuffer, bytes + 1);
-
-		if (charData.UTF8Char.original.data[i] == 0 || charData.UTF8Char.original.data[i] == '\\')
-			whitespaceBuffer.data[whitespaceBuffer.used++] = '\\';
+		VECTOR_ALLOCATE(whitespaceBuffer, bytes);
 
 		memcpy(whitespaceBuffer.data + whitespaceBuffer.used, utf8char, bytes);
 		whitespaceBuffer.used += bytes;
@@ -268,11 +263,13 @@ void handleWhitespaceEnd(InputFile *file) {
 	whitespaceBuffer.used = 0;
 }
 
-enum {
-	CAT_OTHER,
-	CAT_DELIMITER,
-	CAT_WHITESPACE
-};
+/** Classify the character read in ::charData. */
+int classifyChar(void) {
+	/* Need to make sure we test delimiters first, because in UTF8Mode
+	   we can't simply remove any overlapping delimiters from the
+	   whitespace list. */
+	return isDelimiter() ? CAT_DELIMITER : (isWhitespace() ? CAT_WHITESPACE : CAT_OTHER);
+}
 
 /** Read a file and separate whitespace from the rest.
     @param file The @a InputFile to read.
@@ -305,10 +302,7 @@ static int readFile(InputFile *file) {
 	tokenWritten = false;
 
 	while (getNextChar(file->input)) {
-		/* Need to make sure we test delimiters first, because in UTF8Mode
-		   we can't simply remove any overlapping delimiters from the
-		   whitespace list. */
-		category = isDelimiter() ? CAT_DELIMITER : (isWhitespace() ? CAT_WHITESPACE : CAT_OTHER);
+		category = classifyChar();
 		switch (state) {
 			case NONE:
 				if (category == CAT_WHITESPACE) {

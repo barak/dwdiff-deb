@@ -23,10 +23,6 @@
 #include "util.h"
 #include "option.h"
 
-#ifdef NO_MINUS_A
-#include <ctype.h>
-#endif
-
 static int filePutcReal(File *file, int c);
 static int fileWriteReal(File *file, const char *buffer, int bytes);
 static int fileFlushReal(File *file);
@@ -47,9 +43,6 @@ File *fileWrapFD(int fd, FileMode mode) {
 	retval->eof = EOF_NO;
 	retval->mode = mode;
 	retval->vtable = &vtableReal;
-#ifdef NO_MINUS_A
-	retval->escapeNonPrint = 0;
-#endif
 	return retval;
 }
 
@@ -203,29 +196,10 @@ static int filePutcReal(File *file, int c) {
 	if (file->errNo != 0)
 		return EOF;
 
-	if (file->bufferFill >= FILE_BUFFER_SIZE
-#ifdef NO_MINUS_A
-		|| (file->escapeNonPrint && (!isprint(c) || c == '%') && c != '\n' && file->bufferFill >= FILE_BUFFER_SIZE - 2)
-#endif
-	) {
+	if (file->bufferFill >= FILE_BUFFER_SIZE) {
 		if (flushBuffer(file) == EOF)
 			return EOF;
 	}
-
-#ifdef NO_MINUS_A
-	/* Escape non-printable characters for diff programs that do not have a -a
-	   switch.*/
-	if (file->escapeNonPrint) {
-		if (c == '%') {
-			file->buffer[file->bufferFill++] = '%';
-		} else if (!isprint(c) && c != '\n') {
-			file->buffer[file->bufferFill++] = '%';
-			file->buffer[file->bufferFill++] = "0123456789ABCDEFGHIJKLMNOPQRSTUV"[(c >> 5) & 0x1F];
-			file->buffer[file->bufferFill++] = "0123456789ABCDEFGHIJKLMNOPQRSTUV"[c & 0x1F];
-			return 0;
-		}
-	}
-#endif
 
 	file->buffer[file->bufferFill++] = (unsigned char) c;
 	return 0;
@@ -236,21 +210,6 @@ static int fileWriteReal(File *file, const char *buffer, int bytes) {
 	ASSERT(file->mode == FILE_WRITE);
 	if (file->errNo != 0)
 		return EOF;
-
-#ifdef NO_MINUS_A
-	/* Make sure the output is correctly escaped. It is simplest to just do it
-	   character by character. */
-	if (file->escapeNonPrint) {
-		int i;
-
-		if (bytes == 0)
-			return 0;
-
-		for (i = 0; i < bytes - 1; i++)
-			filePutcReal(file, *buffer++);
-		return filePutcReal(file, *buffer);
-	}
-#endif
 
 	while (1) {
 		size_t minLength = FILE_BUFFER_SIZE - file->bufferFill < bytes ? FILE_BUFFER_SIZE - file->bufferFill : bytes;
