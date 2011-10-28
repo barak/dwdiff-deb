@@ -1,3 +1,14 @@
+Version 2.0.1:
+    Bug fixes:
+    - escape parsing for unknown escapes (like for example \;) would result
+      in incorrect strings.
+    - when the space character is not considered whitespace, dwdiff will no
+      longer use it to make changes more readable.
+
+    Internal changes:
+    - the token file no longer uses a newline character as separator, but a nul
+      character, making reparsing easier and the whole of dwdiff more robust.
+
 Version 2.0:
     New features:
     - dwdiff is no longer a front-end for the diff program, but includes its

@@ -210,7 +210,7 @@ static size_t parseEscapes(char *string, const char *descr) {
 				}
 #endif
 				default:
-					string[writePosition++] = string[readPosition];
+					string[writePosition++] = string[readPosition - 1];
 					break;
 			}
 		} else {
@@ -294,8 +294,8 @@ void postProcessOptionsSC(void) {
 		}
 	}
 
-	if (!TEST_BIT(option.whitespace, '\n'))
-		option.transliterate = true;
+	if (!TEST_BIT(option.whitespace, ' '))
+		option.wdiffOutput = true;
 }
 
 #ifdef USE_UNICODE
@@ -382,10 +382,7 @@ void initOptionsUTF8(void) {
 }
 
 void postProcessOptionsUTF8(void) {
-	UTF16Buffer newline;
-	UChar newlineData[1] = { '\n' };
-	newline.data = newlineData;
-	newline.used = 1;
+	static_assert(CRLF_GRAPHEME_CLUSTER_BREAK == 0);
 
 	qsort(option.delimiterList.data, option.delimiterList.used,	sizeof(UTF16Buffer),
 		(int (*)(const void *, const void *)) compareUTF16Buffer);
@@ -393,21 +390,12 @@ void postProcessOptionsUTF8(void) {
 	qsort(option.whitespaceList.data, option.whitespaceList.used, sizeof(UTF16Buffer),
 		(int (*)(const void *, const void *)) compareUTF16Buffer);
 
-	/* Check if all newline characters are considered whitespace (not only newlines
-	   followed by something else). If that is not the case, the input needs to be
-	   transliterated. */
-	if (option.whitespaceSet) {
-		if (bsearch(&newline, option.whitespaceList.data, option.whitespaceList.used,
-				sizeof(UTF16Buffer), (int (*)(const void *, const void *)) compareUTF16Buffer) == NULL) {
-			option.transliterate = true;
-		}
-	} else {
-		if (bsearch(&newline, option.delimiterList.data, option.delimiterList.used,
-				sizeof(UTF16Buffer), (int (*)(const void *, const void *)) compareUTF16Buffer) != NULL) {
-			option.transliterate = true;
-		}
-	}
+	VECTOR_APPEND(charData.UTF8Char.converted, ' ');
+	if (classifyChar() != CAT_WHITESPACE)
+		option.wdiffOutput = true;
+	charData.UTF8Char.converted.used = 0;
 }
+
 /*===============================================================*/
 #endif
 

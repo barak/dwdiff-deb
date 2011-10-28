@@ -30,7 +30,11 @@ static const char eraseLine[] = "\033[K";
 static unsigned int oldLineNumber = 1, newLineNumber = 1;
 static bool lastWasLinefeed = true, lastWasDelete = false, lastWasCarriageReturn = false;
 
-/** Check whether the last-read character equals a certain value. */
+/** Check whether the last-read character equals a certain value.
+
+    This only works correctly if @p c is a character which will always be put
+    into its own grapheme cluster, like control characters.
+*/
 static bool charDataEquals(int c) {
 #ifdef USE_UNICODE
 	if (UTF8Mode)
@@ -169,7 +173,7 @@ static void handleNextWhitespace(InputFile *file, bool print, Mode mode) {
 			if (charDataEquals(0))
 				return;
 
-			if (charDataEquals('\\')) {
+			if (charDataEquals(1)) {
 				if (!readNextChar(file->whitespace->stream))
 					fatal(_("Error reading back input\n"));
 			}
@@ -186,6 +190,8 @@ static void handleNextWhitespace(InputFile *file, bool print, Mode mode) {
 	whitespace.
 */
 static void handleSynchronizedNextWhitespace(bool printNew) {
+	static_assert(CRLF_GRAPHEME_CLUSTER_BREAK == 0);
+
 	bool BValid = true;
 	unsigned int *lineNumberA, *lineNumberB;
 	Stream *whitespaceA, *whitespaceB;
@@ -206,7 +212,7 @@ static void handleSynchronizedNextWhitespace(bool printNew) {
 		if (charDataEquals(0))
 			break;
 
-		if (charDataEquals('\\')) {
+		if (charDataEquals(1)) {
 			if (!readNextChar(whitespaceA))
 				fatal(_("Error reading back input\n"));
 		}
@@ -234,7 +240,7 @@ static void handleSynchronizedNextWhitespace(bool printNew) {
 					if (charDataEquals(0))
 						break;
 
-					if (charDataEquals('\\')) {
+					if (charDataEquals(1)) {
 						if (!readNextChar(whitespaceB))
 							fatal(_("Error reading back input\n"));
 					}
@@ -256,7 +262,7 @@ static void handleSynchronizedNextWhitespace(bool printNew) {
 			if (charDataEquals(0))
 				break;
 
-			if (charDataEquals('\\')) {
+			if (charDataEquals(1)) {
 				if (!readNextChar(whitespaceB))
 					fatal(_("Error reading back input\n"));
 			}
@@ -292,7 +298,7 @@ void addTokenChar(Mode mode) {
 static void handleNextToken(TempFile *file, bool print, Mode mode) {
 	bool empty = true;
 	while (readNextChar(file->stream)) {
-		if (charDataEquals('\n')) {
+		if (charDataEquals(0)) {
 			/* Check for option.paraDelim _should_ be superfluous, unless there is a bug elsewhere. */
 			if (option.paraDelim && print && empty && mode != COMMON) {
 				Stream *stream = newStringStream(option.paraDelimMarker, option.paraDelimMarkerLength);
@@ -309,22 +315,10 @@ static void handleNextToken(TempFile *file, bool print, Mode mode) {
 		}
 		empty = false;
 
-		/* Re-transliterate the characters, if necessary. */
-		if (option.transliterate && charDataEquals('\\')) {
+		/* Unescape the characters, if necessary. */
+		if (charDataEquals(1)) {
 			if (!readNextChar(file->stream))
 				fatal(_("Error reading back input\n"));
-			if (charDataEquals('n')) {
-#ifdef USE_UNICODE
-				if (UTF8Mode)
-					charData.UTF8Char.original.data[0] = '\n';
-				else
-#endif
-					charData.singleChar = '\n';
-			}
-			else if (!charDataEquals('\\'))
-				fatal(_("Error reading back input\n"));
-			/* Transliteration of \X is not necessary as we are reading
-			   back the tokens file, and not the diffTokens file. */
 		}
 
 		if (print) {
@@ -493,7 +487,7 @@ static bool loadNextWhitespace(InputFile *file) {
 		if (charDataEquals(0))
 			return newlineFound;
 
-		if (charDataEquals('\\')) {
+		if (charDataEquals(1)) {
 			if (!readNextChar(file->whitespace->stream))
 				fatal(_("Error reading back input\n"));
 		}
@@ -598,9 +592,9 @@ static void doDiffInternal(lin *baseRange, unsigned context) {
 		   we trim the context to the smallest range. This may move some
 		   changes forward a little. */
 		if (baseRange != 0) {
-			if (context > baseRange[1])
+			if ((lin) context > baseRange[1])
 				context = baseRange[1];
-			if (context > baseRange[3])
+			if ((lin) context > baseRange[3])
 				context = baseRange[3];
 		} else {
 			if (context > option.oldFile.diffTokens.used)
@@ -645,7 +639,7 @@ static void doDiffInternal(lin *baseRange, unsigned context) {
 			   too long when the difference is a change, not when it is an add
 			   or delete. */
 			if (command == C_CHANGE) {
-				if (script->deleted <= context || script->inserted <= context) {
+				if (script->deleted <= (lin) context || script->inserted <= (lin) context) {
 					ASSERT(script->deleted != script->inserted);
 					if (script->deleted < script->inserted) {
 						script->inserted -= script->deleted;

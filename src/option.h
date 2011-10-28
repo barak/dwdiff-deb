@@ -53,7 +53,6 @@ struct {
 		statistics,
 		ignoreCase,
 		colorMode;
-	bool transliterate;
 	int lineNumbers;
 	bool context;
 	int contextLines;
