@@ -25,7 +25,7 @@ USERRULES='.SUFFIXES: .mo .po
 
 TEST_INSTALL="install $PWD/install.sh"
 
-DEFAULT_LINGUAS=" nl"
+DEFAULT_LINGUAS=" de es fr nl"
 [ -f config.pkg.langpack ] && . config.pkg.langpack
 
 USER_HELP="  --without-gettext  Disable gettext translations

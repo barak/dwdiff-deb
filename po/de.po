@@ -68,9 +68,9 @@ msgid "new: %d words  %d %d%% common  %d %d%% inserted  %d %d%% changed\n"
 msgstr "neu: %d Wörter  %d %d%% gleich  %d %d%% eingefügt  %d %d%% geändert\n"
 
 #: dwfilter.c:44
-#, fuzzy, c-format
+#, c-format
 msgid "Usage: dwfilter [OPTIONS] <OLD FILE> <NEW FILE> <POST PROCESSOR> [POST PROCESSOR OPTIONS]\n"
-msgstr "Gebrauch: dwdiff [OPTIONEN] <ALTE DATEI> <NEU DATEI>\n"
+msgstr ""
 
 #. TRANSLATORS:
 #. - If the (C) symbol (that is the c in a circle) is not available,
@@ -127,9 +127,9 @@ msgid "Value for %.*s option (%ld) is out of range\n"
 msgstr "Wert für die %*s Option (%ld) ist außerhalb des zulässigen Bereichs\n"
 
 #: optionMacros.h:295
-#, fuzzy, c-format
+#, c-format
 msgid "Value for %.*s option (%s) is not a valid boolean value\n"
-msgstr "Wert für die %*s Option (%ld) ist außerhalb des zulässigen Bereichs\n"
+msgstr ""
 
 #: optionDescriptions.h:6
 msgid "-h, --help                             Print this help message\n"
@@ -252,9 +252,8 @@ msgstr ""
 "                                       Text zu markieren\n"
 
 #: optionDescriptions.h:56
-#, fuzzy
 msgid "-r, --reverse                          Format new as old\n"
-msgstr "-p, --printer                          Gestrichenen und fetten Text nutzen\n"
+msgstr ""
 
 #: option.c:38
 msgid "Black"
@@ -368,6 +367,11 @@ msgstr "Ungültige Farbspezifikation %s\n"
 msgid "Invalid color %s\n"
 msgstr "Ungültige Farbe %s\n"
 
+#: option.c:445
+#, c-format
+msgid "Invalid background color %s\n"
+msgstr ""
+
 #: option.c:512
 #, c-format
 msgid "Usage: dwdiff [OPTIONS] <OLD FILE> <NEW FILE>\n"
@@ -408,9 +412,9 @@ msgid "The colors black through gray are also usable as background color\n"
 msgstr ""
 
 #: option.c:679
-#, fuzzy, c-format
+#, c-format
 msgid "Error opening temporary output file: %s\n"
-msgstr "Fehler beim Schreiben in temporäre Datei %s: %s\n"
+msgstr ""
 
 #: util.c:38
 msgid "Out of memory"
@@ -418,3 +422,41 @@ msgstr "Hauptspeicher erschöpft"
 
 #~ msgid "Option %.*s has zero length argument\n"
 #~ msgstr "Option %.*s hat ein Argument der Länge Null\n"
+
+#: dwfilter.c:159
+#, c-format
+msgid "Could not execute %s: %s\n"
+msgstr ""
+
+#: optionDescriptions.h:28
+msgid ""
+"--diff-input                           Read the input as the output from "
+"diff\n"
+msgstr ""
+
+#: optionDescriptions.h:57
+msgid ""
+"-A <alg>, --algorithm=<alg>            Choose algorithm: best, normal, fast\n"
+msgstr ""
+
+#: optionDescriptions.h:68
+msgid "-R, --repeat-markers                   Repeat markers at newlines\n"
+msgstr ""
+
+#. TRANSLATORS:
+#. - If the (C) symbol (that is the c in a circle) is not available,
+#. leave as it as is. (Unicode code point 0x00A9)
+#. - G.P. Halkes is name and should be left as is.
+#: option.c:507
+msgid ""
+"Copyright (C) 2006-2011 G.P. Halkes and others\n"
+"Licensed under the GNU General Public License version 3\n"
+msgstr ""
+
+#: option.c:681
+msgid "Invalid algorithm name\n"
+msgstr ""
+
+#: option.c:701
+msgid "Only one input file accepted with --diff-input\n"
+msgstr ""

@@ -370,10 +370,6 @@ UTF16Buffer operations
     @param c The character to append.
 */
 static void addUCS4ToUTF16Buffer(UTF16Buffer *buffer, UChar32 c) {
-	int chars = 1;
-	if (c > 0x10000)
-		chars = 2;
-
 	if (c > 0x10000) {
 		VECTOR_APPEND(*buffer, 0xD800 - (0x10000 >> 10) + (c >> 10));
 		VECTOR_APPEND(*buffer, 0xDC00 | (c & 0x3FF));
