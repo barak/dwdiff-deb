@@ -10,8 +10,8 @@
 .\"
 .\" You should have received a copy of the GNU General Public License
 .\" along with this program.  If not, see <http://www.gnu.org/licenses/>.
-.TH "dwdiff" "1" "28-10-2011" "Version 2.0.2" "delimited word diff program"
-.hw /usr/share/doc/dwdiff-2.0.2 http://os.ghalkes.nl/dwdiff.html
+.TH "dwdiff" "1" "31-05-2012" "Version 2.0.3" "delimited word diff program"
+.hw /usr/share/doc/dwdiff-2.0.3 http://os.ghalkes.nl/dwdiff.html
 
 .SH NAME
 
@@ -54,7 +54,7 @@ characters depends on the current locale.
 Specify a list of characters to be used as whitespace.
 .IP "\fB\-\-diff\-input\fP"
 Interpret the input as the output from \fBdiff\fP in the Unified Diff format
-(usually produced by \fBdiff -u\fP). In this case only one input file is
+(usually produced by \fBdiff \-u\fP). In this case only one input file is
 allowed. This option allows reformating diff output with \fBdwdiff\fP, and is
 useful for example to post-process the output of \fBsvn diff\fP.
 .IP "\fB\-1\fP, \fB\-\-no\-deleted\fP"
@@ -171,7 +171,7 @@ Copyright \(co 2006-2011 G.P. Halkes and others
 dwdiff is licensed under the GNU General Public License version 3.
 .br
 For more details on the license, see the file COPYING in the documentation
-directory. On Un*x systems this is usually /usr/share/doc/dwdiff-2.0.2.
+directory. On Un*x systems this is usually /usr/share/doc/dwdiff-2.0.3.
 .SH SEE ALSO
 
 \fBdwfilter\fP(1), \fBwdiff\fP(1), \fBdiff\fP(1)
