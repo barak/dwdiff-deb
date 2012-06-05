@@ -8,7 +8,7 @@
 
 # Use LINGUAS to force installation of all available linguas.
 
-LINGUAS=$(shell ls po | egrep '[.]po$$' | sed 's/.po//' | tr '\n' ' ')
+LINGUAS=$(shell ls po | egrep '[.]po$$' | sed 's/\.po//' | tr '\n' ' ')
 
 # squelch unknown flags passed to ./configure by dh_auto_configure
 #  ./configure: --build=x86_64-linux-gnu --prefix=/usr
