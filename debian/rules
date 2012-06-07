@@ -17,6 +17,13 @@ LINGUAS=$(shell ls po | egrep '[.]po$$' | sed 's/\.po//' | tr '\n' ' ')
 #    --localstatedir=/var --libexecdir='$${prefix}/lib/dwdiff'
 #    --disable-maintainer-mode --disable-dependency-tracking
 
+# Glom CPPFLAGS onto CFLAGS because this deficient ./configure etc
+# ignores the former.
+
+export CFLAGS = \
+ $(shell dpkg-buildflags --get CFLAGS) \
+ $(shell dpkg-buildflags --get CPPFLAGS)
+
 override_dh_auto_configure:
 	./configure --prefix=/usr --mandir='$${prefix}/share/man'
 
