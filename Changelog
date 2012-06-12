@@ -1,3 +1,8 @@
+Version 2.0.4:
+    Bug fixes:
+    - fix a memory allocation bug, which would be triggered by large values
+      for the -m option.
+
 Version 2.0.3:
     Updated translations for German (incomplete), French (incomplete) and
     Spanish.
