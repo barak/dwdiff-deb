@@ -141,7 +141,7 @@ msgstr ""
 #: optionMacros.h:261
 #, c-format
 msgid "Value for %.*s option (%ld) is out of range\n"
-msgstr "Valeur (%ld) de l'option %.*s est hors limite\n\n"
+msgstr "Valeur (%3$ld) de l'option %2$.*1$s est hors limite\n"
 
 #: optionMacros.h:295
 #, c-format

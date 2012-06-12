@@ -21,6 +21,7 @@
 
 typedef struct MemBlock {
 	struct MemBlock *next;
+	size_t size;
 	size_t idx;
 } MemBlock;
 
@@ -43,12 +44,15 @@ ValueType baseHashMax;
 
 static void *allocFromBlock(size_t size) {
 	void *result;
-	if (head == NULL || size > MEMBLOCK_SIZE - head->idx) {
+	if (head == NULL || size > head->size - head->idx) {
 		MemBlock *newBlock;
-		if (size > 2048)
+		if (size > 2048) {
 			newBlock = safe_malloc(size + sizeof(MemBlock));
-		else
+			newBlock->size = size + sizeof(MemBlock);
+		} else {
 			newBlock = safe_malloc(MEMBLOCK_SIZE);
+			newBlock->size = MEMBLOCK_SIZE;
+		}
 		newBlock->idx = sizeof(MemBlock);
 		newBlock->next = head;
 		head = newBlock;
