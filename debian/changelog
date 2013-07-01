@@ -1,3 +1,11 @@
+dwdiff (2.0.5-1) unstable; urgency=low
+
+  * New upstream version
+  * Bump debian standards version
+  * Canonicalize VCS fields
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Mon, 01 Jul 2013 10:37:35 +0100
+
 dwdiff (2.0.4-1) unstable; urgency=low
 
   * New upstream version (closes: #676436)
