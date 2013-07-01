@@ -531,6 +531,7 @@ static ValueType *initializeContextDiffTokens(ValueTypeVector *diffTokens, lin *
 	ValueType *contextDiffTokens, *dataBase;
 	size_t dataRange;
 	size_t i, idx = 0;
+	ValueType edgeArray[context + 1];
 
 	if (range == NULL)
 		dataRange = diffTokens->used;
@@ -543,15 +544,18 @@ static ValueType *initializeContextDiffTokens(ValueTypeVector *diffTokens, lin *
 	if (range != NULL)
 		dataBase += range[0];
 
+	memcpy(edgeArray + 1, dataBase, context * sizeof(ValueType));
+	edgeArray[0] = -1;
 	for (i = 1; i <= context; i++)
-		contextDiffTokens[idx++] = getValue(dataBase, i * sizeof(ValueType));
+		contextDiffTokens[idx++] = getValue(edgeArray, (i + 1) * sizeof(ValueType));
 
 	for (i = 0; i < dataRange - context; i++)
 		contextDiffTokens[idx++] = getValue(dataBase + i, (context + 1) * sizeof(ValueType));
 
+	memcpy(edgeArray, dataBase + dataRange - context, context * sizeof(ValueType));
+	edgeArray[context] = -1;
 	for (i = 0; i < context; i++)
-		contextDiffTokens[idx++] = getValue(dataBase + dataRange - context + i, (context - i) * sizeof(ValueType));
-
+		contextDiffTokens[idx++] = getValue(edgeArray + i, (context - i + 1) * sizeof(ValueType));
 
 	ASSERT(idx == dataRange + context);
 
@@ -646,7 +650,7 @@ static void doDiffInternal(lin *baseRange, unsigned context) {
 					if (script->deleted < script->inserted) {
 						script->inserted -= script->deleted;
 						command = C_ADD;
-					} else {
+					} else if (script->inserted < script->deleted) {
 						script->deleted -= script->inserted;
 						command = C_DEL;
 					}
