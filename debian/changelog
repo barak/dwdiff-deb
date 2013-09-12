@@ -1,3 +1,9 @@
+dwdiff (2.0.7-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Thu, 12 Sep 2013 10:40:39 +0100
+
 dwdiff (2.0.5-1) unstable; urgency=low
 
   * New upstream version
