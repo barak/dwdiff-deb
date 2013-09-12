@@ -572,7 +572,6 @@ int main(int argc, char *argv[]) {
 	else
 		prepareAndExecuteDiff();
 
-	fflush(option.output);
 
 	if (option.statistics) {
 		int common = statistics.oldTotal - statistics.deleted - statistics.oldChanged;
@@ -594,6 +593,8 @@ int main(int argc, char *argv[]) {
 				statistics.newChanged, (statistics.newChanged * 100) / statistics.newTotal);
 		}
 	}
+
+	fflush(option.output);
 
 #ifdef DEBUG_MEMORY
 	free(option.oldFile.diffTokens.data);

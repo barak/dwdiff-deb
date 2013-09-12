@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-06-30 20:16+0200\n"
+"POT-Creation-Date: 2013-09-12 10:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,8 +22,8 @@ msgstr ""
 msgid "Program-logic error at %s:%d\n"
 msgstr ""
 
-#: doDiff.c:178 doDiff.c:219 doDiff.c:247 doDiff.c:269 doDiff.c:323
-#: doDiff.c:494
+#: doDiff.c:178 doDiff.c:226 doDiff.c:254 doDiff.c:276 doDiff.c:335
+#: doDiff.c:506
 msgid "Error reading back input\n"
 msgstr ""
 
@@ -47,22 +47,22 @@ msgstr ""
 msgid "Error writing to temporary file %s: %s\n"
 msgstr ""
 
-#: dwdiff.c:580
+#: dwdiff.c:579
 #, c-format
 msgid "old: 0 words\n"
 msgstr ""
 
-#: dwdiff.c:582
+#: dwdiff.c:581
 #, c-format
 msgid "old: %d words  %d %d%% common  %d %d%% deleted  %d %d%% changed\n"
 msgstr ""
 
-#: dwdiff.c:589
+#: dwdiff.c:588
 #, c-format
 msgid "new: 0 words\n"
 msgstr ""
 
-#: dwdiff.c:591
+#: dwdiff.c:590
 #, c-format
 msgid "new: %d words  %d %d%% common  %d %d%% inserted  %d %d%% changed\n"
 msgstr ""

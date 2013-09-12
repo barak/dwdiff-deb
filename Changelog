@@ -1,7 +1,12 @@
+Version 2.0.6
+    Bug fixes:
+    - Fix incorrect line numbering caused by optimized printing of differences
+      preceeded in both files by whitespace containing newlines.
+
 Version 2.0.5:
     Bug fixes:
-    - fix a bug in the handling of context, which caused incorrect diffs to be
-      printed. In some cases text was reported both as removed and as common.
+    - Fix handling of context, which caused incorrect diffs to be printed. In
+      some cases text was reported both as removed and as common.
 
 Version 2.0.4:
     Bug fixes:

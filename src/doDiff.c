@@ -184,7 +184,7 @@ static void handleNextWhitespace(InputFile *file, bool print, Mode mode) {
 
 /** Skip or print the next bit of whitespace from the new or old file, keeping
 	the other file synchronized as far as line numbers are concerned.
-	@param printOld Use the old file for printing instead of the new file.
+	@param printNew Use the new file for printing instead of the old file.
 
 	This is only for printing common text, and will skip over the old
 	whitespace.
@@ -198,14 +198,21 @@ static void handleSynchronizedNextWhitespace(bool printNew) {
 	unsigned int *lineNumberA, *lineNumberB;
 	Stream *whitespaceA, *whitespaceB;
 
+	Stream *oldFileWhitespaceStream = option.oldFile.whitespaceBufferUsed ?
+			newStringStream(option.oldFile.whitespaceBuffer.data, option.oldFile.whitespaceBuffer.used) :
+			option.oldFile.whitespace->stream;
+	Stream *newFileWhitespaceStream = option.newFile.whitespaceBufferUsed ?
+			newStringStream(option.newFile.whitespaceBuffer.data, option.newFile.whitespaceBuffer.used) :
+			option.newFile.whitespace->stream;
+
 	if (printNew) {
-		whitespaceA = option.newFile.whitespace->stream;
-		whitespaceB = option.oldFile.whitespace->stream;
+		whitespaceA = newFileWhitespaceStream;
+		whitespaceB = oldFileWhitespaceStream;
 		lineNumberA = &newLineNumber;
 		lineNumberB = &oldLineNumber;
 	} else {
-		whitespaceA = option.oldFile.whitespace->stream;
-		whitespaceB = option.newFile.whitespace->stream;
+		whitespaceA = oldFileWhitespaceStream;
+		whitespaceB = newFileWhitespaceStream;
 		lineNumberA = &oldLineNumber;
 		lineNumberB = &newLineNumber;
 	}
@@ -273,6 +280,11 @@ static void handleSynchronizedNextWhitespace(bool printNew) {
 				(*lineNumberB)++;
 		}
 	}
+
+	if (option.oldFile.whitespaceBufferUsed)
+		free(oldFileWhitespaceStream);
+	if (option.newFile.whitespaceBufferUsed)
+		free(newFileWhitespaceStream);
 }
 
 /** Wrapper for addchar which takes printer and less mode into account
@@ -531,7 +543,6 @@ static ValueType *initializeContextDiffTokens(ValueTypeVector *diffTokens, lin *
 	ValueType *contextDiffTokens, *dataBase;
 	size_t dataRange;
 	size_t i, idx = 0;
-	ValueType edgeArray[context + 1];
 
 	if (range == NULL)
 		dataRange = diffTokens->used;
@@ -544,18 +555,15 @@ static ValueType *initializeContextDiffTokens(ValueTypeVector *diffTokens, lin *
 	if (range != NULL)
 		dataBase += range[0];
 
-	memcpy(edgeArray + 1, dataBase, context * sizeof(ValueType));
-	edgeArray[0] = -1;
 	for (i = 1; i <= context; i++)
-		contextDiffTokens[idx++] = getValue(edgeArray, (i + 1) * sizeof(ValueType));
+		contextDiffTokens[idx++] = getValue(dataBase, i * sizeof(ValueType));
 
 	for (i = 0; i < dataRange - context; i++)
 		contextDiffTokens[idx++] = getValue(dataBase + i, (context + 1) * sizeof(ValueType));
 
-	memcpy(edgeArray, dataBase + dataRange - context, context * sizeof(ValueType));
-	edgeArray[context] = -1;
 	for (i = 0; i < context; i++)
-		contextDiffTokens[idx++] = getValue(edgeArray + i, (context - i + 1) * sizeof(ValueType));
+		contextDiffTokens[idx++] = getValue(dataBase + dataRange - context + i, (context - i) * sizeof(ValueType));
+
 
 	ASSERT(idx == dataRange + context);
 
@@ -650,7 +658,7 @@ static void doDiffInternal(lin *baseRange, unsigned context) {
 					if (script->deleted < script->inserted) {
 						script->inserted -= script->deleted;
 						command = C_ADD;
-					} else if (script->inserted < script->deleted) {
+					} else {
 						script->deleted -= script->inserted;
 						command = C_DEL;
 					}
@@ -672,15 +680,22 @@ static void doDiffInternal(lin *baseRange, unsigned context) {
 		/* Print common words. */
 		printToCommonWord(script->line1);
 
-		/* Load whitespace for both files and analyse. If old ws does not
+		/* Load whitespace for both files and analyse (same func). If old ws does not
 		   contain a newline, don't bother with loading the new because we need
 		   regular printing. Otherwise, determine if we need reverse printing or
 		   need to change the new ws into a single space */
 		if (command == C_CHANGE && !option.wdiffOutput) {
 			if (loadNextWhitespace(&option.oldFile)) {
 				if (loadNextWhitespace(&option.newFile)) {
+					/* Because of the line feeds in both pieces of whitespace, we need to
+					   print the pieces synchronized to keep the line counters correct. We
+					   then empty the old whitespace buffer because that has already been
+					   printed, and we set the new whitespace buffer to a space such that
+					   the old and the new word are at least separated by a single space. */
+					handleSynchronizedNextWhitespace(!lastWasDelete);
 					option.newFile.whitespaceBuffer.data[0] = ' ';
 					option.newFile.whitespaceBuffer.used = 1;
+					option.oldFile.whitespaceBuffer.used = 0;
 				} else {
 					reverseDeleteAdd = true;
 				}
