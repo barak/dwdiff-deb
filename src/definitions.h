@@ -56,7 +56,7 @@ typedef enum {false, true} bool;
 #define strdupA strdup
 #endif
 
-#define VERSION_STRING "2.0.6"
+#define VERSION_STRING "2.0.7"
 
 typedef struct CharData CharData;
 
