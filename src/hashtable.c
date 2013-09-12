@@ -14,10 +14,13 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stddef.h>
 #include "definitions.h"
 #include "hashtable.h"
 
 #define MEMBLOCK_SIZE 32768
+#define ALIGNOF(type) offsetof(struct { char c; type member; }, member)
+#define ROUNDUP(x, to) (((x + (to - 1)) / to) * to)
 
 typedef struct MemBlock {
 	struct MemBlock *next;
@@ -41,9 +44,10 @@ static ValueType nextValue;
 
 ValueType baseHashMax;
 
+static Tuple *allocFromBlock(size_t size) {
+	Tuple *result;
 
-static void *allocFromBlock(size_t size) {
-	void *result;
+	size = ROUNDUP(size, ALIGNOF(Tuple));
 	if (head == NULL || size > head->size - head->idx) {
 		MemBlock *newBlock;
 		if (size > 2048) {
@@ -53,11 +57,11 @@ static void *allocFromBlock(size_t size) {
 			newBlock = safe_malloc(MEMBLOCK_SIZE);
 			newBlock->size = MEMBLOCK_SIZE;
 		}
-		newBlock->idx = sizeof(MemBlock);
+		newBlock->idx = ROUNDUP(sizeof(MemBlock), ALIGNOF(Tuple));
 		newBlock->next = head;
 		head = newBlock;
 	}
-	result = ((char *) head) + head->idx;
+	result = (Tuple *)(((char *) head) + head->idx);
 	head->idx += size;
 	return result;
 }

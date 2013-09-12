@@ -80,7 +80,7 @@ static size_t parseEscapes(char *string, const char *descr) {
 	size_t readPosition = 0, writePosition = 0;
 	size_t i;
 
-	while(readPosition < maxReadPosition) {
+	while (readPosition < maxReadPosition) {
 		if (string[readPosition] == '\\') {
 			readPosition++;
 
