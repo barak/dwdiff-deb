@@ -1,3 +1,6 @@
+Version 2.0.9:
+    Fix typo in configure script which prevents it from running.
+
 Version 2.0.8:
     Bug fixes:
     - Fix build against glibc 2.16 and newer.
