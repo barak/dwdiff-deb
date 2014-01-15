@@ -1,3 +1,10 @@
+Version 2.0.8:
+    Bug fixes:
+    - Fix build against glibc 2.16 and newer.
+
+    Miscelaneous changes:
+    - Added correct breaking for Unicode Regional Indicators.
+
 Version 2.0.7:
     Fix incorrect release of 2.0.6, which omitted changes from the 2.0.5
     release.
