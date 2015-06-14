@@ -62,6 +62,7 @@ struct {
 	const char *paraDelimMarker;
 	size_t paraDelimMarkerLength;
 	bool wdiffOutput;
+	const char *profile;
 
 	FILE *output;
 	bool dwfilterMode;

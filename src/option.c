@@ -1,4 +1,4 @@
-/* Copyright (C) 2006-2011 G.P. Halkes
+/* Copyright (C) 2006-2015 G.P. Halkes
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License version 3, as
    published by the Free Software Foundation.
@@ -23,6 +23,7 @@
 #include "util.h"
 #include "buffer.h"
 #include "dispatch.h"
+#include "profile.h"
 
 #define DWDIFF_COMPILE
 #include "optionDescriptions.h"
@@ -459,10 +460,7 @@ static char *parseColor(const char *_color) {
 	return strdupA(sequenceBuffer);
 }
 
-PARSE_FUNCTION(parseCmdLine)
-	char *comma;
-	int noOptionCount = 0;
-
+static void initializeOptions(void) {
 	/* Initialise options to correct values */
 	memset(&option, 0, sizeof(option));
 	option.printDeleted = option.printAdded = option.printCommon = true;
@@ -476,6 +474,52 @@ PARSE_FUNCTION(parseCmdLine)
 
 	option.paraDelimMarker = "<-->";
 	option.paraDelimMarkerLength = strlen(option.paraDelimMarker);
+	option.profile = "default";
+}
+
+static void completeDefaults(void) {
+	/* Check and set some values */
+	if (!option.dwfilterMode) {
+		if (option.delStart == NULL) {
+			option.delStart = "[-";
+			option.delStartLen = 2;
+		}
+		if (option.delStop == NULL) {
+			option.delStop = "-]";
+			option.delStopLen = 2;
+		}
+		if (option.addStart == NULL) {
+			option.addStart = "{+";
+			option.addStartLen = 2;
+		}
+		if (option.addStop == NULL) {
+			option.addStop = "+}";
+			option.addStopLen = 2;
+		}
+
+		if (!option.printCommon && !option.printAdded && !option.printDeleted)
+			option.needMarkers = false;
+
+		if ((!option.printAdded + !option.printDeleted + !option.printCommon) == 2)
+			option.needStartStop = false;
+	} else {
+		option.delStart = "";
+		option.delStartLen = 0;
+		option.delStop = "";
+		option.delStopLen = 0;
+		option.addStart = "";
+		option.addStartLen = 0;
+		option.addStop = "";
+		option.addStopLen = 0;
+		option.printAdded = false;
+		option.needMarkers = false;
+		option.needStartStop = true;
+	}
+}
+
+static PARSE_FUNCTION(parseArgs)
+	char *comma;
+	int noOptionCount = 0;
 
 	OPTIONS
 		OPTION('d', "delimiters", REQUIRED_ARG)
@@ -491,11 +535,13 @@ PARSE_FUNCTION(parseCmdLine)
 			addCharacters(optArg, length, SWITCH_UNICODE(&option.whitespaceList, NULL), option.whitespace);
 		END_OPTION
 		OPTION('h', "help", NO_ARG)
-				int i = 0;
-				printf(_("Usage: dwdiff [OPTIONS] <OLD FILE> <NEW FILE>\n"));
-				while (descriptions[i] != NULL)
-					fputs(_(descriptions[i++]), stdout);
-				exit(EXIT_SUCCESS);
+			/* START_KEEP */
+			int i = 0;
+			printf(_("Usage: dwdiff [OPTIONS] <OLD FILE> <NEW FILE>\n"));
+			while (descriptions[i] != NULL)
+				fputs(_(descriptions[i++]), stdout);
+			exit(EXIT_SUCCESS);
+			/* STOP_KEEP */
 		END_OPTION
 		OPTION('v', "version", NO_ARG)
 			fputs("dwdiff " VERSION_STRING "\n", stdout);
@@ -504,26 +550,32 @@ PARSE_FUNCTION(parseCmdLine)
 				   - If the (C) symbol (that is the c in a circle) is not available,
 					 leave as it as is. (Unicode code point 0x00A9)
 				   - G.P. Halkes is name and should be left as is. */
-				_("Copyright (C) 2006-2011 G.P. Halkes and others\nLicensed under the GNU General Public License version 3\n"), stdout);
+				_("Copyright (C) 2006-2015 G.P. Halkes and others\nLicensed under the GNU General Public License version 3\n"), stdout);
 			exit(EXIT_SUCCESS);
 		END_OPTION
 		OPTION('1', "no-deleted", NO_ARG)
-			option.printDeleted = false;
-			if (!option.printAdded)
-				option.needMarkers = true;
-			if (!option.printCommon || !option.printAdded)
-				option.needStartStop = false;
+			if (!option.dwfilterMode) {
+				option.printDeleted = false;
+				if (!option.printAdded)
+					option.needMarkers = true;
+				if (!option.printCommon || !option.printAdded)
+					option.needStartStop = false;
+			}
 		END_OPTION
 		OPTION('2', "no-inserted", NO_ARG)
-			option.printAdded = false;
-			if (!option.printDeleted)
-				option.needMarkers = true;
-			if (!option.printCommon || !option.printDeleted)
-				option.needStartStop = false;
+			if (!option.dwfilterMode) {
+				option.printAdded = false;
+				if (!option.printDeleted)
+					option.needMarkers = true;
+				if (!option.printCommon || !option.printDeleted)
+					option.needStartStop = false;
+			}
 		END_OPTION
 		OPTION('3', "no-common", NO_ARG)
-			option.printCommon = false;
-			option.needMarkers = true;
+			if (!option.dwfilterMode) {
+				option.printCommon = false;
+				option.needMarkers = true;
+			}
 		END_OPTION
 		OPTION('i', "ignore-case", NO_ARG)
 			option.ignoreCase = true;
@@ -540,23 +592,31 @@ PARSE_FUNCTION(parseCmdLine)
 #endif
 		END_OPTION
 		OPTION('s', "statistics", NO_ARG)
-			option.statistics = true;
+			if (!option.dwfilterMode) {
+				option.statistics = true;
+			}
 		END_OPTION
 		OPTION('a', "autopager", NO_ARG)
 			fatal(_("Option %.*s is not supported\n"), OPTPRARG);
 		END_OPTION
 		OPTION('p', "printer", NO_ARG)
-			option.printer = true;
-			noDefaultMarkers();
+			if (!option.dwfilterMode) {
+				option.printer = true;
+				noDefaultMarkers();
+			}
 		END_OPTION
 		OPTION('l', "less-mode", NO_ARG)
-			option.less = true;
-			noDefaultMarkers();
+			if (!option.dwfilterMode) {
+				option.less = true;
+				noDefaultMarkers();
+			}
 		END_OPTION
 		LONG_OPTION("less", NO_ARG)
-			option.less = true;
-			noDefaultMarkers();
-			fprintf(stderr, "WARNING: the --less argument is deprecated. Use --less-mode instead.\n");
+			if (!option.dwfilterMode) {
+				option.less = true;
+				noDefaultMarkers();
+				fprintf(stderr, "WARNING: the --less argument is deprecated. Use --less-mode instead.\n");
+			}
 		END_OPTION
 		OPTION('t', "terminal", NO_ARG)
 			fatal(_("Option %.*s is not supported\n"), OPTPRARG);
@@ -598,40 +658,42 @@ PARSE_FUNCTION(parseCmdLine)
 			NO_MORE_OPTIONS;
 		END_OPTION
 		OPTION('c', "color", OPTIONAL_ARG)
-			option.colorMode = true;
-			if (optArg != NULL) {
-				int i;
+			if (!option.dwfilterMode) {
+				option.colorMode = true;
+				if (optArg != NULL) {
+					int i;
 
-				if (strCaseCmp(optArg, "list") == 0) {
-					fputs(
-						/* TRANSLATORS:
-						   "Name" and "Description" are table headings for the color name list.
-						   Make sure you keep the alignment of the headings over the text. */
-						_("Name            Description\n"), stdout);
-					fputs("--              --\n", stdout);
-					for (i = 0; colors[i].name != NULL; i++)
-						printf("%-15s %s\n", colors[i].name, _(colors[i].description));
-					fputc('\n', stdout);
-					fputs(_("The colors black through gray are also usable as background color\n"), stdout);
-					exit(EXIT_SUCCESS);
+					if (strCaseCmp(optArg, "list") == 0) {
+						fputs(
+							/* TRANSLATORS:
+							   "Name" and "Description" are table headings for the color name list.
+							   Make sure you keep the alignment of the headings over the text. */
+							_("Name            Description\n"), stdout);
+						fputs("--              --\n", stdout);
+						for (i = 0; colors[i].name != NULL; i++)
+							printf("%-15s %s\n", colors[i].name, _(colors[i].description));
+						fputc('\n', stdout);
+						fputs(_("The colors black through gray are also usable as background color\n"), stdout);
+						exit(EXIT_SUCCESS);
+					}
+
+					comma = strchr(optArg, ',');
+					if (comma != NULL && strrchr(optArg, ',') != comma)
+						fatal(_("Invalid color specification %s\n"), optArg);
+
+					if (comma != NULL)
+						*comma++ = 0;
+
+					option.delColor = parseColor(optArg[0] == 0 ? "bred" : optArg);
+					option.addColor = parseColor(comma == NULL ? "bgreen" : comma);
+				} else {
+					option.delColor = parseColor("bred");
+					option.addColor = parseColor("bgreen");
 				}
-
-				comma = strchr(optArg, ',');
-				if (comma != NULL && strrchr(optArg, ',') != comma)
-					fatal(_("Invalid color specification %s\n"), optArg);
-
-				if (comma != NULL)
-					*comma++ = 0;
-
-				option.delColor = parseColor(optArg[0] == 0 ? "bred" : optArg);
-				option.addColor = parseColor(comma == NULL ? "bgreen" : comma);
-			} else {
-				option.delColor = parseColor("bred");
-				option.addColor = parseColor("bgreen");
+				option.delColorLen = strlen(option.delColor);
+				option.addColorLen = strlen(option.addColor);
+				noDefaultMarkers();
 			}
-			option.delColorLen = strlen(option.delColor);
-			option.addColorLen = strlen(option.addColor);
-			noDefaultMarkers();
 		END_OPTION
 		OPTION('L', "line-numbers", OPTIONAL_ARG)
 			if (optArg != NULL)
@@ -650,15 +712,19 @@ PARSE_FUNCTION(parseCmdLine)
 		END_OPTION
 		BOOLEAN_LONG_OPTION("aggregate-changes", option.aggregateChanges)
 		OPTION('S', "paragraph-separator", OPTIONAL_ARG)
-			option.paraDelim = true;
-			if (optArg != NULL) {
-				option.paraDelimMarker = optArg;
-				option.paraDelimMarkerLength = parseEscapes(optArg, "paragraph-separator");
+			if (!option.dwfilterMode) {
+				option.paraDelim = true;
+				if (optArg != NULL) {
+					option.paraDelimMarker = optArg;
+					option.paraDelimMarkerLength = parseEscapes(optArg, "paragraph-separator");
+				}
 			}
 		END_OPTION
 		BOOLEAN_LONG_OPTION("wdiff-output", option.wdiffOutput)
 		LONG_OPTION("dwfilter", REQUIRED_ARG)
+			/* START_KEEP */
 			option.dwfilterMode = true;
+			/* STOP_KEEP */
 			if ((option.output = fopen(optArg, "r+")) == NULL)
 				fatal(_("Error opening temporary output file: %s\n"), strerror(errno));
 		END_OPTION
@@ -667,10 +733,14 @@ PARSE_FUNCTION(parseCmdLine)
 				fatal(_("Option %.*s does not exist\n"), OPTPRARG);
 		END_OPTION
 		OPTION('R', "repeat-markers", NO_ARG)
-			option.repeatMarkers = true;
+			if (!option.dwfilterMode) {
+				option.repeatMarkers = true;
+			}
 		END_OPTION
 		LONG_OPTION("diff-input", NO_ARG)
-			option.diffInput = true;
+			if (!option.dwfilterMode) {
+				option.diffInput = true;
+			}
 		END_OPTION
 		OPTION('A', "algorithm", REQUIRED_ARG)
 			if (strcmp(optArg, "best") == 0) {
@@ -686,6 +756,16 @@ PARSE_FUNCTION(parseCmdLine)
 				fatal(_("Invalid algorithm name\n"));
 			}
 		END_OPTION
+		LONG_OPTION("profile", REQUIRED_ARG)
+			/* START_KEEP */
+			option.profile = optArg;
+			/* STOP_KEEP */
+		END_OPTION
+		LONG_OPTION("no-profile", NO_ARG)
+			/* START_KEEP */
+			option.profile = NULL;
+			/* STOP_KEEP */
+		END_OPTION
 
 		fatal(_("Option %.*s does not exist\n"), OPTPRARG);
 	NO_OPTION
@@ -700,42 +780,32 @@ PARSE_FUNCTION(parseCmdLine)
 				fatal(_("Too many files to compare\n"));
 		}
 	END_OPTIONS
+END_FUNCTION
+
+static PARSE_FUNCTION(preParseArgs)
+#include "option_stripped.inc"
+END_FUNCTION
+
+void parseCmdLine(int argc, char *argv[]) {
+	ProfileOption *profileOptions = NULL;
+	initializeOptions();
+	preParseArgs(argc, argv);
+	if (option.profile != NULL)
+		profileOptions = loadProfile(".dwdiffrc", option.profile);
+	applyProfileOptions(profileOptions, parseArgs, argv[0]);
+	parseArgs(argc, argv);
+
 	/* Check that we have something to work with. */
 	if (option.diffInput) {
-		if (noOptionCount > 1)
+		if (option.newFile.name != NULL)
 			fatal(_("Only one input file accepted with --diff-input\n"));
-		if (noOptionCount == 0)
+		if (option.oldFile.name == NULL)
 			option.oldFile.input = newFileStream(fileWrapFD(STDIN_FILENO, FILE_READ));
 	} else {
-		if (noOptionCount != 2)
+		if (option.newFile.name == NULL)
 			fatal(_("Need two files to compare\n"));
 	}
-
-	/* Check and set some values */
-	if (option.delStart == NULL) {
-		option.delStart = "[-";
-		option.delStartLen = 2;
-	}
-	if (option.delStop == NULL) {
-		option.delStop = "-]";
-		option.delStopLen = 2;
-	}
-	if (option.addStart == NULL) {
-		option.addStart = "{+";
-		option.addStartLen = 2;
-	}
-	if (option.addStop == NULL) {
-		option.addStop = "+}";
-		option.addStopLen = 2;
-	}
-
-	if (!option.printCommon && !option.printAdded && !option.printDeleted)
-		option.needMarkers = false;
-
-	if ((!option.printAdded + !option.printDeleted + !option.printCommon) == 2)
-		option.needStartStop = false;
-
+	completeDefaults();
 	postProcessOptions();
-
 	checkOverlap();
-END_FUNCTION
+}

@@ -105,6 +105,10 @@ static PARSE_FUNCTION(parseCmdLine)
 		END_OPTION */
 
 		BOOLEAN_OPTION('r', "reverse", option.reverse)
+		LONG_OPTION("profile", REQUIRED_ARG)
+		END_OPTION
+		LONG_OPTION("no-profile", NO_ARG)
+		END_OPTION
 
 		fatal(_("Option %.*s does not exist\n"), OPTPRARG);
 	NO_OPTION
@@ -183,8 +187,8 @@ int main(int argc, char *argv[]) {
 
 	parseCmdLine(argc, argv);
 	createTempfile();
-	cmdArgs = safe_malloc(sizeof(char *) * (option.postProcessorStart + 7));
-	outputArg = safe_malloc(sizeof(char) * (strlen(tempfile) + sizeof(OUTPUT_OPTION)));
+	cmdArgs = safe_malloc(sizeof(char *) * (option.postProcessorStart + 3));
+	outputArg = safe_malloc(strlen(tempfile) + sizeof(OUTPUT_OPTION) + 1);
 
 	cmdArgs[0] = safe_strdup(DWDIFF);
 	/* argument has been allocated to correct size above, so we can safely use sprintf */
@@ -194,12 +198,6 @@ int main(int argc, char *argv[]) {
 	for (i = 1, j = 2; i < option.postProcessorStart; i++)
 		if (i != option.oldFile && i != option.newFile)
 			cmdArgs[j++] = argv[i];
-
-	cmdArgs[j++] = safe_strdup("-w");
-	cmdArgs[j++] = safe_strdup("");
-	cmdArgs[j++] = safe_strdup("-x");
-	cmdArgs[j++] = safe_strdup("");
-	cmdArgs[j++] = safe_strdup("-2");
 
 	cmdArgs[j++] = argv[option.reverse ? option.newFile : option.oldFile];
 	cmdArgs[j++] = argv[option.reverse ? option.oldFile : option.newFile];
@@ -222,5 +220,4 @@ int main(int argc, char *argv[]) {
 
 	return execute(cmdArgs);
 }
-
 

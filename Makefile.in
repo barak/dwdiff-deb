@@ -54,14 +54,14 @@ DWFILTER=yes
 
 # Miscelaneous install paths
 bindir=$(prefix)/bin
-docdir=$(prefix)/share/doc/dwdiff-2.0.10
+docdir=$(prefix)/share/doc/dwdiff-2.1.0
 mandir=$(prefix)/share/man
 
 all: dwdiff $(DWFILTER:yes=dwfilter) linguas
 
 .PHONY: all clean dist-clean install dwdiff-install lingua-install linguas
 
-OBJECTS_DWDIFF=src/doDiff.o src/diff/analyze.o src/file.o src/option.o src/unicode.o src/buffer.o src/hashtable.o src/dwdiff.o src/util.o src/tempfile.o src/stream.o
+OBJECTS_DWDIFF=src/doDiff.o src/diff/analyze.o src/file.o src/option.o src/unicode.o src/buffer.o src/hashtable.o src/profile.o src/dwdiff.o src/util.o src/tempfile.o src/stream.o
 OBJECTS_DWFILTER=src/dwfilter.o src/util.o
 
 clean:

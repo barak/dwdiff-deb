@@ -1,3 +1,12 @@
+Version 2.1.0:
+    New features:
+    - A new config file with profiles has been introduced. Profile selection is
+      done with the --profile option. Disabling the default profile can be done
+      thorugh the --no-profile option.
+
+    Bug fixes:
+    - Display the version with the --version flag.
+
 Version 2.0.10:
     Bug fixes:
     - The flag --less-mode was advertised, but the actual accepted name was
