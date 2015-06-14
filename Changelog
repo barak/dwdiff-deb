@@ -1,3 +1,9 @@
+Version 2.0.10:
+    Bug fixes:
+    - The flag --less-mode was advertised, but the actual accepted name was
+      --less. This has been changed to accept --less-mode and emit a warning on
+      the old flag.
+
 Version 2.0.9:
     Fix typo in configure script which prevents it from running.
 
