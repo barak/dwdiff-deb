@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-05 18:31+0100\n"
+"POT-Creation-Date: 2015-03-15 11:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -84,12 +84,12 @@ msgid ""
 "Licensed under the GNU General Public License version 3\n"
 msgstr ""
 
-#: dwfilter.c:109 option.c:662 option.c:685
+#: dwfilter.c:109 option.c:667 option.c:690
 #, c-format
 msgid "Option %.*s does not exist\n"
 msgstr ""
 
-#: dwfilter.c:126 option.c:706
+#: dwfilter.c:126 option.c:711
 msgid "Need two files to compare\n"
 msgstr ""
 
@@ -381,7 +381,7 @@ msgstr ""
 msgid "Whitespace and delimiter sets overlap\n"
 msgstr ""
 
-#: option.c:420 option.c:616
+#: option.c:420 option.c:621
 #, c-format
 msgid "Invalid color specification %s\n"
 msgstr ""
@@ -421,40 +421,40 @@ msgstr ""
 msgid "Support for option %.*s is not compiled into this version of dwdiff\n"
 msgstr ""
 
-#: option.c:546 option.c:557 option.c:576
+#: option.c:546 option.c:562 option.c:581
 #, c-format
 msgid "Option %.*s is not supported\n"
 msgstr ""
 
-#: option.c:585
+#: option.c:590
 msgid "Can't read both files from standard input\n"
 msgstr ""
 
-#: option.c:589 option.c:695
+#: option.c:594 option.c:700
 msgid "Too many files to compare\n"
 msgstr ""
 
 #. TRANSLATORS:
 #. "Name" and "Description" are table headings for the color name list.
 #. Make sure you keep the alignment of the headings over the text.
-#: option.c:605
+#: option.c:610
 msgid "Name            Description\n"
 msgstr ""
 
-#: option.c:610
+#: option.c:615
 msgid "The colors black through gray are also usable as background color\n"
 msgstr ""
 
-#: option.c:658
+#: option.c:663
 #, c-format
 msgid "Error opening temporary output file: %s\n"
 msgstr ""
 
-#: option.c:681
+#: option.c:686
 msgid "Invalid algorithm name\n"
 msgstr ""
 
-#: option.c:701
+#: option.c:706
 msgid "Only one input file accepted with --diff-input\n"
 msgstr ""
 

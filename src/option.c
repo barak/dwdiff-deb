@@ -549,9 +549,14 @@ PARSE_FUNCTION(parseCmdLine)
 			option.printer = true;
 			noDefaultMarkers();
 		END_OPTION
-		OPTION('l', "less", NO_ARG)
+		OPTION('l', "less-mode", NO_ARG)
 			option.less = true;
 			noDefaultMarkers();
+		END_OPTION
+		LONG_OPTION("less", NO_ARG)
+			option.less = true;
+			noDefaultMarkers();
+			fprintf(stderr, "WARNING: the --less argument is deprecated. Use --less-mode instead.\n");
 		END_OPTION
 		OPTION('t', "terminal", NO_ARG)
 			fatal(_("Option %.*s is not supported\n"), OPTPRARG);

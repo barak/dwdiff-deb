@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2009-2010 G.P. Halkes
+# Copyright (C) 2009 G.P. Halkes
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 3, as
 # published by the Free Software Foundation.
@@ -15,7 +15,7 @@
 # Set zsh to emulate sh (otherwise all kinds of eval's wont work)
 [ -n "${ZSH_VERSION}" ] && emulate sh
 
-unset directory sources dest mode owner group
+unset directory sources dest mode owner group strip
 
 # Provide an alternative to !
 not() {
@@ -55,6 +55,9 @@ do
 			;;
 		-g*)
 			group=`echo "$1" | sed 's/^-g//'`
+			;;
+		-s)
+			strip=1
 			;;
 		*)
 			break
@@ -137,6 +140,11 @@ install_file() {
 	fi
 	if [ -n "${group}" ] ; then
 		if not chgrp "${group}" "$2" ; then
+			exit 1
+		fi
+	fi
+	if [ -n "${strip}" ] ; then
+		if not strip "$2" ; then
 			exit 1
 		fi
 	fi

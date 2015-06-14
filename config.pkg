@@ -11,27 +11,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+EXTENSIONS="c verbose_compile gettext"
 
-SWITCHES="+gettext +unicode +dwfilter"
-OPTIONS="localedir icu-config"
+SWITCHES="+unicode +dwfilter"
+OPTIONS="icu-config"
 
 COMPILERULE='$(CC) $(CFLAGS) $(GETTEXTFLAGS) $(ICUFLAGS) -c -o $@ $<'
 LINKRULE='$(CC) $(CFLAGS) $(LDFLAGS) -o .config .config.o $(LDLIBS) $(GETTEXTLIBS) $(ICULIBS)'
 
-USERRULES='.SUFFIXES: .mo .po
-.po.mo:
-	msgfmt -o $@ $<
-'
-
-TEST_INSTALL="install $PWD/install.sh"
-
-DEFAULT_LINGUAS=" de es fr nl"
+DEFAULT_LINGUAS="de es fr nl"
 [ -f config.pkg.langpack ] && . config.pkg.langpack
 
-USER_HELP="  --without-gettext  Disable gettext translations
-  --without-unicode  Disable Unicode support
+USER_HELP="  --without-unicode  Disable Unicode support
   --icu-config=<path>  Path to icu-config script
-  --localedir=<dir>  Installation directory for locales [prefix/share/locale]
 
 Environment variables:
   LINGUAS            List of languages to install. Available languages are:
@@ -134,64 +126,6 @@ EOF
 		}
 	fi
 
-	unset GETTEXTFLAGS GETTEXTLIBS linguas LOCALEDIR
-	# Check for gettext functionality
-	if [ "yes" = "${with_gettext}" ] ; then
-		cat > .config.c <<EOF
-#include <locale.h>
-#include <libintl.h>
-
-int main(int argc, char *argv[]) {
-	setlocale(LC_ALL, "");
-	bindtextdomain("dwdiff", "/usr/share/locale");
-	textdomain("dwdiff");
-	gettext("dwdiff");
-	return 0;
-}
-EOF
-		{
-			test_compile "gettext and related functions" && {
-				test_link "gettext in standard library" ||
-				{ test_link "gettext in -lintl" GETTEXTLIBS=-lintl && GETTEXTLIBS=-lintl ; } ||
-				{ test_link "gettext in -lintl -liconv" "GETTEXTLIBS=-lintl -liconv" && GETTEXTLIBS="-lintl -liconv" ; }
-			} && {
-				clean .config.po .config.mo
-				cat > .config.po <<EOF
-msgid  "msg"
-msgstr "translation"
-EOF
-				check_message "Checking for msgfmt... "
-				if test_make .config.mo >> config.log 2>&1 ; then
-					check_message_result "yes"
-					true
-				else
-					check_message_result "no"
-					false
-				fi
-			}
-		} || {
-			clean .config.po .config.mo
-			check_message_result "!! Could not compile with gettext. Try configuring with --without-gettext."
-			exit 1
-		}
-		GETTEXTFLAGS="-DUSE_GETTEXT"
-		clean .config.po .config.mo
-
-		unset linguas
-		if [ -n "${LINGUAS+set}" ] ; then
-			check_message "Checking for available selected translations... "
-			for lingua in ${LINGUAS}
-			do
-				if [ -f "po/${lingua}.po" ] && echo "${linguas}" | not grep "^\\(.* \\)*${lingua}\\( .*\\)*$" > /dev/null ; then
-					linguas="${linguas}${linguas:+ }${lingua}"
-				fi
-			done
-			check_message_result "done [${linguas}]"
-		else
-			linguas="${DEFAULT_LINGUAS}"
-		fi
-	fi
-
 	if [ "yes" = "${with_unicode}" ] ; then
 		ICU_CONFIG="${option_icu_config:-icu-config}"
 		{
@@ -259,8 +193,7 @@ EOF
 		fi
 	fi
 
-	create_makefile "GETTEXTFLAGS=${GETTEXTFLAGS}" "GETTEXTLIBS=${GETTEXTLIBS}" \
-		"LINGUAS=${linguas}" ${option_localedir:+"LOCALEDIR=${option_localedir}"} \
+	create_makefile ${option_localedir:+"LOCALEDIR=${option_localedir}"} \
 		"ICUFLAGS=${ICUFLAGS}" "ICULIBS=${ICULIBS}" $DWFILTER
 }
 
