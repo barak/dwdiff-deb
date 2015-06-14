@@ -1,3 +1,13 @@
+dwdiff (2.1.0-1) unstable; urgency=medium
+
+  * New upstream version
+  * Bump debian standards version, no changes required
+  * Remove now-unneeded patch to work around no-longer-present icu-config bug
+  * Add quilt patch to correct newly-introduced nroff error in dwdiff(1)
+  * Update debian/copyright to silence lintian
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Sun, 14 Jun 2015 16:25:07 +0100
+
 dwdiff (2.0.9-1) unstable; urgency=low
 
   * New upstream version
