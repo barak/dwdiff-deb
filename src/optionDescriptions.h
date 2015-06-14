@@ -71,7 +71,8 @@ N_("-R, --repeat-markers                   Repeat markers at newlines\n"),
 #ifdef DWFILTER_COMPILE
 N_("-r, --reverse                          Format new as old\n"),
 #endif
-
+N_("--profile=<name>                       Use profile <name>\n"),
+N_("--no-profile                           Disable profile reading\n"),
 NULL};
 
 #endif

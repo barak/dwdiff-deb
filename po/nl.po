@@ -459,3 +459,21 @@ msgstr ""
 #: option.c:693
 msgid "Invalid algorithm name\n"
 msgstr "Ongeldige algorithme naam\n"
+
+#: optionDescriptions.h:74
+msgid "--profile=<name>                       Use profile <name>\n"
+msgstr "--profile=<naam>                       Gebruik profiel <naam>\n"
+
+#: profile.c:79
+#, c-format
+msgid "Could not open configuration file %s: %s\n"
+msgstr "Kon configuratie bestand %s niet openen: %s\n"
+
+#: optionDescriptions.h:75
+msgid "--no-profile                           Disable profile reading\n"
+msgstr "--no-profile                           Schakel het lezen van profielen uit\n"
+
+#: profile.c:97
+#, c-format
+msgid "Warning: empty profile name on line %s:%d\n"
+msgstr "Waarschuwing: lege profielnaam op regel %s:%d\n"

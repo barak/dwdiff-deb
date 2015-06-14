@@ -20,6 +20,7 @@ void fatal(const char *fmt, ...) __attribute__((format (printf, 1, 2))) __attrib
 #else
 /*@noreturn@*/ void fatal(const char *fmt, ...);
 #endif
+void outOfMemory(void);
 int ASCIItolower(int c);
 
 #ifdef DEBUG

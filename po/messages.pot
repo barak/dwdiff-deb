@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-15 11:46+0100\n"
+"POT-Creation-Date: 2015-06-09 22:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: util.h:26 util.h:28
+#: util.h:27 util.h:29
 #, c-format
 msgid "Program-logic error at %s:%d\n"
 msgstr ""
@@ -32,7 +32,7 @@ msgstr ""
 msgid "Can't open file %s: %s\n"
 msgstr ""
 
-#: dwdiff.c:295 dwdiff.c:300 dwfilter.c:148
+#: dwdiff.c:295 dwdiff.c:300 dwfilter.c:152
 #, c-format
 msgid "Could not create temporary file: %s\n"
 msgstr ""
@@ -84,30 +84,30 @@ msgid ""
 "Licensed under the GNU General Public License version 3\n"
 msgstr ""
 
-#: dwfilter.c:109 option.c:667 option.c:690
+#: dwfilter.c:113 option.c:733 option.c:770
 #, c-format
 msgid "Option %.*s does not exist\n"
 msgstr ""
 
-#: dwfilter.c:126 option.c:711
+#: dwfilter.c:130 option.c:806
 msgid "Need two files to compare\n"
 msgstr ""
 
-#: dwfilter.c:128
+#: dwfilter.c:132
 msgid "No post processor specified\n"
-msgstr ""
-
-#: dwfilter.c:160
-#, c-format
-msgid "Could not execute %s: %s\n"
 msgstr ""
 
 #: dwfilter.c:164
 #, c-format
+msgid "Could not execute %s: %s\n"
+msgstr ""
+
+#: dwfilter.c:168
+#, c-format
 msgid "Error waiting for child process to terminate: %s\n"
 msgstr ""
 
-#: dwfilter.c:209
+#: dwfilter.c:207
 msgid "dwdiff returned an error\n"
 msgstr ""
 
@@ -279,78 +279,86 @@ msgstr ""
 msgid "-r, --reverse                          Format new as old\n"
 msgstr ""
 
-#: option.c:38
-msgid "Black"
+#: optionDescriptions.h:74
+msgid "--profile=<name>                       Use profile <name>\n"
+msgstr ""
+
+#: optionDescriptions.h:75
+msgid "--no-profile                           Disable profile reading\n"
 msgstr ""
 
 #: option.c:39
-msgid "Red"
+msgid "Black"
 msgstr ""
 
 #: option.c:40
-msgid "Green"
+msgid "Red"
 msgstr ""
 
 #: option.c:41
-msgid "Brown"
+msgid "Green"
 msgstr ""
 
 #: option.c:42
-msgid "Blue"
+msgid "Brown"
 msgstr ""
 
 #: option.c:43
-msgid "Magenta"
+msgid "Blue"
 msgstr ""
 
 #: option.c:44
-msgid "Cyan"
+msgid "Magenta"
 msgstr ""
 
 #: option.c:45
-msgid "Gray"
+msgid "Cyan"
 msgstr ""
 
 #: option.c:46
-msgid "Dark gray"
+msgid "Gray"
 msgstr ""
 
 #: option.c:47
-msgid "Bright red"
+msgid "Dark gray"
 msgstr ""
 
 #: option.c:48
-msgid "Bright green"
+msgid "Bright red"
 msgstr ""
 
 #: option.c:49
-msgid "Yellow"
+msgid "Bright green"
 msgstr ""
 
 #: option.c:50
-msgid "Bright blue"
+msgid "Yellow"
 msgstr ""
 
 #: option.c:51
-msgid "Bright magenta"
+msgid "Bright blue"
 msgstr ""
 
 #: option.c:52
-msgid "Bright cyan"
+msgid "Bright magenta"
 msgstr ""
 
 #: option.c:53
+msgid "Bright cyan"
+msgstr ""
+
+#: option.c:54
 msgid "White"
 msgstr ""
 
-#: option.c:88
+#: option.c:89
 #, c-format
 msgid "Single backslash at end of %s argument\n"
 msgstr ""
 
 #. TRANSLATORS:
 #. The %s argument is a long option name without preceding dashes.
-#: option.c:140 option.c:147
+#: option.c:141 option.c:148
 #, c-format
 msgid "Invalid hexadecimal escape sequence in %s argument\n"
 msgstr ""
@@ -358,45 +366,45 @@ msgstr ""
 #. TRANSLATORS:
 #. The %c argument will be either 'u' or 'U'. The %s argument is a long
 #. option name without preceding dashes.
-#: option.c:181 option.c:187
+#: option.c:182 option.c:188
 #, c-format
 msgid "Too short \\%c escape in %s argument\n"
 msgstr ""
 
 #. TRANSLATORS:
 #. The %s argument is a long option name without preceding dashes.
-#: option.c:198
+#: option.c:199
 #, c-format
 msgid "\\U escape out of range in %s argument\n"
 msgstr ""
 
 #. TRANSLATORS:
 #. The %s argument is a long option name without preceding dashes.
-#: option.c:203
+#: option.c:204
 #, c-format
 msgid "\\%c escapes for surrogate codepoints are not allowed in %s argument\n"
 msgstr ""
 
-#: option.c:273 option.c:362 option.c:370
+#: option.c:274 option.c:363 option.c:371
 msgid "Whitespace and delimiter sets overlap\n"
 msgstr ""
 
-#: option.c:420 option.c:621
+#: option.c:421 option.c:682
 #, c-format
 msgid "Invalid color specification %s\n"
 msgstr ""
 
-#: option.c:433
+#: option.c:434
 #, c-format
 msgid "Invalid color %s\n"
 msgstr ""
 
-#: option.c:445
+#: option.c:446
 #, c-format
 msgid "Invalid background color %s\n"
 msgstr ""
 
-#: option.c:495
+#: option.c:540 option_stripped.inc:10
 #, c-format
 msgid "Usage: dwdiff [OPTIONS] <OLD FILE> <NEW FILE>\n"
 msgstr ""
@@ -405,57 +413,67 @@ msgstr ""
 #. - If the (C) symbol (that is the c in a circle) is not available,
 #. leave as it as is. (Unicode code point 0x00A9)
 #. - G.P. Halkes is name and should be left as is.
-#: option.c:507
+#: option.c:553
 msgid ""
-"Copyright (C) 2006-2011 G.P. Halkes and others\n"
+"Copyright (C) 2006-2015 G.P. Halkes and others\n"
 "Licensed under the GNU General Public License version 3\n"
 msgstr ""
 
-#: option.c:536
+#: option.c:588
 #, c-format
 msgid "Option %.*s is only supported for UTF-8 mode\n"
 msgstr ""
 
-#: option.c:539
+#: option.c:591
 #, c-format
 msgid "Support for option %.*s is not compiled into this version of dwdiff\n"
 msgstr ""
 
-#: option.c:546 option.c:562 option.c:581
+#: option.c:600 option.c:622 option.c:641
 #, c-format
 msgid "Option %.*s is not supported\n"
 msgstr ""
 
-#: option.c:590
+#: option.c:650
 msgid "Can't read both files from standard input\n"
 msgstr ""
 
-#: option.c:594 option.c:700
+#: option.c:654 option.c:780
 msgid "Too many files to compare\n"
 msgstr ""
 
 #. TRANSLATORS:
 #. "Name" and "Description" are table headings for the color name list.
 #. Make sure you keep the alignment of the headings over the text.
-#: option.c:610
+#: option.c:671
 msgid "Name            Description\n"
 msgstr ""
 
-#: option.c:615
+#: option.c:676
 msgid "The colors black through gray are also usable as background color\n"
 msgstr ""
 
-#: option.c:663
+#: option.c:729
 #, c-format
 msgid "Error opening temporary output file: %s\n"
 msgstr ""
 
-#: option.c:686
+#: option.c:756
 msgid "Invalid algorithm name\n"
 msgstr ""
 
-#: option.c:706
+#: option.c:801
 msgid "Only one input file accepted with --diff-input\n"
+msgstr ""
+
+#: profile.c:79
+#, c-format
+msgid "Could not open configuration file %s: %s\n"
+msgstr ""
+
+#: profile.c:100
+#, c-format
+msgid "Warning: empty profile name on line %s:%d\n"
 msgstr ""
 
 #: util.c:38
