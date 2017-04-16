@@ -74,7 +74,7 @@
 		END_OPTION
 		OPTION('R', "repeat-markers", NO_ARG)
 		END_OPTION
-		LONG_OPTION("diff-input", NO_ARG)
+		OPTION('u', "diff-input", NO_ARG)
 		END_OPTION
 		OPTION('A', "algorithm", REQUIRED_ARG)
 		END_OPTION

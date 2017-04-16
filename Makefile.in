@@ -54,7 +54,7 @@ DWFILTER=yes
 
 # Miscelaneous install paths
 bindir=$(prefix)/bin
-docdir=$(prefix)/share/doc/dwdiff-2.1.0
+docdir=$(prefix)/share/doc/dwdiff-2.1.1
 mandir=$(prefix)/share/man
 
 all: dwdiff $(DWFILTER:yes=dwfilter) linguas
@@ -71,7 +71,7 @@ dist-clean: clean
 	rm -rf dwdiff config.log Makefile
 
 .c.o:
-	$(CC) $(CFLAGS) -Isrc $(GETTEXTFLAGS) -DLOCALEDIR=\"$(LOCALEDIR)\" $(ICUFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -Isrc $(GETTEXTFLAGS) -DOPTION_STRDUP=strdupA -DLOCALEDIR=\"$(LOCALEDIR)\" $(ICUFLAGS) -c -o $@ $<
 
 dwdiff: $(OBJECTS_DWDIFF)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o dwdiff $(OBJECTS_DWDIFF) $(LDLIBS) $(ICULIBS) $(GETTEXTLIBS)
