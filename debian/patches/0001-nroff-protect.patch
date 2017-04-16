@@ -15,15 +15,15 @@ W: dwdiff: manpage-has-errors-from-man usr/share/man/man1/dwdiff.1.gz 183: warni
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/man/dwdiff.1 b/man/dwdiff.1
-index ccbeb34..457b956 100644
+index 4351e4e..cb8175d 100644
 --- a/man/dwdiff.1
 +++ b/man/dwdiff.1
-@@ -180,7 +180,7 @@ to read.
+@@ -185,7 +185,7 @@ exit with status 2.
  Since version 2.1.0, \fBdwdiff\fR allows users to create profiles. A profile is a set
  of options that can be loaded using the \fB\-\-profile\fR option. Profiles are
- specified in the .dwdiffrc in the user's home directory. The format of the
--.dwdiffrc file is as follows:
-+\fB.dwdiffrc\fR file is as follows:
+ specified in the .dwdiffrc in the user's home directory. The format of
+-the .dwdiffrc file is as follows:
++the \fB.dwdiffrc\fR file is as follows:
  .PP
  A line contains either a profile header (a text enclosed in []) or a long option
  name without leading dashes, optionally followed by it's argument. Arguments are
