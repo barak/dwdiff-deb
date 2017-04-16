@@ -1,0 +1,193 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Sun, 16 Apr 2017 16:14:16 +0100
+Subject: spelling
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+Specifiy ⟶ Specify
+occuring ⟶ occurring
+eventhough ⟶ even though
+---
+ Changelog                | 2 +-
+ man/dwdiff.1             | 2 +-
+ man/dwfilter.1           | 2 +-
+ po/de.po                 | 4 ++--
+ po/es.po                 | 4 ++--
+ po/fr.po                 | 4 ++--
+ po/messages.pot          | 4 ++--
+ po/nl.po                 | 4 ++--
+ src/optionDescriptions.h | 4 ++--
+ 9 files changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/Changelog b/Changelog
+index 9383d71..ae566b9 100644
+--- a/Changelog
++++ b/Changelog
+@@ -174,7 +174,7 @@ Version 1.5.1:
+ Version 1.5:
+     New features:
+     - added match context which ensures better results for large edits with
+-      frequently occuring words
++      frequently occurring words
+ 
+ Version 1.4:
+     New features:
+diff --git a/man/dwdiff.1 b/man/dwdiff.1
+index d8af703..e59d0da 100644
+--- a/man/dwdiff.1
++++ b/man/dwdiff.1
+@@ -121,7 +121,7 @@ printed.
+ Use \fInum\fR words of context before and after words for matching. Words in
+ the old text will then only match words in the new text if words surrounding
+ them are also equal. This improves the output for \fBdwdiff\fR for large changes
+-with frequently occuring words. However, using context requires more disk
++with frequently occurring words. However, using context requires more disk
+ space and more processing time. The default value is 1. Set this option to 0
+ to revert to the pre 1.5 behavior.
+ .TP
+diff --git a/man/dwfilter.1 b/man/dwfilter.1
+index 3c43136..0ac8949 100644
+--- a/man/dwfilter.1
++++ b/man/dwfilter.1
+@@ -9,7 +9,7 @@ dwfilter \- reformat text with dwdiff for further processing
+ \fBdwfilter\fR reformats the text in the old file according to the contents of
+ the new file (or vice versa) and subsequently passes the reformated old file
+ and the new file through a secondary filter. It's main use is to allow visual
+-diff programs such as \fBmeld\fR and \fBkdiff3\fR to be used, eventhough a text
++diff programs such as \fBmeld\fR and \fBkdiff3\fR to be used, even though a text
+ file has been reformated after editing. A further use is to allow the creation
+ of small patches even when the new text has been reformated. \fBdwfilter\fR
+ uses \fBdwdiff\fR for reformatting.
+diff --git a/po/de.po b/po/de.po
+index 2554710..4ff5ca0 100644
+--- a/po/de.po
++++ b/po/de.po
+@@ -142,7 +142,7 @@ msgstr ""
+ "                                       ausgeben\n"
+ 
+ #: optionDescriptions.h:10
+-msgid "-d <delim>, --delimiters=<delim>       Specifiy delimiters\n"
++msgid "-d <delim>, --delimiters=<delim>       Specify delimiters\n"
+ msgstr "-d <delim>, --delimiters=<delim>       Begrenzer spezifizieren\n"
+ 
+ #: optionDescriptions.h:11
+@@ -199,7 +199,7 @@ msgstr "-I, --ignore-formatting                Ignoriere Formatierungsunterschie
+ #. The context meant here are words preceeding and succeeding each word in
+ #. the text. By using these extra context words when applying the diff
+ #. program,
+-#. frequently occuring words will be more likely to be matched to the
++#. frequently occurring words will be more likely to be matched to the
+ #. correct corresponding word in the other text, thus giving a better result.
+ #: optionDescriptions.h:36
+ msgid "-m <num>, --match-context=<num>        Use <num> words of context for matching\n"
+diff --git a/po/es.po b/po/es.po
+index d2be6ea..7b80da2 100644
+--- a/po/es.po
++++ b/po/es.po
+@@ -159,7 +159,7 @@ msgid ""
+ msgstr "-v, --version                          Muestra versión e información de Copyright\n"
+ 
+ #: optionDescriptions.h:24
+-msgid "-d <delim>, --delimiters=<delim>       Specifiy delimiters\n"
++msgid "-d <delim>, --delimiters=<delim>       Specify delimiters\n"
+ msgstr "-d <delim>, --delimiters=<delim>       Especifica delimitadores\n"
+ 
+ #: optionDescriptions.h:25
+@@ -224,7 +224,7 @@ msgstr "-I, --ignore-formatting                Ignorar diferencias de presentaci
+ #. The context meant here are words preceeding and succeeding each word in
+ #. the text. By using these extra context words when applying the diff
+ #. program,
+-#. frequently occuring words will be more likely to be matched to the
++#. frequently occurring words will be more likely to be matched to the
+ #. correct corresponding word in the other text, thus giving a better result.
+ #: optionDescriptions.h:51
+ msgid ""
+diff --git a/po/fr.po b/po/fr.po
+index e4d16b5..cb531c3 100644
+--- a/po/fr.po
++++ b/po/fr.po
+@@ -159,7 +159,7 @@ msgid ""
+ msgstr "-v, --version                          Affiche les informations de version et de copyright\n"
+ 
+ #: optionDescriptions.h:24
+-msgid "-d <delim>, --delimiters=<delim>       Specifiy delimiters\n"
++msgid "-d <delim>, --delimiters=<delim>       Specify delimiters\n"
+ msgstr "-d <delim>, --delimiters=<delim>       Spécifie les séparateurs\n"
+ 
+ #: optionDescriptions.h:25
+@@ -224,7 +224,7 @@ msgstr "-I, --ignore-formatting                Ignore les différences de format
+ #. The context meant here are words preceeding and succeeding each word in
+ #. the text. By using these extra context words when applying the diff
+ #. program,
+-#. frequently occuring words will be more likely to be matched to the
++#. frequently occurring words will be more likely to be matched to the
+ #. correct corresponding word in the other text, thus giving a better result.
+ #: optionDescriptions.h:51
+ msgid ""
+diff --git a/po/messages.pot b/po/messages.pot
+index 97fa054..586d5e1 100644
+--- a/po/messages.pot
++++ b/po/messages.pot
+@@ -147,7 +147,7 @@ msgid ""
+ msgstr ""
+ 
+ #: optionDescriptions.h:24
+-msgid "-d <delim>, --delimiters=<delim>       Specifiy delimiters\n"
++msgid "-d <delim>, --delimiters=<delim>       Specify delimiters\n"
+ msgstr ""
+ 
+ #: optionDescriptions.h:25
+@@ -214,7 +214,7 @@ msgstr ""
+ #. TRANSLATORS:
+ #. The context meant here are words preceeding and succeeding each word in
+ #. the text. By using these extra context words when applying the diff program,
+-#. frequently occuring words will be more likely to be matched to the
++#. frequently occurring words will be more likely to be matched to the
+ #. correct corresponding word in the other text, thus giving a better result.
+ #: optionDescriptions.h:50
+ msgid ""
+diff --git a/po/nl.po b/po/nl.po
+index 68a9fb9..b9da09a 100644
+--- a/po/nl.po
++++ b/po/nl.po
+@@ -158,7 +158,7 @@ msgid "-v, --version                          Print version and copyright inform
+ msgstr "-v, --version                          Toon versie en auteursrecht informatie\n"
+ 
+ #: optionDescriptions.h:24
+-msgid "-d <delim>, --delimiters=<delim>       Specifiy delimiters\n"
++msgid "-d <delim>, --delimiters=<delim>       Specify delimiters\n"
+ msgstr "-d <delim>, --delimiters=<delim>       Specificeer afbakeningskarakters\n"
+ 
+ #: optionDescriptions.h:25
+@@ -221,7 +221,7 @@ msgstr "-I, --ignore-formatting                Negeer verschillen in opmaak\n"
+ #. The context meant here are words preceeding and succeeding each word in
+ #. the text. By using these extra context words when applying the diff
+ #. program,
+-#. frequently occuring words will be more likely to be matched to the
++#. frequently occurring words will be more likely to be matched to the
+ #. correct corresponding word in the other text, thus giving a better result.
+ #: optionDescriptions.h:51
+ msgid "-m <num>, --match-context=<num>        Use <num> words of context for matching\n"
+diff --git a/src/optionDescriptions.h b/src/optionDescriptions.h
+index a675d67..70f5e11 100644
+--- a/src/optionDescriptions.h
++++ b/src/optionDescriptions.h
+@@ -21,7 +21,7 @@ N_("-h, --help                             Print this help message\n"),
+ N_("-v, --version                          Print version and copyright information\n"),
+ 
+ /* Options changing what is considered (non-)whitespace */
+-N_("-d <delim>, --delimiters=<delim>       Specifiy delimiters\n"),
++N_("-d <delim>, --delimiters=<delim>       Specify delimiters\n"),
+ N_("-P, --punctuation                      Use punctuation characters as delimiters\n"),
+ N_("-W <ws>, --white-space=<ws>            Specify whitespace characters\n"),
+ #ifdef DWDIFF_COMPILE
+@@ -45,7 +45,7 @@ N_("-I, --ignore-formatting                Ignore formatting differences\n"),
+ /* TRANSLATORS:
+    The context meant here are words preceeding and succeeding each word in
+    the text. By using these extra context words when applying the diff program,
+-   frequently occuring words will be more likely to be matched to the
++   frequently occurring words will be more likely to be matched to the
+    correct corresponding word in the other text, thus giving a better result. */
+ N_("-m <num>, --match-context=<num>        Use <num> words of context for matching\n"),
+ /* TRANSLATORS:
