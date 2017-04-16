@@ -4,7 +4,7 @@
 #export DH_VERBOSE=1
 
 %:
-	dh $@ --parallel
+	dh $@
 
 # Use LINGUAS to force installation of all available linguas.
 
