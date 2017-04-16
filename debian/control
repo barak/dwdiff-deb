@@ -6,8 +6,8 @@ Uploaders: Olexandr Kravchuk <sashko.debian@gmail.com>
 Build-Depends: debhelper (>= 10), libicu-dev
 Standards-Version: 3.9.8
 Homepage: http://os.ghalkes.nl/dwdiff.html
-Vcs-Git: git://anonscm.debian.org/collab-maint/dwdiff.git
-Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/dwdiff.git
+Vcs-Git: https://anonscm.debian.org/collab-maint/git/dwdiff.git
+Vcs-Browser: https://anonscm.debian.org/gitweb/?p=collab-maint/dwdiff.git
 
 Package: dwdiff
 Architecture: any
