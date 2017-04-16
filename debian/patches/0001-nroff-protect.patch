@@ -11,19 +11,39 @@ man page.
 This issue was detected by lintian:
 W: dwdiff: manpage-has-errors-from-man usr/share/man/man1/dwdiff.1.gz 183: warning: macro `dwdiffrc' not defined
 ---
- man/dwdiff.1 | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ man/dwdiff.1 | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/man/dwdiff.1 b/man/dwdiff.1
-index 4351e4e..cb8175d 100644
+index 4351e4e..d8af703 100644
 --- a/man/dwdiff.1
 +++ b/man/dwdiff.1
-@@ -185,7 +185,7 @@ exit with status 2.
+@@ -164,7 +164,7 @@ Repeat the begin and end markers at the start and end of line if a change
+ crosses a newline.
+ .TP
+ \fB\-\-profile\fR=\fIname\fR
+-Load the profile with name \fIname\fR from the .dwdiffrc file in the user's home
++Load the profile with name \fIname\fR from the \fB.dwdiffrc\fR file in the user's home
+ directory. Only the last profile named is actually read, unless it is followed
+ by a \fB\-\-no\-profile\fR option. By default the profile named \fIdefault\fR is read.
+ .TP
+@@ -184,8 +184,8 @@ exit with status 2.
+ .SH PROFILES
  Since version 2.1.0, \fBdwdiff\fR allows users to create profiles. A profile is a set
  of options that can be loaded using the \fB\-\-profile\fR option. Profiles are
- specified in the .dwdiffrc in the user's home directory. The format of
+-specified in the .dwdiffrc in the user's home directory. The format of
 -the .dwdiffrc file is as follows:
++specified in the \fB.dwdiffrc\fR in the user's home directory. The format of
 +the \fB.dwdiffrc\fR file is as follows:
  .PP
  A line contains either a profile header (a text enclosed in []) or a long option
  name without leading dashes, optionally followed by it's argument. Arguments are
+@@ -194,7 +194,7 @@ matching double or single quotes, these are removed as well. Comments can be
+ included by starting a line with a hash mark (#).
+ .PP
+ If no profile is specified, the profile named \fIdefault\fR will be loaded, unless
+-the \fB\-\-no\-profile\fR option is specified. Here is an example .dwdiffrc:
++the \fB\-\-no\-profile\fR option is specified. Here is an example \fB.dwdiffrc\fR:
+ .PP
+ .po +5
+ [default]
