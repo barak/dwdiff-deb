@@ -20,6 +20,8 @@ LINGUAS=$(shell ls po | egrep '[.]po$$' | sed 's/\.po//' | tr '\n' ' ')
 # Glom CPPFLAGS onto CFLAGS because this deficient ./configure etc
 # ignores the former.
 
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
 export CFLAGS = \
  $(shell dpkg-buildflags --get CFLAGS) \
  $(shell dpkg-buildflags --get CPPFLAGS)
