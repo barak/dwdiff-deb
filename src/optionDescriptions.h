@@ -25,7 +25,7 @@ N_("-d <delim>, --delimiters=<delim>       Specifiy delimiters\n"),
 N_("-P, --punctuation                      Use punctuation characters as delimiters\n"),
 N_("-W <ws>, --white-space=<ws>            Specify whitespace characters\n"),
 #ifdef DWDIFF_COMPILE
-N_("--diff-input                           Read the input as the output from diff\n"),
+N_("-u, --diff-input                       Read the input as the output from diff\n"),
 N_("-S[<marker>], --paragraph-separator[=<marker>]  Show inserted or deleted blocks\n"
    "                               of empty lines, optionally overriding the marker\n"),
 

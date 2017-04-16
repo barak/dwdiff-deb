@@ -451,6 +451,7 @@ void splitDiffInput(void) {
 					sputc(newFile->stream, ' ');
 					mode = COMMON;
 				} else {
+					int savedChar = charData.singleChar;
 					closeTempFile(oldFile);
 					closeTempFile(newFile);
 
@@ -463,8 +464,8 @@ void splitDiffInput(void) {
 					oldFile = tempFile();
 					newFile = tempFile();
 
-					putchar(charData.singleChar);
-					mode = charData.singleChar == '@' ? LINE_COUNTS : HEADER;
+					putchar(savedChar);
+					mode = savedChar == '@' ? LINE_COUNTS : HEADER;
 				}
 				break;
 			case OLD:
@@ -598,9 +599,11 @@ int main(int argc, char *argv[]) {
 #ifdef DEBUG_MEMORY
 	free(option.oldFile.diffTokens.data);
 	free(option.newFile.diffTokens.data);
+#ifdef USE_UNICODE
 	free(charData.UTF8Char.original.data);
 	free(charData.UTF8Char.converted.data);
 	free(charData.UTF8Char.casefolded.data);
+#endif
 	free(option.delColor);
 	free(option.addColor);
 #endif

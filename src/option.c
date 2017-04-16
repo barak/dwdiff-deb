@@ -737,7 +737,7 @@ static PARSE_FUNCTION(parseArgs)
 				option.repeatMarkers = true;
 			}
 		END_OPTION
-		LONG_OPTION("diff-input", NO_ARG)
+		OPTION('u', "diff-input", NO_ARG)
 			if (!option.dwfilterMode) {
 				option.diffInput = true;
 			}
@@ -802,7 +802,7 @@ void parseCmdLine(int argc, char *argv[]) {
 		if (option.oldFile.name == NULL)
 			option.oldFile.input = newFileStream(fileWrapFD(STDIN_FILENO, FILE_READ));
 	} else {
-		if (option.newFile.name == NULL)
+		if (option.newFile.name == NULL && option.newFile.input == NULL)
 			fatal(_("Need two files to compare\n"));
 	}
 	completeDefaults();

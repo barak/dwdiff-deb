@@ -182,7 +182,7 @@ clean_c() {
 show_help_c() {
 	if [ "$1" = VARIABLES ] ; then
 		cat <<EOF
-  CC          C compiler to use (default determined by make)
+  CC          C compiler to use (defaults to search gcc, clang and make default)
   CFLAGS      C-compiler flags to use [-O2]
 EOF
 	fi

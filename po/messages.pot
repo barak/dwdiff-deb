@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-09 22:10+0200\n"
+"POT-Creation-Date: 2017-04-16 09:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,22 +47,22 @@ msgstr ""
 msgid "Error writing to temporary file %s: %s\n"
 msgstr ""
 
-#: dwdiff.c:580
+#: dwdiff.c:581
 #, c-format
 msgid "old: 0 words\n"
 msgstr ""
 
-#: dwdiff.c:582
+#: dwdiff.c:583
 #, c-format
 msgid "old: %d words  %d %d%% common  %d %d%% deleted  %d %d%% changed\n"
 msgstr ""
 
-#: dwdiff.c:589
+#: dwdiff.c:590
 #, c-format
 msgid "new: 0 words\n"
 msgstr ""
 
-#: dwdiff.c:591
+#: dwdiff.c:592
 #, c-format
 msgid "new: %d words  %d %d%% common  %d %d%% inserted  %d %d%% changed\n"
 msgstr ""
@@ -162,7 +162,7 @@ msgstr ""
 
 #: optionDescriptions.h:28
 msgid ""
-"--diff-input                           Read the input as the output from "
+"-u, --diff-input                       Read the input as the output from "
 "diff\n"
 msgstr ""
 
