@@ -1,3 +1,10 @@
+dwdiff (2.1.1-2) unstable; urgency=medium
+
+  * bump policy version
+  * remove MIA uploader (closes: #873556)
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Tue, 29 Aug 2017 06:50:19 +0100
+
 dwdiff (2.1.1-1) unstable; urgency=medium
 
   * New upstream version
