@@ -2,7 +2,6 @@ Source: dwdiff
 Section: utils
 Priority: extra
 Maintainer: Barak A. Pearlmutter <bap@debian.org>
-Uploaders: Olexandr Kravchuk <sashko.debian@gmail.com>
 Build-Depends: debhelper (>= 10), libicu-dev
 Standards-Version: 4.1.0
 Homepage: http://os.ghalkes.nl/dwdiff.html
