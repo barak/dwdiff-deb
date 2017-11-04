@@ -1,9 +1,9 @@
 Source: dwdiff
 Section: utils
-Priority: extra
+Priority: optional
 Maintainer: Barak A. Pearlmutter <bap@debian.org>
 Build-Depends: debhelper (>= 10), libicu-dev
-Standards-Version: 4.1.0
+Standards-Version: 4.1.1
 Homepage: http://os.ghalkes.nl/dwdiff.html
 Vcs-Git: https://anonscm.debian.org/collab-maint/git/dwdiff.git
 Vcs-Browser: https://anonscm.debian.org/gitweb/?p=collab-maint/dwdiff.git
