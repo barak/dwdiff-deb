@@ -1,12 +1,18 @@
-dwdiff (2.1.1-2.1) UNRELEASED; urgency=medium
+dwdiff (2.1.1-3) unstable; urgency=medium
 
   [ Helmut Grohne ]
   * Fix FTCBFS: Let dpkg's buildtools.mk set up CC. (Closes: #900743)
 
   [ Barak A. Pearlmutter ]
   * Merge patch in above bug, thanks to Helmut Grohne
+  * Move some remarks from comments into chatter in logs
+  * Configure git-buildpackage
+  * Swizzle packaging repo to salsa
+  * Move to appropriate priority
+  * Bump policy
+  * Bump dh version
 
- -- Barak A. Pearlmutter <bap@debian.org>  Mon, 04 Jun 2018 13:41:06 +0100
+ -- Barak A. Pearlmutter <bap@debian.org>  Mon, 04 Jun 2018 14:35:18 +0100
 
 dwdiff (2.1.1-2) unstable; urgency=medium
 
