@@ -34,11 +34,10 @@ override_dh_auto_configure:
 override_dh_auto_build:
 	dh_auto_build -- LINGUAS="$(LINGUAS)"
 
-# Work around Makefile installing Changelog and COPYING into docdir.
-# Work around Makefile installing unneeded *.UTF-8 directories
-
 override_dh_auto_install:
 	dh_auto_install -- LINGUAS="$(LINGUAS)" docdir='$$(prefix)/share/doc/dwdiff'
+	echo "Work around Makefile installing Changelog and COPYING into docdir."
 	-rm --verbose debian/dwdiff/usr/share/doc/dwdiff/Changelog
 	-rm --verbose debian/dwdiff/usr/share/doc/dwdiff/COPYING
+	echo "Work around Makefile installing unneeded *.UTF-8 directories"
 	-rm --verbose -r debian/dwdiff/usr/share/man/*.UTF-8
