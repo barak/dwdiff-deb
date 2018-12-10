@@ -40,8 +40,8 @@ LINGUAS=
 # ICUFLAGS: should at least be set to -DUSE_UNICODE. If the nl_langinfo
 #  function is available it should also include -DUSE_NL_LANGINFO. Furthermore
 #  it should include any C preprocessor flags that are required for building.
-#  Usually this can be `icu-config --cppflags`.
-# ICULIBS: Flags to link to ICU, usually `icu-config --ldflags`
+#  Usually this can be `pkg-config --cflags icu-uc`.
+# ICULIBS: Flags to link to ICU, usually `pkg-config --libs icu-uc`
 ICUFLAGS=
 ICULIBS=
 
@@ -54,7 +54,7 @@ DWFILTER=yes
 
 # Miscelaneous install paths
 bindir=$(prefix)/bin
-docdir=$(prefix)/share/doc/dwdiff-2.1.1
+docdir=$(prefix)/share/doc/dwdiff-2.1.2
 mandir=$(prefix)/share/man
 
 all: dwdiff $(DWFILTER:yes=dwfilter) linguas

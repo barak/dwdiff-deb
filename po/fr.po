@@ -8,68 +8,68 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dwdiff\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-31 20:18+0100\n"
+"POT-Creation-Date: 2018-12-05 08:59+0100\n"
 "PO-Revision-Date: 2011-09-24 16:07+0000\n"
 "Last-Translator: Emmanuel Trillaud <etrillaud@gmail.com>\n"
-"Language-Team: French (http://www.transifex.net/projects/p/dwdiff/language/fr/)\n"
+"Language-Team: French (http://www.transifex.net/projects/p/dwdiff/language/"
+"fr/)\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
 
-#: util.h:28 util.h:30
+#: util.h:27 util.h:29
 #, c-format
 msgid "Program-logic error at %s:%d\n"
 msgstr "Erreur de programmation à %s : %d\n"
 
-#: doDiff.c:209 doDiff.c:246 doDiff.c:274 doDiff.c:296 doDiff.c:350
-#: doDiff.c:360 doDiff.c:533
+#: doDiff.c:178 doDiff.c:226 doDiff.c:254 doDiff.c:276 doDiff.c:335
+#: doDiff.c:506
 msgid "Error reading back input\n"
 msgstr "Erreur lors de la lecture de l'entrée\n"
 
-#: doDiff.c:584 doDiff.c:586 dwdiff.c:277 dwdiff.c:280 dwdiff.c:289
-#: dwfilter.c:147
-#, c-format
-msgid "Could not create temporary file: %s\n"
-msgstr "Impossible de créer un fichier temporaire : %s\n"
-
-#: dwdiff.c:274 dwdiff.c:418
+#: dwdiff.c:292 dwdiff.c:430
 #, c-format
 msgid "Can't open file %s: %s\n"
 msgstr "Impossible d'ouvrir le fichier %s : %s\n"
 
-#: dwdiff.c:359
+#: dwdiff.c:295 dwdiff.c:300 dwfilter.c:152
+#, c-format
+msgid "Could not create temporary file: %s\n"
+msgstr "Impossible de créer un fichier temporaire : %s\n"
+
+#: dwdiff.c:367
 #, c-format
 msgid "Error reading file %s: %s\n"
 msgstr "Erreur lors de la lecture du fichier %s : %s\n"
 
-#: dwdiff.c:378 dwdiff.c:383 dwdiff.c:388
+#: dwdiff.c:386 dwdiff.c:391
 #, c-format
 msgid "Error writing to temporary file %s: %s\n"
 msgstr "Erreur lors de l'écriture du fichier temporaire %s : %s\n"
 
-#: dwdiff.c:562
+#: dwdiff.c:581
 #, c-format
 msgid "old: 0 words\n"
 msgstr "ancien : 0 mot\n"
 
-#: dwdiff.c:564
+#: dwdiff.c:583
 #, c-format
 msgid "old: %d words  %d %d%% common  %d %d%% deleted  %d %d%% changed\n"
 msgstr "ancien : %d mots  %d %d%% commun  %d %d%% supprimé  %d %d%% modifié\n"
 
-#: dwdiff.c:571
+#: dwdiff.c:590
 #, c-format
 msgid "new: 0 words\n"
 msgstr "nouveau : 0 mot\n"
 
-#: dwdiff.c:573
+#: dwdiff.c:592
 #, c-format
 msgid "new: %d words  %d %d%% common  %d %d%% inserted  %d %d%% changed\n"
 msgstr "nouveau : %d mots  %d %d%% commun  %d %d%% inséré  %d %d%% modifié\n"
 
-#: dwfilter.c:58
+#: dwfilter.c:59
 #, c-format
 msgid ""
 "Usage: dwfilter [OPTIONS] <OLD FILE> <NEW FILE> <POST PROCESSOR> [POST "
@@ -80,46 +80,38 @@ msgstr ""
 #. - If the (C) symbol (that is the c in a circle) is not available,
 #. leave as it as is. (Unicode code point 0x00A9)
 #. - G.P. Halkes is name and should be left as is.
-#: dwfilter.c:70 option.c:535
+#: dwfilter.c:71
 msgid ""
 "Copyright (C) 2006-2011 G.P. Halkes\n"
 "Licensed under the GNU General Public License version 3\n"
-msgstr "Copyright (C) 2006-2011 G.P. Halkes\nSoumis à la GNU General Public License version 3\n"
+msgstr ""
+"Copyright (C) 2006-2011 G.P. Halkes\n"
+"Soumis à la GNU General Public License version 3\n"
 
-#. TRANSLATORS:
-#. - If the (C) symbol (that is the c in a circle) is not available,
-#. leave as it as is. (Unicode code point 0x00A9)
-#. - G.P. Halkes is name and should be left as is.
-#: option.c:507
-msgid ""
-"Copyright (C) 2006-2011 G.P. Halkes and others\n"
-"Licensed under the GNU General Public License version 3\n"
-msgstr "Copyright (C) 2006-2011 G.P. Halkes et autres\nSoumis à la GNU General Public License version 3\n"
-
-#: dwfilter.c:108 option.c:693 option.c:702
+#: dwfilter.c:113 option.c:733 option.c:770
 #, c-format
 msgid "Option %.*s does not exist\n"
 msgstr "L'option %.*s n'existe pas\n"
 
-#: dwfilter.c:125 option.c:723
+#: dwfilter.c:130 option.c:806
 msgid "Need two files to compare\n"
 msgstr "Deux fichiers sont nécessaire à la comparaison\n"
 
-#: dwfilter.c:127
+#: dwfilter.c:132
 msgid "No post processor specified\n"
 msgstr "Aucun post-processeur précisé\n"
 
-#: dwfilter.c:159
+#: dwfilter.c:164
 #, c-format
 msgid "Could not execute %s: %s\n"
 msgstr "Impossible d'exécuter %s : %s\n"
 
-#: dwfilter.c:163
+#: dwfilter.c:168
 #, c-format
 msgid "Error waiting for child process to terminate: %s\n"
 msgstr "Erreur lors de l'attente de la fin du processus fils : %s\n"
 
-#: dwfilter.c:210
+#: dwfilter.c:207
 msgid "dwdiff returned an error\n"
 msgstr "dwdiff a renvoyé une erreur\n"
 
@@ -146,7 +138,8 @@ msgstr "Valeur (%3$ld) de l'option %2$.*1$s est hors limite\n"
 #: optionMacros.h:295
 #, c-format
 msgid "Value for %.*s option (%s) is not a valid boolean value\n"
-msgstr "La valeur de l'option %.*s (%s) n'est pas une valeur booléenne valide\n"
+msgstr ""
+"La valeur de l'option %.*s (%s) n'est pas une valeur booléenne valide\n"
 
 #: optionDescriptions.h:20
 msgid "-h, --help                             Print this help message\n"
@@ -156,45 +149,61 @@ msgstr "-h, --help                             Affiche ce message d'aide\n"
 msgid ""
 "-v, --version                          Print version and copyright "
 "information\n"
-msgstr "-v, --version                          Affiche les informations de version et de copyright\n"
+msgstr ""
+"-v, --version                          Affiche les informations de version "
+"et de copyright\n"
 
 #: optionDescriptions.h:24
-msgid "-d <delim>, --delimiters=<delim>       Specifiy delimiters\n"
+msgid "-d <delim>, --delimiters=<delim>       Specify delimiters\n"
 msgstr "-d <delim>, --delimiters=<delim>       Spécifie les séparateurs\n"
 
 #: optionDescriptions.h:25
 msgid ""
 "-P, --punctuation                      Use punctuation characters as "
 "delimiters\n"
-msgstr "-P, --punctuation                      Utilise les caractères de ponctuation comme séparateur\n"
+msgstr ""
+"-P, --punctuation                      Utilise les caractères de ponctuation "
+"comme séparateur\n"
 
 #: optionDescriptions.h:26
 msgid "-W <ws>, --white-space=<ws>            Specify whitespace characters\n"
-msgstr "-W <ws>, --white-space=<ws>            Spécifie les caractères blancs\n"
+msgstr ""
+"-W <ws>, --white-space=<ws>            Spécifie les caractères blancs\n"
 
 #: optionDescriptions.h:28
 msgid ""
-"--diff-input                           Read the input as the output from "
+"-u, --diff-input                       Read the input as the output from "
 "diff\n"
-msgstr "--diff-input                           lire l'entrée en tant que sortie de diff\n"
+msgstr ""
+"-u, --diff-input                       lire l'entrée en tant que sortie "
+"de diff\n"
 
 #: optionDescriptions.h:29
 msgid ""
-"-S[<marker>], --paragraph-separator[=<marker>]  Show inserted or deleted blocks\n"
-"                               of empty lines, optionally overriding the marker\n"
-msgstr "-S[<marker>], --paragraph-separator[=<marker>]  Montrer les blocs ajoutés ou supprimés\n                               de ligne vide, surcharge optionnellement le marqueur\n"
+"-S[<marker>], --paragraph-separator[=<marker>]  Show inserted or deleted "
+"blocks\n"
+"                               of empty lines, optionally overriding the "
+"marker\n"
+msgstr ""
+"-S[<marker>], --paragraph-separator[=<marker>]  Montrer les blocs ajoutés ou "
+"supprimés\n"
+"                               de ligne vide, surcharge optionnellement le "
+"marqueur\n"
 
 #: optionDescriptions.h:33
 msgid "-1, --no-deleted                       Do not print deleted words\n"
-msgstr "-1, --no-deleted                       Ne pas afficher les mots supprimés\n"
+msgstr ""
+"-1, --no-deleted                       Ne pas afficher les mots supprimés\n"
 
 #: optionDescriptions.h:34
 msgid "-2, --no-inserted                      Do not print inserted words\n"
-msgstr "-2, --no-inserted                      Ne pas afficher les mots insérés\n"
+msgstr ""
+"-2, --no-inserted                      Ne pas afficher les mots insérés\n"
 
 #: optionDescriptions.h:35
 msgid "-3, --no-common                        Do not print common words\n"
-msgstr "-3, --no-common                        Ne pas afficher les mots communs\n"
+msgstr ""
+"-3, --no-common                        Ne pas afficher les mots communs\n"
 
 #: optionDescriptions.h:36
 msgid "-L[<width>], --line-numbers[<width>]   Prepend line numbers\n"
@@ -202,45 +211,57 @@ msgstr "-L[<width>], --line-numbers[<width>]   Ajoute les numéro de ligne\n"
 
 #: optionDescriptions.h:37
 msgid "-C<num>, --context=<num>               Show <num> lines of context\n"
-msgstr "-C<num>, --context=<num>               Montrer <nb> lignes de contexte\n"
+msgstr ""
+"-C<num>, --context=<num>               Montrer <nb> lignes de contexte\n"
 
 #: optionDescriptions.h:38
 msgid "-s, --statistics                       Print statistics when done\n"
-msgstr "-s, --statistics                       Affiche les statistiques après l'exécution\n"
+msgstr ""
+"-s, --statistics                       Affiche les statistiques après "
+"l'exécution\n"
 
 #: optionDescriptions.h:40
-msgid "--wdiff-output                         Produce wdiff compatible output\n"
-msgstr "--wdiff-output                         Génère sortie compatible avec wdiff\n"
+msgid ""
+"--wdiff-output                         Produce wdiff compatible output\n"
+msgstr ""
+"--wdiff-output                         Génère sortie compatible avec wdiff\n"
 
 #: optionDescriptions.h:43
 msgid "-i, --ignore-case                      Ignore differences in case\n"
-msgstr "-i, --ignore-case                      Ignore les différences de casse\n"
+msgstr ""
+"-i, --ignore-case                      Ignore les différences de casse\n"
 
 #: optionDescriptions.h:44
 msgid "-I, --ignore-formatting                Ignore formatting differences\n"
-msgstr "-I, --ignore-formatting                Ignore les différences de format\n"
+msgstr ""
+"-I, --ignore-formatting                Ignore les différences de format\n"
 
 #. TRANSLATORS:
 #. The context meant here are words preceeding and succeeding each word in
-#. the text. By using these extra context words when applying the diff
-#. program,
-#. frequently occuring words will be more likely to be matched to the
+#. the text. By using these extra context words when applying the diff program,
+#. frequently occurring words will be more likely to be matched to the
 #. correct corresponding word in the other text, thus giving a better result.
-#: optionDescriptions.h:51
+#: optionDescriptions.h:50
 msgid ""
 "-m <num>, --match-context=<num>        Use <num> words of context for "
 "matching\n"
-msgstr "-m <num>, --match-context=<num>        Utilise <num> mot de contexte pour chercher les similarités\n"
+msgstr ""
+"-m <num>, --match-context=<num>        Utilise <num> mot de contexte pour "
+"chercher les similarités\n"
 
 #. TRANSLATORS:
 #. The use of context words for matching is more expensive, because after the
 #. first pass of diff the changes reported need refining. However, if the user
-#. can live with multiple changes that are within (2 * match-context + 1)
-#. words
+#. can live with multiple changes that are within (2 * match-context + 1) words
 #. from eachother being reported as a single change, they can use this option.
-#: optionDescriptions.h:57
+#: optionDescriptions.h:56
 msgid ""
 "--aggregate-changes                    Allow close changes to aggregate\n"
+msgstr ""
+
+#: optionDescriptions.h:57
+msgid ""
+"-A <alg>, --algorithm=<alg>            Choose algorithm: best, normal, fast\n"
 msgstr ""
 
 #: optionDescriptions.h:61
@@ -258,111 +279,123 @@ msgstr ""
 
 #: optionDescriptions.h:64
 msgid ""
-"-w <string>, --start-delete=<string>   String to mark begin of deleted "
-"text\n"
-msgstr "-w <string>, --start-delete=<string>   Chaîne marquant le début d'un texte supprimé\n"
+"-w <string>, --start-delete=<string>   String to mark begin of deleted text\n"
+msgstr ""
+"-w <string>, --start-delete=<string>   Chaîne marquant le début d'un texte "
+"supprimé\n"
 
 #: optionDescriptions.h:65
 msgid ""
 "-x <string>, --stop-delete=<string>    String to mark end of deleted text\n"
-msgstr "-w <string>, --start-delete=<string>   Chaîne marquant la fin d'un texte supprimé\n"
+msgstr ""
+"-w <string>, --start-delete=<string>   Chaîne marquant la fin d'un texte "
+"supprimé\n"
 
 #: optionDescriptions.h:66
 msgid ""
 "-y <string>, --start-insert=<string>   String to mark begin of inserted "
 "text\n"
-msgstr "-y <string>, --start-insert=<string>   Chaîne marquant le début d'un texte inséré\n"
+msgstr ""
+"-y <string>, --start-insert=<string>   Chaîne marquant le début d'un texte "
+"inséré\n"
 
 #: optionDescriptions.h:67
 msgid ""
 "-z <string>, --stop-insert=<string>    String to mark end of inserted text\n"
-msgstr "-y <string>, --start-insert=<string>   Chaîne marquant la fin d'un texte inséré\n"
+msgstr ""
+"-y <string>, --start-insert=<string>   Chaîne marquant la fin d'un texte "
+"inséré\n"
 
 #: optionDescriptions.h:68
 msgid "-R, --repeat-markers                   Repeat markers at newlines\n"
-msgstr "-R, --repeat-markers                   Répéter les marqueurs au début de nouvelle ligne\n"
+msgstr ""
+"-R, --repeat-markers                   Répéter les marqueurs au début de "
+"nouvelle ligne\n"
 
 #: optionDescriptions.h:72
 msgid "-r, --reverse                          Format new as old\n"
 msgstr ""
 
-#: optionDescriptions.h:57
-msgid ""
-"-A <alg>, --algorithm=<alg>            Choose algorithm: best, normal, fast\n"
+#: optionDescriptions.h:74
+msgid "--profile=<name>                       Use profile <name>\n"
 msgstr ""
 
-#: option.c:38
+#: optionDescriptions.h:75
+msgid "--no-profile                           Disable profile reading\n"
+msgstr ""
+
+#: option.c:39
 msgid "Black"
 msgstr "Noir"
 
-#: option.c:39
+#: option.c:40
 msgid "Red"
 msgstr "Rouge"
 
-#: option.c:40
+#: option.c:41
 msgid "Green"
 msgstr "Vert"
 
-#: option.c:41
+#: option.c:42
 msgid "Brown"
 msgstr "Marron"
 
-#: option.c:42
+#: option.c:43
 msgid "Blue"
 msgstr "Bleu"
 
-#: option.c:43
+#: option.c:44
 msgid "Magenta"
 msgstr "Magenta"
 
-#: option.c:44
+#: option.c:45
 msgid "Cyan"
 msgstr "Cyan"
 
-#: option.c:45
+#: option.c:46
 msgid "Gray"
 msgstr "Gris"
 
-#: option.c:46
+#: option.c:47
 msgid "Dark gray"
 msgstr "Gris sombre"
 
-#: option.c:47
+#: option.c:48
 msgid "Bright red"
 msgstr "Rouge lumineux"
 
-#: option.c:48
+#: option.c:49
 msgid "Bright green"
 msgstr "Vert lumineux"
 
-#: option.c:49
+#: option.c:50
 msgid "Yellow"
 msgstr "Jaune"
 
-#: option.c:50
+#: option.c:51
 msgid "Bright blue"
 msgstr "Bleu lumineux"
 
-#: option.c:51
+#: option.c:52
 msgid "Bright magenta"
 msgstr "Magenta lumineux"
 
-#: option.c:52
+#: option.c:53
 msgid "Bright cyan"
 msgstr "Cyan lumineux"
 
-#: option.c:53
+#: option.c:54
 msgid "White"
 msgstr "Blanc"
 
-#: option.c:88
+#: option.c:89
 #, c-format
 msgid "Single backslash at end of %s argument\n"
 msgstr "Anti-slash simple à la fin de l'argument %s\n"
 
 #. TRANSLATORS:
 #. The %s argument is a long option name without preceding dashes.
-#: option.c:140 option.c:147
+#: option.c:141 option.c:148
 #, c-format
 msgid "Invalid hexadecimal escape sequence in %s argument\n"
 msgstr "Séquence d'echapement héxadécimal invalide dans l'argument %s\n"
@@ -370,96 +403,119 @@ msgstr "Séquence d'echapement héxadécimal invalide dans l'argument %s\n"
 #. TRANSLATORS:
 #. The %c argument will be either 'u' or 'U'. The %s argument is a long
 #. option name without preceding dashes.
-#: option.c:181 option.c:187
+#: option.c:182 option.c:188
 #, c-format
 msgid "Too short \\%c escape in %s argument\n"
 msgstr ""
 
 #. TRANSLATORS:
 #. The %s argument is a long option name without preceding dashes.
-#: option.c:198
+#: option.c:199
 #, c-format
 msgid "\\U escape out of range in %s argument\n"
 msgstr ""
 
 #. TRANSLATORS:
 #. The %s argument is a long option name without preceding dashes.
-#: option.c:203
+#: option.c:204
 #, c-format
 msgid "\\%c escapes for surrogate codepoints are not allowed in %s argument\n"
 msgstr ""
 
-#: option.c:273 option.c:373 option.c:381
+#: option.c:274 option.c:363 option.c:371
 msgid "Whitespace and delimiter sets overlap\n"
 msgstr ""
 
-#: option.c:445 option.c:647
+#: option.c:421 option.c:682
 #, c-format
 msgid "Invalid color specification %s\n"
 msgstr ""
 
-#: option.c:458 option.c:470
+#: option.c:434
 #, c-format
 msgid "Invalid color %s\n"
 msgstr "Couleur %s invalide\n"
 
-#: option.c:445
+#: option.c:446
 #, c-format
 msgid "Invalid background color %s\n"
 msgstr ""
 
-#: option.c:523
+#: option.c:540 option_stripped.inc:10
 #, c-format
 msgid "Usage: dwdiff [OPTIONS] <OLD FILE> <NEW FILE>\n"
 msgstr "Usage: dwdiff [OPTIONS] <OLD FILE> <NEW FILE>\n"
 
-#: option.c:564
+#. TRANSLATORS:
+#. - If the (C) symbol (that is the c in a circle) is not available,
+#. leave as it as is. (Unicode code point 0x00A9)
+#. - G.P. Halkes is name and should be left as is.
+#: option.c:553
+msgid ""
+"Copyright (C) 2006-2015 G.P. Halkes and others\n"
+"Licensed under the GNU General Public License version 3\n"
+msgstr ""
+"Copyright (C) 2006-2015 G.P. Halkes et autres\n"
+"Soumis à la GNU General Public License version 3\n"
+
+#: option.c:588
 #, c-format
 msgid "Option %.*s is only supported for UTF-8 mode\n"
 msgstr "L'option %.*s est supportée uniquement en mode UTF-8\n"
 
-#: option.c:567
+#: option.c:591
 #, c-format
 msgid "Support for option %.*s is not compiled into this version of dwdiff\n"
 msgstr ""
 
-#: option.c:574 option.c:585 option.c:604
+#: option.c:600 option.c:622 option.c:641
 #, c-format
 msgid "Option %.*s is not supported\n"
 msgstr "L'option %.*s n'est pas supportée\n"
 
-#: option.c:613
+#: option.c:650
 msgid "Can't read both files from standard input\n"
 msgstr "Impossible de lire les deux fichier depuis l'entrée standard\n"
 
-#: option.c:617 option.c:712
+#: option.c:654 option.c:780
 msgid "Too many files to compare\n"
 msgstr "Trop de fichier à comparer\n"
 
 #. TRANSLATORS:
 #. "Name" and "Description" are table headings for the color name list.
 #. Make sure you keep the alignment of the headings over the text.
-#: option.c:636
+#: option.c:671
 msgid "Name            Description\n"
 msgstr "Nom              Description\n"
 
-#: option.c:641
+#: option.c:676
 msgid "The colors black through gray are also usable as background color\n"
-msgstr "Les couleurs du noir au gris sont utilisable comme couleur d'arrière plan\n"
+msgstr ""
+"Les couleurs du noir au gris sont utilisable comme couleur d'arrière plan\n"
 
-#: option.c:689
+#: option.c:729
 #, c-format
 msgid "Error opening temporary output file: %s\n"
 msgstr "Erreur à l'ouverture du fichier temporaire de sortie : %s\n"
 
-#: option.c:718
+#: option.c:756
+msgid "Invalid algorithm name\n"
+msgstr ""
+
+#: option.c:801
 msgid "Only one input file accepted with --diff-input\n"
 msgstr "Un seul fichier accepté en entrée avec --diff-input\n"
+
+#: profile.c:79
+#, c-format
+msgid "Could not open configuration file %s: %s\n"
+msgstr ""
+
+#: profile.c:100
+#, c-format
+msgid "Warning: empty profile name on line %s:%d\n"
+msgstr ""
 
 #: util.c:38
 msgid "Out of memory"
 msgstr "Plus de mémoire disponible"
-
-#: option.c:681
-msgid "Invalid algorithm name\n"
-msgstr ""

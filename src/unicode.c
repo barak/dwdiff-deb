@@ -15,7 +15,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <unicode/unorm.h>
+#include <unicode/unorm2.h>
 #include <unicode/ustring.h>
 
 #include "definitions.h"
@@ -231,7 +231,7 @@ int putuc(Stream *stream, UChar32 c) {
 /* This will warn us if we compile against a new library with more cluster
    break classes. */
 #ifdef DEBUG
-static_assert(U_GCB_COUNT <= MAX_GCB_CLASS);
+static_assert(U_GCB_COUNT <= 19);
 #endif
 
 /* Latest version of the algorithm, with all its classes, can be found at
@@ -250,11 +250,19 @@ static_assert(U_GCB_LV == 6);
 static_assert(U_GCB_LVT == 7);
 static_assert(U_GCB_T == 8);
 static_assert(U_GCB_V == 9);
-#if ICU_VERSION_MAJOR_NUM > 3
+#if ICU_VERSION_MAJOR_NUM > 3 || defined(U_ICU_VERSION_MAJOR_NUM)
 static_assert(U_GCB_SPACING_MARK == 10);
 static_assert(U_GCB_PREPEND == 11);
-#if ICU_VERSION_MAJOR_NUM > 4
+#if ICU_VERSION_MAJOR_NUM > 4 || defined(U_ICU_VERSION_MAJOR_NUM)
 static_assert(U_GCB_REGIONAL_INDICATOR == 12);
+#if U_ICU_VERSION_MAJOR_NUM > 57
+static_assert(U_GCB_E_BASE == 13);
+static_assert(U_GCB_E_BASE_GAZ == 14);
+static_assert(U_GCB_E_MODIFIER == 15);
+static_assert(U_GCB_GLUE_AFTER_ZWJ == 16);
+static_assert(U_GCB_ZWJ == 17);
+static_assert(U_GCB_COUNT == 18);
+#endif
 #endif
 #endif
 
@@ -389,7 +397,7 @@ static void addUCS4ToUTF16Buffer(UTF16Buffer *buffer, UChar32 c) {
 void decomposeChar(CharData *c) {
 	UErrorCode error = U_ZERO_ERROR;
 	size_t requiredLength;
-	requiredLength = unorm_normalize(c->UTF8Char.original.data, c->UTF8Char.original.used, option.decomposition, 0,
+	requiredLength = unorm2_normalize(option.decomposition, c->UTF8Char.original.data, c->UTF8Char.original.used,
 		c->UTF8Char.converted.data, c->UTF8Char.converted.allocated, &error);
 
 	if (requiredLength > c->UTF8Char.converted.allocated) {
@@ -397,7 +405,7 @@ void decomposeChar(CharData *c) {
 		error = U_ZERO_ERROR;
 
 		VECTOR_ALLOCATE(c->UTF8Char.converted, requiredLength * sizeof(UChar));
-		requiredLength = unorm_normalize(c->UTF8Char.original.data, c->UTF8Char.original.used, option.decomposition, 0,
+		requiredLength = unorm2_normalize(option.decomposition, c->UTF8Char.original.data, c->UTF8Char.original.used,
 			c->UTF8Char.converted.data, c->UTF8Char.converted.allocated, &error);
 	}
 	ASSERT(U_SUCCESS(error));
