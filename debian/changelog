@@ -1,3 +1,13 @@
+dwdiff (2.1.2-1) unstable; urgency=medium
+
+  * New upstream version
+    - which uses pkg-config instead of icu-config (closes: #916119)
+  * Bump policy
+  * Debian patches upstreamed; remove
+  * Add build dependency on pkg-config
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Mon, 10 Dec 2018 19:21:45 +0000
+
 dwdiff (2.1.1-3) unstable; urgency=medium
 
   [ Helmut Grohne ]
