@@ -21,7 +21,7 @@ N_("-h, --help                             Print this help message\n"),
 N_("-v, --version                          Print version and copyright information\n"),
 
 /* Options changing what is considered (non-)whitespace */
-N_("-d <delim>, --delimiters=<delim>       Specifiy delimiters\n"),
+N_("-d <delim>, --delimiters=<delim>       Specify delimiters\n"),
 N_("-P, --punctuation                      Use punctuation characters as delimiters\n"),
 N_("-W <ws>, --white-space=<ws>            Specify whitespace characters\n"),
 #ifdef DWDIFF_COMPILE
@@ -45,7 +45,7 @@ N_("-I, --ignore-formatting                Ignore formatting differences\n"),
 /* TRANSLATORS:
    The context meant here are words preceeding and succeeding each word in
    the text. By using these extra context words when applying the diff program,
-   frequently occuring words will be more likely to be matched to the
+   frequently occurring words will be more likely to be matched to the
    correct corresponding word in the other text, thus giving a better result. */
 N_("-m <num>, --match-context=<num>        Use <num> words of context for matching\n"),
 /* TRANSLATORS:

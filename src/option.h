@@ -40,7 +40,7 @@ struct {
 	CharList delimiterList;
 	CharList whitespaceList;
 	uint32_t punctuationMask;
-	UNormalizationMode decomposition;
+	const UNormalizer2 * decomposition;
 #endif
 	bool whitespaceSet;
 	bool printDeleted,

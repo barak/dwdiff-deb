@@ -468,7 +468,8 @@ static void initializeOptions(void) {
 	option.output = stdout;
 
 	initOptions();
-	ONLY_UNICODE(option.decomposition = UNORM_NFD;)
+  UErrorCode error = U_ZERO_ERROR;
+	ONLY_UNICODE(option.decomposition = unorm2_getNFDInstance(&error);)
 
 	option.needStartStop = true;
 
@@ -582,8 +583,9 @@ static PARSE_FUNCTION(parseArgs)
 		END_OPTION
 #ifdef USE_UNICODE
 		OPTION('I', "ignore-formatting", NO_ARG)
+      UErrorCode error = U_ZERO_ERROR;
 			if (UTF8Mode)
-				option.decomposition = UNORM_NFKD;
+				option.decomposition = unorm2_getNFKDInstance(&error);
 			else
 				fatal(_("Option %.*s is only supported for UTF-8 mode\n"), OPTPRARG);
 #else

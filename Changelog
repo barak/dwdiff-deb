@@ -1,3 +1,8 @@
+Version 2.1.2:
+    New features:
+    - Brought up-to-date with newer ICU, including move to pkg-config instead of
+      icu-config.
+
 Version 2.1.1:
     New features:
     - The --diff-input option now also has short option name -u.
@@ -174,7 +179,7 @@ Version 1.5.1:
 Version 1.5:
     New features:
     - added match context which ensures better results for large edits with
-      frequently occuring words
+      frequently occurring words
 
 Version 1.4:
     New features:

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-16 09:35+0200\n"
+"POT-Creation-Date: 2018-12-10 19:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -84,12 +84,12 @@ msgid ""
 "Licensed under the GNU General Public License version 3\n"
 msgstr ""
 
-#: dwfilter.c:113 option.c:733 option.c:770
+#: dwfilter.c:113 option.c:735 option.c:772
 #, c-format
 msgid "Option %.*s does not exist\n"
 msgstr ""
 
-#: dwfilter.c:130 option.c:806
+#: dwfilter.c:130 option.c:808
 msgid "Need two files to compare\n"
 msgstr ""
 
@@ -147,7 +147,7 @@ msgid ""
 msgstr ""
 
 #: optionDescriptions.h:24
-msgid "-d <delim>, --delimiters=<delim>       Specifiy delimiters\n"
+msgid "-d <delim>, --delimiters=<delim>       Specify delimiters\n"
 msgstr ""
 
 #: optionDescriptions.h:25
@@ -214,7 +214,7 @@ msgstr ""
 #. TRANSLATORS:
 #. The context meant here are words preceeding and succeeding each word in
 #. the text. By using these extra context words when applying the diff program,
-#. frequently occuring words will be more likely to be matched to the
+#. frequently occurring words will be more likely to be matched to the
 #. correct corresponding word in the other text, thus giving a better result.
 #: optionDescriptions.h:50
 msgid ""
@@ -389,7 +389,7 @@ msgstr ""
 msgid "Whitespace and delimiter sets overlap\n"
 msgstr ""
 
-#: option.c:421 option.c:682
+#: option.c:421 option.c:684
 #, c-format
 msgid "Invalid color specification %s\n"
 msgstr ""
@@ -404,7 +404,7 @@ msgstr ""
 msgid "Invalid background color %s\n"
 msgstr ""
 
-#: option.c:540 option_stripped.inc:10
+#: option.c:541 option_stripped.inc:10
 #, c-format
 msgid "Usage: dwdiff [OPTIONS] <OLD FILE> <NEW FILE>\n"
 msgstr ""
@@ -413,56 +413,56 @@ msgstr ""
 #. - If the (C) symbol (that is the c in a circle) is not available,
 #. leave as it as is. (Unicode code point 0x00A9)
 #. - G.P. Halkes is name and should be left as is.
-#: option.c:553
+#: option.c:554
 msgid ""
 "Copyright (C) 2006-2015 G.P. Halkes and others\n"
 "Licensed under the GNU General Public License version 3\n"
 msgstr ""
 
-#: option.c:588
+#: option.c:590
 #, c-format
 msgid "Option %.*s is only supported for UTF-8 mode\n"
 msgstr ""
 
-#: option.c:591
+#: option.c:593
 #, c-format
 msgid "Support for option %.*s is not compiled into this version of dwdiff\n"
 msgstr ""
 
-#: option.c:600 option.c:622 option.c:641
+#: option.c:602 option.c:624 option.c:643
 #, c-format
 msgid "Option %.*s is not supported\n"
 msgstr ""
 
-#: option.c:650
+#: option.c:652
 msgid "Can't read both files from standard input\n"
 msgstr ""
 
-#: option.c:654 option.c:780
+#: option.c:656 option.c:782
 msgid "Too many files to compare\n"
 msgstr ""
 
 #. TRANSLATORS:
 #. "Name" and "Description" are table headings for the color name list.
 #. Make sure you keep the alignment of the headings over the text.
-#: option.c:671
+#: option.c:673
 msgid "Name            Description\n"
 msgstr ""
 
-#: option.c:676
+#: option.c:678
 msgid "The colors black through gray are also usable as background color\n"
 msgstr ""
 
-#: option.c:729
+#: option.c:731
 #, c-format
 msgid "Error opening temporary output file: %s\n"
 msgstr ""
 
-#: option.c:756
+#: option.c:758
 msgid "Invalid algorithm name\n"
 msgstr ""
 
-#: option.c:801
+#: option.c:803
 msgid "Only one input file accepted with --diff-input\n"
 msgstr ""
 

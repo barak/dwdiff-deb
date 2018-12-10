@@ -104,6 +104,7 @@ $1=$2"
 }
 
 insert() {
+	echo "/^$1/d"
 	[ -n "$2" ] && echo "/^\\.POSIX:/a\\
 $1=$2"
 }
@@ -148,7 +149,7 @@ create_makefile() {
 		check_message_result "Creating ${MAKEFILE}"
 		cat ${MAKEFILE}.in | sed -f .sedscript > ${MAKEFILE}
 	done
-	clean .sedscript .Makefile .foo .config_base
+	clean .Makefile .Makefile.in .sedscript .foo .config_base
 	for EXT in ${EXTENSIONS}
 	do
 		clean_${EXT}
@@ -224,7 +225,7 @@ EOF
 }
 
 sed_rules_c() {
-	replace_default CFLAGS "${CFLAGS}"
+	insert CFLAGS "${CFLAGS}"
 	[ -n "${CC}" ] && insert CC "${CC}"
 }
 
@@ -512,7 +513,7 @@ fi
 echo "Configuration test log created at `date`" > config.log
 echo "-- configure called with $0 $@" >> config.log
 
-clean config.log .Makefile .sedscript .config_base
+clean config.log .Makefile .Makefile.in .sedscript .foo .config_base
 for EXT in ${EXTENSIONS}
 do
 	clean_${EXT}
@@ -565,8 +566,8 @@ for EXT in ${EXTENSIONS}
 do
 	basic_test_${EXT}
 	sed_rules_${EXT} >> .sedscript
+	sed -f .sedscript .Makefile.in > .Makefile
 done
-sed -f .sedscript .Makefile.in > .Makefile
 
 config
 error "Error in config.pkg. Cannot continue."

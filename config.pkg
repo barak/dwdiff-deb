@@ -14,7 +14,6 @@
 EXTENSIONS="c verbose_compile gettext"
 
 SWITCHES="+unicode +dwfilter"
-OPTIONS="icu-config"
 
 COMPILERULE='$(CC) $(CFLAGS) $(GETTEXTFLAGS) $(ICUFLAGS) -c -o $@ $<'
 LINKRULE='$(CC) $(CFLAGS) $(LDFLAGS) -o .config .config.o $(LDLIBS) $(GETTEXTLIBS) $(ICULIBS)'
@@ -23,7 +22,6 @@ DEFAULT_LINGUAS="de es fr nl"
 [ -f config.pkg.langpack ] && . config.pkg.langpack
 
 USER_HELP="  --without-unicode  Disable Unicode support
-  --icu-config=<path>  Path to icu-config script
 
 Environment variables:
   LINGUAS            List of languages to install. Available languages are:
@@ -127,19 +125,11 @@ EOF
 	fi
 
 	if [ "yes" = "${with_unicode}" ] ; then
-		ICU_CONFIG="${option_icu_config:-icu-config}"
 		{
+      check_message "Checking for ICU pkg-config... "
 			{
-				check_message "Checking for icu-config... "
-				echo "Running which ${ICU_CONFIG} >/dev/null" >> config.log
-				if not which "${ICU_CONFIG}" >/dev/null ; then
-					check_message_result "no"
-					check_message_result "!! Could not find icu-config. Ensure that you have installed the development files for libicu, or try configuring with --without-unicode"
-					exit 1
-				fi
-
-				echo "Running ${ICU_CONFIG} --cppflags --ldflags" >> config.log
-				if "${ICU_CONFIG}" --cppflags --ldflags 2>&1 > /dev/null ; then
+				echo "Running pkg-config --cflags --libs icu-uc" >> config.log
+				if pkg-config --cflags --libs icu-uc 2>&1 > /dev/null ; then
 					check_message_result "yes"
 					true
 				else
@@ -147,22 +137,9 @@ EOF
 					false
 				fi
 			} && {
-				check_message "Checking ICU version >= 3.4... "
-				echo "Running ${ICU_CONFIG} --version" >> config.log
-				ICUVERSION="`\"${ICU_CONFIG}\" --version`"
-				ICUMAJOR="`echo \"${ICUVERSION}\" | sed 's/\..*//'`"
-				ICUMINOR="`echo \"${ICUVERSION}\" | sed -e 's/^[^.]*\.//' -e 's/[^0-9]*$//'`"
-				if expr 3 \< "${ICUMAJOR}" \| \( 3 = "${ICUMAJOR}" \& 4 \<= "${ICUMINOR}" \) >/dev/null ; then
-					check_message_result "yes (${ICUVERSION})"
-					true
-				else
-					check_message_result "no (${ICUVERSION})"
-					false
-				fi
-			} && {
 				cat > .config.c <<EOF
 #include <unicode/uchar.h>
-#include <unicode/unorm.h>
+#include <unicode/unorm2.h>
 #include <unicode/ustring.h>
 
 int main(int argc, char *argv[]) {
@@ -173,21 +150,21 @@ int main(int argc, char *argv[]) {
 	u_isUWhiteSpace(c);
 	U_GET_GC_MASK(c);
 	u_strFoldCase(a, 10, b, 10, U_FOLD_CASE_DEFAULT, &error);
-	unorm_normalize(a, 10, UNORM_NFKD, 0, b, 10, &error);
+	unorm2_normalize(unorm2_getNFDInstance(&error), a, 10, b, 10, &error);
 	u_getIntPropertyValue(c, UCHAR_GRAPHEME_CLUSTER_BREAK);
 	return 0;
 }
 EOF
 				clean .config.o
-				test_link "functions in libicu" ICUFLAGS="\`\"${ICU_CONFIG}\" --cppflags\`" ICULIBS="\`\"${ICU_CONFIG}\" --ldflags\`"
+				test_link "functions in libicu" ICUFLAGS="\`pkg-config --cflags icu-uc\`" ICULIBS="\`pkg-config --libs icu-uc\`"
 			}
 		} || {
 			check_message_result "!! Could not compile with Unicode support. Try configuring with --without-unicode."
 			exit 1
 		}
 
-		ICUFLAGS="-DUSE_UNICODE \`\"${ICU_CONFIG}\" --cppflags\`"
-		ICULIBS="\`\"${ICU_CONFIG}\" --ldflags\`"
+		ICUFLAGS="-DUSE_UNICODE \`pkg-config --cflags icu-uc\`"
+		ICULIBS="\`pkg-config --libs icu-uc\`"
 		if checkfunction "nl_langinfo" "nl_langinfo(CODESET);" "<langinfo.h>" ; then
 			ICUFLAGS="${ICUFLAGS} -DUSE_NL_LANGINFO"
 		fi

@@ -1,7 +1,0 @@
-*.o
-/.Makefile.in
-/Makefile
-/config.log
-/dwdiff
-/dwfilter
-/po/*.mo
