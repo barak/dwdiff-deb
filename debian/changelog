@@ -1,9 +1,15 @@
-dwdiff (2.1.2-1.1) UNRELEASED; urgency=medium
+dwdiff (2.1.2-2) unstable; urgency=medium
 
-  * Non-maintainer upload.
-  * Fix FTCBFS: Use a triplet-prefixed pkg-config. (Closes: #-1)
+  [ Helmut Grohne ]
+  * Fix FTCBFS: Use a triplet-prefixed pkg-config. (Closes: #922408)
 
- -- Helmut Grohne <helmut@subdivi.de>  Fri, 15 Feb 2019 15:49:38 +0100
+  [ Barak A. Pearlmutter ]
+  * Accept patch
+  * Tell gbp the upstream tarball is .xz
+  * Bump policy version
+  * Bump to debhelper 12
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Fri, 15 Feb 2019 20:53:28 +0000
 
 dwdiff (2.1.2-1) unstable; urgency=medium
 
@@ -155,4 +161,3 @@ dwdiff (1.4-1) unstable; urgency=low
   * Initial release (Closes: #498270)
 
  -- Olexandr Kravchuk <sashko.debian@gmail.com>  Sat, 06 Sep 2008 20:34:47 +0300
-
