@@ -24,6 +24,7 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
 -include /usr/share/dpkg/buildtools.mk
 export CC
+export PKG_CONFIG ?= pkg-config
 export CFLAGS = \
  $(shell dpkg-buildflags --get CFLAGS) \
  $(shell dpkg-buildflags --get CPPFLAGS)
