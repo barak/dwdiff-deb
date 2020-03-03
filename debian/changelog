@@ -1,3 +1,10 @@
+dwdiff (2.1.2-3) UNRELEASED; urgency=medium
+
+  * debian/copyright: use spaces rather than tabs to start continuation
+    lines.
+
+ -- Debian Janitor <janitor@jelmer.uk>  Tue, 03 Mar 2020 10:44:00 +0000
+
 dwdiff (2.1.2-2) unstable; urgency=medium
 
   [ Helmut Grohne ]

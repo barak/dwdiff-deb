@@ -4,13 +4,13 @@ Source: http://os.ghalkes.nl/dwdiff.html
 
 Files: *
 Copyright: 2008-2015 Gertjan Halkes <dwdiff@ghalkes.nl>
-	   2006-2011, 2015 G.P. Halkes
+           2006-2011, 2015 G.P. Halkes
 License: GPL-3+
 
 Files: debian/*
 Copyright: 2008 Olexandr Kravchuk <sashko.debian@gmail.com>
-	   2010 Clint Adams <clint@gnu.org>
-	   2011-2015 Barak A. Pearlmutter <bap@debian.org>
+           2010 Clint Adams <clint@gnu.org>
+           2011-2015 Barak A. Pearlmutter <bap@debian.org>
 License: GPL-3+
 
 License: GPL-3+
