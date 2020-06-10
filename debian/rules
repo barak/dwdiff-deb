@@ -37,6 +37,8 @@ override_dh_auto_build:
 
 override_dh_auto_install:
 	dh_auto_install -- LINGUAS="$(LINGUAS)" docdir='$$(prefix)/share/doc/dwdiff'
+
+execute_after_dh_auto_install:
 	echo "Work around Makefile installing Changelog and COPYING into docdir."
 	-rm --verbose debian/dwdiff/usr/share/doc/dwdiff/Changelog
 	-rm --verbose debian/dwdiff/usr/share/doc/dwdiff/COPYING
