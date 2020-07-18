@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-10 19:25+0100\n"
+"POT-Creation-Date: 2020-07-18 08:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,7 +23,7 @@ msgid "Program-logic error at %s:%d\n"
 msgstr ""
 
 #: doDiff.c:178 doDiff.c:226 doDiff.c:254 doDiff.c:276 doDiff.c:335
-#: doDiff.c:506
+#: doDiff.c:507
 msgid "Error reading back input\n"
 msgstr ""
 
@@ -84,12 +84,12 @@ msgid ""
 "Licensed under the GNU General Public License version 3\n"
 msgstr ""
 
-#: dwfilter.c:113 option.c:735 option.c:772
+#: dwfilter.c:113 option.c:737 option.c:774
 #, c-format
 msgid "Option %.*s does not exist\n"
 msgstr ""
 
-#: dwfilter.c:130 option.c:808
+#: dwfilter.c:130 option.c:810
 msgid "Need two files to compare\n"
 msgstr ""
 
@@ -287,78 +287,78 @@ msgstr ""
 msgid "--no-profile                           Disable profile reading\n"
 msgstr ""
 
-#: option.c:39
+#: option.c:41
 msgid "Black"
 msgstr ""
 
-#: option.c:40
+#: option.c:42
 msgid "Red"
 msgstr ""
 
-#: option.c:41
+#: option.c:43
 msgid "Green"
 msgstr ""
 
-#: option.c:42
+#: option.c:44
 msgid "Brown"
 msgstr ""
 
-#: option.c:43
+#: option.c:45
 msgid "Blue"
 msgstr ""
 
-#: option.c:44
+#: option.c:46
 msgid "Magenta"
 msgstr ""
 
-#: option.c:45
+#: option.c:47
 msgid "Cyan"
 msgstr ""
 
-#: option.c:46
+#: option.c:48
 msgid "Gray"
 msgstr ""
 
-#: option.c:47
+#: option.c:49
 msgid "Dark gray"
 msgstr ""
 
-#: option.c:48
+#: option.c:50
 msgid "Bright red"
 msgstr ""
 
-#: option.c:49
+#: option.c:51
 msgid "Bright green"
 msgstr ""
 
-#: option.c:50
+#: option.c:52
 msgid "Yellow"
 msgstr ""
 
-#: option.c:51
+#: option.c:53
 msgid "Bright blue"
 msgstr ""
 
-#: option.c:52
+#: option.c:54
 msgid "Bright magenta"
 msgstr ""
 
-#: option.c:53
+#: option.c:55
 msgid "Bright cyan"
 msgstr ""
 
-#: option.c:54
+#: option.c:56
 msgid "White"
 msgstr ""
 
-#: option.c:89
+#: option.c:91
 #, c-format
 msgid "Single backslash at end of %s argument\n"
 msgstr ""
 
 #. TRANSLATORS:
 #. The %s argument is a long option name without preceding dashes.
-#: option.c:141 option.c:148
+#: option.c:143 option.c:150
 #, c-format
 msgid "Invalid hexadecimal escape sequence in %s argument\n"
 msgstr ""
@@ -366,45 +366,45 @@ msgstr ""
 #. TRANSLATORS:
 #. The %c argument will be either 'u' or 'U'. The %s argument is a long
 #. option name without preceding dashes.
-#: option.c:182 option.c:188
+#: option.c:184 option.c:190
 #, c-format
 msgid "Too short \\%c escape in %s argument\n"
 msgstr ""
 
 #. TRANSLATORS:
 #. The %s argument is a long option name without preceding dashes.
-#: option.c:199
+#: option.c:201
 #, c-format
 msgid "\\U escape out of range in %s argument\n"
 msgstr ""
 
 #. TRANSLATORS:
 #. The %s argument is a long option name without preceding dashes.
-#: option.c:204
+#: option.c:206
 #, c-format
 msgid "\\%c escapes for surrogate codepoints are not allowed in %s argument\n"
 msgstr ""
 
-#: option.c:274 option.c:363 option.c:371
+#: option.c:276 option.c:365 option.c:373
 msgid "Whitespace and delimiter sets overlap\n"
 msgstr ""
 
-#: option.c:421 option.c:684
+#: option.c:423 option.c:686
 #, c-format
 msgid "Invalid color specification %s\n"
 msgstr ""
 
-#: option.c:434
+#: option.c:436
 #, c-format
 msgid "Invalid color %s\n"
 msgstr ""
 
-#: option.c:446
+#: option.c:448
 #, c-format
 msgid "Invalid background color %s\n"
 msgstr ""
 
-#: option.c:541 option_stripped.inc:10
+#: option.c:543 option_stripped.inc:10
 #, c-format
 msgid "Usage: dwdiff [OPTIONS] <OLD FILE> <NEW FILE>\n"
 msgstr ""
@@ -413,56 +413,56 @@ msgstr ""
 #. - If the (C) symbol (that is the c in a circle) is not available,
 #. leave as it as is. (Unicode code point 0x00A9)
 #. - G.P. Halkes is name and should be left as is.
-#: option.c:554
+#: option.c:556
 msgid ""
 "Copyright (C) 2006-2015 G.P. Halkes and others\n"
 "Licensed under the GNU General Public License version 3\n"
 msgstr ""
 
-#: option.c:590
+#: option.c:592
 #, c-format
 msgid "Option %.*s is only supported for UTF-8 mode\n"
 msgstr ""
 
-#: option.c:593
+#: option.c:595
 #, c-format
 msgid "Support for option %.*s is not compiled into this version of dwdiff\n"
 msgstr ""
 
-#: option.c:602 option.c:624 option.c:643
+#: option.c:604 option.c:626 option.c:645
 #, c-format
 msgid "Option %.*s is not supported\n"
 msgstr ""
 
-#: option.c:652
+#: option.c:654
 msgid "Can't read both files from standard input\n"
 msgstr ""
 
-#: option.c:656 option.c:782
+#: option.c:658 option.c:784
 msgid "Too many files to compare\n"
 msgstr ""
 
 #. TRANSLATORS:
 #. "Name" and "Description" are table headings for the color name list.
 #. Make sure you keep the alignment of the headings over the text.
-#: option.c:673
+#: option.c:675
 msgid "Name            Description\n"
 msgstr ""
 
-#: option.c:678
+#: option.c:680
 msgid "The colors black through gray are also usable as background color\n"
 msgstr ""
 
-#: option.c:731
+#: option.c:733
 #, c-format
 msgid "Error opening temporary output file: %s\n"
 msgstr ""
 
-#: option.c:758
+#: option.c:760
 msgid "Invalid algorithm name\n"
 msgstr ""
 
-#: option.c:803
+#: option.c:805
 msgid "Only one input file accepted with --diff-input\n"
 msgstr ""
 

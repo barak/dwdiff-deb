@@ -28,6 +28,8 @@
 #define DWDIFF_COMPILE
 #include "optionDescriptions.h"
 
+option_t option;
+
 typedef struct {
 	const char *name;
 	const char *description;
