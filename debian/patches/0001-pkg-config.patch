@@ -1,6 +1,17 @@
---- dwdiff-2.1.2.orig/config.pkg
-+++ dwdiff-2.1.2/config.pkg
-@@ -125,11 +125,12 @@
+From: Helmut Grohne <helmut@subdivi.de>
+Date: Fri, 15 Feb 2019 15:49:38 +0100
+Subject: pkg-config
+
+Use a triplet-prefixed pkg-config.
+---
+ config.pkg | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/config.pkg b/config.pkg
+index 3f20cc5..efaeba2 100644
+--- a/config.pkg
++++ b/config.pkg
+@@ -125,11 +125,12 @@ EOF
  	fi
  
  	if [ "yes" = "${with_unicode}" ] ; then
@@ -15,7 +26,7 @@
  					check_message_result "yes"
  					true
  				else
-@@ -156,15 +157,15 @@
+@@ -156,15 +157,15 @@ int main(int argc, char *argv[]) {
  }
  EOF
  				clean .config.o
