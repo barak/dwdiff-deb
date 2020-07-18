@@ -1,2 +1,2 @@
 version=3
-http://os.ghalkes.nl/dist/dwdiff-([\d\.]*)\.(?:zip|tgz|tbz2|txz|tar\.(?:gz|bz2|xz))
+https://os.ghalkes.nl/dist/dwdiff-([\d\.]*)\.(?:zip|tgz|tbz2|txz|tar\.(?:gz|bz2|xz))

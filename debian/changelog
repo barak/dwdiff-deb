@@ -1,9 +1,13 @@
 dwdiff (2.1.2-3) UNRELEASED; urgency=medium
 
+  [ Debian Janitor ]
   * debian/copyright: use spaces rather than tabs to start continuation
     lines.
   * Use secure URI in Homepage field.
   * Update standards version to 4.4.1, no changes needed.
+
+  [ Barak A. Pearlmutter ]
+  * Use secure URI in debian/watch.
 
  -- Debian Janitor <janitor@jelmer.uk>  Tue, 03 Mar 2020 10:44:00 +0000
 
