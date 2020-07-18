@@ -1,3 +1,8 @@
+Version 2.1.3:
+    Bug fixes:
+    - Fixed compilation problems on GCC 10, due to multiple definition of the
+      same variable.
+
 Version 2.1.2:
     New features:
     - Brought up-to-date with newer ICU, including move to pkg-config instead of

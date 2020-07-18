@@ -17,7 +17,7 @@
 
 #define DEFAULT_LINENUMBER_WIDTH 4
 #define BITMASK_SIZE (UCHAR_MAX+7)/8
-struct {
+typedef struct {
 	InputFile oldFile,
 		newFile;
 	const char *delStart,
@@ -68,7 +68,9 @@ struct {
 	bool dwfilterMode;
 	bool repeatMarkers;
 	bool diffInput;
-} option;
+} option_t;
+
+extern option_t option;
 
 void parseCmdLine(int argc, char *argv[]);
 

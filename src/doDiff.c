@@ -368,6 +368,7 @@ static void handleNextToken(TempFile *file, bool print, Mode mode) {
 				   OLD_COMMON the line counter is not incremented. */
 				case COMMON:
 					oldLineNumber++;
+          /* FALLTHROUGH */
 				case ADD:
 					newLineNumber++;
 					break;

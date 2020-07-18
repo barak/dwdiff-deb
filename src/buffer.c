@@ -75,6 +75,7 @@ void addchar(char c, bool common) {
 			   buffers after the current one, then print all buffers before the current. */
 			case BUFFERING:
 				ignore = fwrite("--\n", 1, 3, option.output);
+        /* FALLTHROUGH */
 			case BUFFERING_INITIAL:
 				for (i = bufferIndex + 1; i <= option.contextLines; i++)
 					ignore = fwrite(contextBuffers[i].data, 1, contextBuffers[i].used, option.output);

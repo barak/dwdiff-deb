@@ -160,7 +160,7 @@ create_makefile() {
 #==============================
 # Setup
 #==============================
-unset LINKRULE COMPILERULE USERRULES USERHELP EXTENSIONS SWITCHES PRECHECKFUNC INSTALLDIRS DUMP_LOG
+unset LINKRULE COMPILERULE USERRULES USERHELP EXTENSIONS SWITCHES PRECHECKFUNC INSTALLDIRS DUMP_LOG HOST_PREFIX
 
 . ./config.pkg
 
@@ -172,6 +172,7 @@ done
 
 #@INCLUDE_START
 [ "${EXTENSIONS}" = "c verbose_compile gettext" ] || error "EXTENSIONS changed after running merge_config. Run merge_config again."
+SWITCHES="${SWITCHES} +c99"
 SUFFIXES="${SUFFIXES} .c .o"
 [ -z "${LINKRULE}" ] && LINKRULE='$(CC) $(CFLAGS) $(LDFLAGS) -o $@ .config.o $(LDLIBS) $(TESTLIBS)'
 [ -z "${COMPILERULE}" ] && COMPILERULE='$(CC) $(CFLAGS) $(TESTFLAGS) -c -o $@ $<'
@@ -224,6 +225,27 @@ EOF
 	test_link "working C compiler (${CC-${MAKE} default})" || error "No working C compiler found. See config.log for errors."
 }
 
+has_support_c99() {
+	if [ "no" = "${with_c99}" ] ; then
+		return
+	fi
+	clean_c
+	cat > .config.c <<EOF
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#error Not a C99 compiler
+#endif
+int main(int argc, char *argv[]) {
+	return 0;
+}
+EOF
+	if test_link "C99 support in ${CC} as default" ; then
+		C99=1
+	elif test_link "C99 support in ${CC} with -std=c99" CFLAGS="$CFLAGS -std=c99" ; then
+		CFLAGS="${CFLAGS} -std=c99"
+		C99=1
+	fi
+}
+
 sed_rules_c() {
 	insert CFLAGS "${CFLAGS}"
 	[ -n "${CC}" ] && insert CC "${CC}"
@@ -234,7 +256,7 @@ test_compile() {
 	check_message "Checking for $1... "
 	shift
 
-	if test_make "$@" .config.o >> config.log 2>&1 ; then
+	if test_make "CFLAGS=$CFLAGS" "$@" .config.o >> config.log 2>&1 ; then
 		check_message_result "yes"
 		true
 	else
@@ -250,7 +272,7 @@ test_link() {
 	check_message "Checking for $1... "
 	shift
 
-	if test_make "$@" .config >> config.log 2>&1 ; then
+	if test_make "CFLAGS=$CFLAGS" "$@" .config >> config.log 2>&1 ; then
 		check_message_result "yes"
 		true
 	else
@@ -452,6 +474,25 @@ EOF
 		--prefix=*)
 			PREFIX="${PARAM#--prefix=}"
 		;;
+		--host=*)
+			HOST_PREFIX="${PARAM#--host=}"
+			[ -z "${LIBTOOL}" ] && LIBTOOL="${HOST_PREFIX}-libtool"
+			if which "${LIBTOOL}" > /dev/null && echo "${EXTENSIONS}" | grep "libtool" > /dev/null
+			then
+				[ -z "${CC}" ] && CC="`"${LIBTOOL}" --config | grep '^CC' | tail -n1 | sed 's/.*"\([^"]\+\)".*/\1/'`"
+				[ -z "${CXX}" ] && CXX="`"${LIBTOOL}" --tag=CXX --config | grep '^CC' | tail -n1 | sed 's/.*"\([^"]\+\)".*/\1/'`"
+			else
+				[ -z "${CC}" ] && CC="${HOST_PREFIX}-gcc"
+				[ -z "${CXX}" ] && CXX="${HOST_PREFIX}-g++"
+			fi
+			[ -z "${PKG_CONFIG}" ] && PKG_CONFIG="${HOST_PREFIX}-pkg-config"
+
+			echo "INFO: cross compiling using the following settings:"
+			echo "  CC=$CC"
+			echo "  CXX=$CXX"
+			echo "  LIBTOOL=$LIBTOOL"
+			echo "  PKG_CONFIG=$PKG_CONFIG"
+		;;
 		--dump-log)
 			DUMP_LOG=1
 		;;
@@ -501,6 +542,15 @@ EOF
 			error "Error on commandline: ${PARAM}"
 		;;
 	esac
+done
+
+# Remove trailing slashes from the prefix. These are superfluous and get in
+# the way of testing.
+STRIPPED_PREFIX="${PREFIX%/}"
+while [ "${PREFIX}" != "${STRIPPED_PREFIX}" ]
+do
+	PREFIX="${STRIPPED_PREFIX}"
+	STRIPPED_PREFIX="${PREFIX%/}"
 done
 
 if [ -n "${INSTALL}" ] ; then
