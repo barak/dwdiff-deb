@@ -1,2 +1,2 @@
-version=3
-https://os.ghalkes.nl/dist/dwdiff-([\d\.]*)\.(?:zip|tgz|tbz2|txz|tar\.(?:gz|bz2|xz))
+version=4
+https://os.ghalkes.nl/dist/@PACKAGE@-?@ANY_VERSION@@ARCHIVE_EXT@
