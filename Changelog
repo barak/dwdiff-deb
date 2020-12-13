@@ -1,3 +1,8 @@
+Version 2.1.4:
+    Bug fixes:
+    - Fixed compilation problems on C99 compilers due to checking incorrect value
+      of the __STDC_VERSION__ macro.
+
 Version 2.1.3:
     Bug fixes:
     - Fixed compilation problems on GCC 10, due to multiple definition of the

@@ -54,7 +54,7 @@ DWFILTER=yes
 
 # Miscelaneous install paths
 bindir=$(prefix)/bin
-docdir=$(prefix)/share/doc/dwdiff-2.1.3
+docdir=$(prefix)/share/doc/dwdiff-2.1.4
 mandir=$(prefix)/share/man
 
 all: dwdiff $(DWFILTER:yes=dwfilter) linguas
