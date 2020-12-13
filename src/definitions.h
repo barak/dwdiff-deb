@@ -43,11 +43,11 @@
 
 /*==== Misc definitions ====*/
 /* Define a bool type if not already defined (C++ and C99 do)*/
-#if !(defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 19990601L))
+#if !(defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L))
 /*@-incondefs@*/
 typedef enum {false, true} bool;
 /*@+incondefs@*/
-#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 19990601L
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
 #endif
 
@@ -56,7 +56,7 @@ typedef enum {false, true} bool;
 #define strdupA strdup
 #endif
 
-#define VERSION_STRING "2.1.3"
+#define VERSION_STRING "2.1.4"
 
 typedef struct CharData CharData;
 
